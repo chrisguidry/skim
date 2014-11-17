@@ -66,24 +66,17 @@ def save_feed(feed_url, feed):
         feed_file.write(feed.get('subtitle', '') + '\n')
 
 def save_entry(feed_url, feed, entry):
-    entry_key = '{}|{}'.format(feed_url, entry_url(feed_url, entry)).encode('utf-8')
-    with dbm.open(url_index_file(feed_url), 'c') as url_index:
-        if entry_key in url_index:
-            return
+    filename = entry_filename(feed_url, entry)
+    with open(filename, 'w') as entry_file:
+        entry_file.write((entry.get('title') or '[untitled]') + '\n')
+        entry_file.write(entry.get('link', '') + '\n')
+        entry_file.write('\n')
+        text = entry_text(entry)
+        entry_file.write(text)
 
-        filename = entry_filename(feed_url, entry)
-        with open(filename, 'w') as entry_file:
-            entry_file.write((entry.get('title') or '[untitled]') + '\n')
-            entry_file.write(entry.get('link', '') + '\n')
-            entry_file.write('\n')
-            text = entry_text(entry)
-            entry_file.write(text)
-
-        os.utime(filename,
-                 times=(time.mktime(time.gmtime()),
-                        time.mktime(entry_time(entry).utctimetuple())))
-
-        url_index[entry_key] = '1'
+    os.utime(filename,
+             times=(time.mktime(time.gmtime()),
+                    time.mktime(entry_time(entry).utctimetuple())))
 
 def entry_url(feed_url, entry):
     return entry.get('link') or '{}#{}'.format(feed_url, entry_time(entry).isoformat())
@@ -127,9 +120,20 @@ def crawler(feed_url, indexing_queue):
 
         save_feed(feed_url, parsed.feed)
 
-        for entry in parsed.entries:
-            save_entry(feed_url, parsed.feed, entry)
-            indexing_queue.put((feed_url, parsed.feed, entry), block=True)
+        with dbm.open(url_index_file(feed_url), 'c') as url_index:
+            for entry in parsed.entries:
+                new_entry_url = entry_url(feed_url, entry)
+                entry_key = new_entry_url.encode('utf-8')
+                if entry_key in url_index:
+                    logger.info('%s has already been seen on %s', new_entry_url, feed_url)
+                    continue
+
+                logger.info('New entry %s on %s', new_entry_url, feed_url)
+
+                save_entry(feed_url, parsed.feed, entry)
+                indexing_queue.put((feed_url, parsed.feed, entry), block=True)
+
+                url_index[entry_key] = '1'
 
         save_conditional_get_state(feed_url, parsed.get('etag'), parsed.get('modified'))
     except Exception:
@@ -155,9 +159,11 @@ def indexer(indexing_queue):
 
         indexed += 1
         if indexed % 100 == 0:
+            logger.info('Committing index...')
             writer.commit()
             writer = index.writer()
 
+    logger.info('Final index commit.')
     writer.commit()
 
 def main():

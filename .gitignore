@@ -1,6 +1,7 @@
 __pycache__
 .environment
-skim/configuration.py
+.tox
+configuration.py
 skim.egg-info
 dist
 storage

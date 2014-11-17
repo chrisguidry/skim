@@ -7,13 +7,9 @@ __version__ = ''
 with open(os.path.join(os.path.dirname(__file__), 'skim', 'version.py')) as version_file:
     exec(version_file.read())
 
-with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme_file:
-    readme = readme_file.read()
-
 setup(
     name='skim',
     description='skim, a self-hosted news reader',
-    long_description=readme,
     url='https://github.com/chrisguidry/skim',
     author='Chris Guidry',
     author_email='chris@theguidrys.us',
