@@ -1,0 +1,5 @@
+#coding: utf-8
+DEBUG = False
+ASSETS_DEBUG = False
+APPLICATION_ROOT = None  # may be /skim, for example, if running in a subdirectory
+STORAGE_ROOT = '/path/to/your/database/'  # must be a directory

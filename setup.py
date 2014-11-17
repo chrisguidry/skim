@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+#coding: utf-8
+import os.path
+from setuptools import setup, find_packages
+
+__version__ = ''
+with open(os.path.join(os.path.dirname(__file__), 'skim', 'version.py')) as version_file:
+    exec(version_file.read())
+
+with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme_file:
+    readme = readme_file.read()
+
+setup(
+    name='skim',
+    description='skim, a self-hosted news reader',
+    long_description=readme,
+    url='https://github.com/chrisguidry/skim',
+    author='Chris Guidry',
+    author_email='chris@theguidrys.us',
+    version=__version__,
+    packages=find_packages(),
+    install_requires=[
+        'Flask==0.10.0',
+        'Flask-Assets==0.10',
+        'feedparser==5.1.3',
+        'html2text==2014.9.25',
+        'python-slugify==0.1.0',
+        'Whoosh==2.6.0'
+    ]
+)

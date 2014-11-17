@@ -1,0 +1,6 @@
+__pycache__
+.environment
+skim/configuration.py
+skim.egg-info
+dist
+storage
