@@ -1,0 +1,9 @@
+html, body {
+    background: white;
+}
+html, button, input, select, textarea, .pure-g [class *= "pure-u"] {
+    font-family: sans-serif;
+}
+p {
+    font-family: serif;
+}

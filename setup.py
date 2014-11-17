@@ -24,6 +24,7 @@ setup(
         'Flask-Assets==0.10',
         'feedparser==5.1.3',
         'html2text==2014.9.25',
+        'Markdown==2.5.1',
         'python-slugify==0.1.0',
         'Whoosh==2.6.0'
     ]

@@ -7,6 +7,7 @@ import sys
 from whoosh.index import create_in, exists_in, open_dir
 from whoosh.fields import Schema, ID, TEXT, DATETIME
 from whoosh.qparser import QueryParser
+from whoosh.sorting import FieldFacet
 
 from skim.configuration import STORAGE_ROOT
 
@@ -21,7 +22,7 @@ def search_index():
                     feed_path=ID(stored=True),
                     path=ID(unique=True, stored=True),
                     title=TEXT(stored=True),
-                    published=DATETIME(stored=True),
+                    published=DATETIME(stored=True, sortable=True),
                     content=TEXT)
     return create_in(path, schema, indexname='entries')
 
@@ -29,11 +30,13 @@ def search(query):
     index = search_index()
     with index.searcher() as searcher:
         query = QueryParser('content', index.schema).parse(query)
-        results = searcher.search(query)
+        results = searcher.search(query, sortedby=FieldFacet('published', reverse=True))
         yield from results
 
 
 if __name__ == '__main__':
     query = ' '.join(sys.argv[1:]) or '*'
     for result in search(query):
+        print(dir(result))
+        print(result.keys())
         print(result)

@@ -14,6 +14,7 @@ from slugify import slugify
 
 from skim import __version__, key, logging_to_console
 from skim.configuration import STORAGE_ROOT
+from skim.entries import entries_root
 from skim.search import search_index
 from skim.subscribe import subscriptions
 
@@ -23,13 +24,23 @@ logger = logging.getLogger(__name__)
 
 
 def feed_path(feed_url):
-    path = os.path.join(STORAGE_ROOT, 'entries', key(feed_url))
+    path = os.path.join(STORAGE_ROOT, 'feeds', key(feed_url))
     if not os.path.exists(path):
         os.makedirs(path)
     return path
 
+def entries_path(feed_url):
+    path = os.path.join(entries_root(), key(feed_url))
+    if not os.path.exists(path):
+        os.makedirs(path)
+    return path
+
+def entry_filename(feed_url, entry):
+    basename = '{}-{}'.format(entry_time(entry).isoformat(), slugify(entry.title)[:100])
+    return os.path.join(entries_path(feed_url), basename)
+
 def url_index_file(feed_url):
-    return os.path.join(STORAGE_ROOT, 'entries', key(feed_url), 'url_index.db')
+    return os.path.join(feed_path(feed_url), 'url_index.db')
 
 def conditional_get_state(feed_url):
     state_filename = os.path.join(feed_path(feed_url), 'conditional')
@@ -60,21 +71,22 @@ def save_entry(feed_url, feed, entry):
         if entry_key in url_index:
             return
 
-        with open(entry_filename(feed_url, entry), 'w') as entry_file:
+        filename = entry_filename(feed_url, entry)
+        with open(filename, 'w') as entry_file:
             entry_file.write((entry.get('title') or '[untitled]') + '\n')
             entry_file.write(entry.get('link', '') + '\n')
             entry_file.write('\n')
             text = entry_text(entry)
             entry_file.write(text)
 
+        os.utime(filename,
+                 times=(time.mktime(time.gmtime()),
+                        time.mktime(entry_time(entry).utctimetuple())))
+
         url_index[entry_key] = '1'
 
 def entry_url(feed_url, entry):
     return entry.get('link') or '{}#{}'.format(feed_url, entry_time(entry).isoformat())
-
-def entry_filename(feed_url, entry):
-    basename = '{}-{}'.format(entry_time(entry).isoformat(), slugify(entry.title)[:100])
-    return os.path.join(feed_path(feed_url), basename)
 
 def entry_time(entry):
     entry_time = entry.get('updated_parsed', entry.get('published_parsed'))

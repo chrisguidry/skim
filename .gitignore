@@ -4,3 +4,5 @@ skim/configuration.py
 skim.egg-info
 dist
 storage
+skim/static/build
+skim/static/.webassets-cache

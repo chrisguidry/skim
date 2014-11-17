@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<ol>
+    {% for entry in entries %}
+    <li>
+        <article>
+            <h2><a href='{{ entry.url }}' target='_blank'>{{ entry.title }}</a></h2>
+            <h3>{{ entry.published }}</h3>
+            <section>
+            {{ entry.body|safe }}
+            </section>
+        </article>
+    </li>
+    {% endfor %}
+</ol>
+{% endblock %}
