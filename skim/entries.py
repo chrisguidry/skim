@@ -16,19 +16,31 @@ def entries_root():
         os.makedirs(path)
     return path
 
-def entry_filenames_by_time():
-   with_times = []
-   for root, _, filenames in os.walk(entries_root()):
-       filenames = (os.path.join(root, filename) for filename in filenames)
-       with_times += [(os.path.getmtime(filename), filename) for filename in filenames]
-   return [filename for _, filename in sorted(with_times, reverse=True)]
+def entry_filenames_by_time(through):
+    through = through.isoformat()
+    all_files = []
+    for root, _, filenames in os.walk(entries_root()):
+        all_files += [(filename, os.path.join(root, filename))
+                      for filename in filenames
+                      if filename >= through]
+    return [fullpath for _, fullpath in sorted(all_files, reverse=True)]
 
 def entry_time(path):
     return datetime.fromtimestamp(os.path.getmtime(path))
 
+def feed(feed_key):
+    with open(os.path.join(STORAGE_ROOT, 'feeds', feed_key, 'feed'), 'r') as feed_file,\
+         open(os.path.join(STORAGE_ROOT, 'subscriptions', 'all', feed_key), 'r') as subscription_file:
+        return {
+            'url': subscription_file.readline().strip(),
+            'title': feed_file.readline().strip(),
+            'subtitle': feed_file.readline().strip()
+        }
+
 def full_entry(path):
     with open(path, 'r') as entry_file:
         return {
+            'feed': feed(os.path.basename(os.path.dirname(path))),
             'title': entry_file.readline().strip(),
             'url': entry_file.readline().strip(),
             'published': entry_time(path),

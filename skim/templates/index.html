@@ -1,16 +1,29 @@
 {% extends 'base.html' %}
 {% block content %}
-<ol>
-    {% for entry in entries %}
-    <li>
-        <article>
-            <h2><a href='{{ entry.url }}' target='_blank'>{{ entry.title }}</a></h2>
-            <h3>{{ entry.published }}</h3>
-            <section>
-            {{ entry.body|safe }}
-            </section>
-        </article>
-    </li>
-    {% endfor %}
-</ol>
+<main class='pure-g'>
+    <section class='longform pure-u-2-3'>
+        <ol>
+            {% for entry in long_entries %}
+            <li>
+                <article>
+                    <h2><a href='{{ entry.url }}' target='_blank'>{{ entry.title }}</a></h2>
+                    <h3><time>{{ entry.published }}</time> at <span>{{ entry.feed.title }}</span></h3>
+                    <section>
+                    {{ entry.body|safe }}
+                    </section>
+                </article>
+            </li>
+            {% endfor %}
+        </ol>
+    </section>
+    <aside class='soundbites pure-u-1-3'>
+        <ol>
+            {% for entry in short_entries %}
+            <li>
+                <a href='{{ entry.url }}' target='_blank'>{{ entry.title }}</a>
+            </li>
+            {% endfor %}
+        </ol>
+    </aside>
+</main>
 {% endblock %}

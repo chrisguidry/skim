@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 #coding: utf-8
+from datetime import datetime, timedelta
 import os
 import os.path
 import sys
@@ -27,9 +28,11 @@ assets.register('javascripts', Bundle('skim.js',
 
 @app.route('/')
 def index():
-    entry_filenames = entry_filenames_by_time()[:100]
+    entry_filenames = entry_filenames_by_time(datetime.utcnow() - timedelta(hours=4))
+    all_entries = [full_entry(filename) for filename in entry_filenames]
     context = {
-        'entries': [full_entry(filename) for filename in entry_filenames]
+        'long_entries': [entry for entry in all_entries if len(entry['body']) > 1000],
+        'short_entries': [entry for entry in all_entries if len(entry['body']) <= 1000]
     }
     return render_template('index.html', **context)
 
@@ -37,8 +40,10 @@ def index():
 def search_query():
     results = search(request.args.get('q', ''))
     entry_filenames = [os.path.join(STORAGE_ROOT, result['path']) for result in results]
+    all_entries = [full_entry(filename) for filename in entry_filenames]
     context = {
-        'entries': [full_entry(filename) for filename in entry_filenames]
+        'long_entries': [entry for entry in all_entries if len(entry['body']) > 1000],
+        'short_entries': [entry for entry in all_entries if len(entry['body']) <= 1000]
     }
     return render_template('index.html', **context)
 

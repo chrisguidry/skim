@@ -4,6 +4,30 @@ html, body {
 html, button, input, select, textarea, .pure-g [class *= "pure-u"] {
     font-family: sans-serif;
 }
-p {
+
+article {
+    clear: both;
+}
+article p {
     font-family: serif;
 }
+article img {
+    max-width: 100%;
+}
+
+.longform {
+
+}
+
+.soundbites {
+    position: fixed;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+ol {
+    list-style-type: none;
+    margin-left: 0;
+    padding-left: 0;
+}
+

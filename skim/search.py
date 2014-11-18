@@ -26,12 +26,13 @@ def search_index():
                     content=TEXT)
     return create_in(path, schema, indexname='entries')
 
-def search(query):
+def search(query, limit=200):
     index = search_index()
     with index.searcher() as searcher:
         query = QueryParser('content', index.schema).parse(query)
-        results = searcher.search(query, sortedby=FieldFacet('published', reverse=True))
-        yield from results
+        results = searcher.search(query, limit=limit, sortedby=FieldFacet('published', reverse=True))
+        for result in results:
+            yield result
 
 
 if __name__ == '__main__':

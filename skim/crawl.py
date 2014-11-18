@@ -6,6 +6,7 @@ import logging
 from multiprocessing import Manager, Pool, Process, Queue
 import os
 import os.path
+import sys
 import time
 
 import feedparser
@@ -19,6 +20,7 @@ from skim.search import search_index
 from skim.subscribe import subscriptions
 
 feedparser.USER_AGENT = 'Skim/{} +https://github.com/chrisguidry/skim/'.format(__version__)
+html2text.config.UNICODE_SNOB = 1
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +38,7 @@ def entries_path(feed_url):
     return path
 
 def entry_filename(feed_url, entry):
-    basename = '{}-{}'.format(entry_time(entry).isoformat(), slugify(entry.title)[:100])
+    basename = '{}-{}'.format(entry_time(entry).isoformat(), slugify(entry_title(entry))[:100])
     return os.path.join(entries_path(feed_url), basename)
 
 def url_index_file(feed_url):
@@ -68,7 +70,7 @@ def save_feed(feed_url, feed):
 def save_entry(feed_url, feed, entry):
     filename = entry_filename(feed_url, entry)
     with open(filename, 'w') as entry_file:
-        entry_file.write((entry.get('title') or '[untitled]') + '\n')
+        entry_file.write(entry_title(entry) + '\n')
         entry_file.write(entry.get('link', '') + '\n')
         entry_file.write('\n')
         text = entry_text(entry)
@@ -77,9 +79,16 @@ def save_entry(feed_url, feed, entry):
     os.utime(filename,
              times=(time.mktime(time.gmtime()),
                     time.mktime(entry_time(entry).utctimetuple())))
+    return filename
 
 def entry_url(feed_url, entry):
     return entry.get('link') or '{}#{}'.format(feed_url, entry_time(entry).isoformat())
+
+def entry_title(entry):
+    title = entry.get('title')
+    if not title:
+        return '[untitled]'
+    return html2text.html2text(title, bodywidth=0)
 
 def entry_time(entry):
     entry_time = entry.get('updated_parsed', entry.get('published_parsed'))
@@ -88,6 +97,11 @@ def entry_time(entry):
     else:
         logger.warn('Substituting now for entry lacking a timestamp: %r', entry.get('link'))
         entry_time = datetime.utcnow()
+
+    if entry_time > datetime.utcnow():
+        logger.warn('Entry from the future; using now: %r', entry.get('link'))
+        entry_time = datetime.utcnow()
+
     return entry_time
 
 def entry_text(entry):
@@ -99,7 +113,10 @@ def entry_text(entry):
     else:
         return ''
 
-    return html2text.html2text(content.value, baseurl=content.base)
+    if not content.base.strip():
+        console.warn('No baseurl for entry %r', entry)
+
+    return html2text.html2text(content.value, baseurl=content.base, bodywidth=0)
 
 def crawler(feed_url, indexing_queue):
     try:
@@ -130,8 +147,8 @@ def crawler(feed_url, indexing_queue):
 
                 logger.info('New entry %s on %s', new_entry_url, feed_url)
 
-                save_entry(feed_url, parsed.feed, entry)
-                indexing_queue.put((feed_url, parsed.feed, entry), block=True)
+                entry_full_path = save_entry(feed_url, parsed.feed, entry)
+                indexing_queue.put((feed_url, parsed.feed, entry, entry_full_path), block=True)
 
                 url_index[entry_key] = '1'
 
@@ -145,15 +162,15 @@ def indexer(indexing_queue):
     writer = index.writer()
     indexed = 0
     while True:
-        feed_url, feed, entry = indexing_queue.get(block=True)
+        feed_url, feed, entry, filename = indexing_queue.get(block=True)
         if entry == None:
             break
 
         logger.info('Indexing %r', entry_url(feed_url, entry))
         writer.update_document(feed_path=os.path.relpath(feed_path(feed_url), STORAGE_ROOT),
                                feed_title=feed.title,
-                               path=os.path.relpath(entry_filename(feed_url, entry), STORAGE_ROOT),
-                               title=entry.title,
+                               path=os.path.relpath(filename, STORAGE_ROOT),
+                               title=entry_title(entry),
                                published=entry_time(entry),
                                content=entry_text(entry))
 
@@ -166,7 +183,7 @@ def indexer(indexing_queue):
     logger.info('Final index commit.')
     writer.commit()
 
-def main():
+def crawl_all():
     manager = Manager()
     indexing_queue = manager.Queue()
     indexing_process = Process(target=indexer, args=(indexing_queue,), name='indexer')
@@ -180,9 +197,19 @@ def main():
         pool.close()
         pool.join()
 
-    indexing_queue.put((None, None, None))
+    indexing_queue.put((None, None, None, None), block=True)
     indexing_process.join()
+
+def crawl_one(feed_url):
+    indexing_queue = Queue()
+    crawler(feed_url, indexing_queue)
+    indexing_queue.put((None, None, None, None))
+    indexer(indexing_queue)
 
 if __name__ == '__main__':
     logging_to_console(logging.getLogger(''))
-    main()
+    if len(sys.argv) > 1:
+        for feed_url in sys.argv[1:]:
+            crawl_one(feed_url)
+    else:
+        crawl_all()
