@@ -3,7 +3,7 @@
 from datetime import datetime
 import dbm
 import logging
-from multiprocessing import Manager, Pool, Process, Queue
+from multiprocessing import Process, Queue
 import os
 import os.path
 import sys
@@ -88,7 +88,7 @@ def entry_title(entry):
     title = entry.get('title')
     if not title:
         return '[untitled]'
-    return html2text.html2text(title, bodywidth=0)
+    return html2text.html2text(title, bodywidth=0).strip()
 
 def entry_time(entry):
     entry_time = entry.get('updated_parsed', entry.get('published_parsed'))
@@ -118,53 +118,69 @@ def entry_text(entry):
 
     return html2text.html2text(content.value, baseurl=content.base, bodywidth=0)
 
-def crawler(feed_url, indexing_queue):
-    try:
-        logger.info('Crawling %r...', feed_url)
-        etag, modified = conditional_get_state(feed_url)
-        parsed = feedparser.parse(feed_url, etag=etag, modified=modified)
-        if not parsed.get('status'):
-            logger.warn('No status returned while crawling %s.  Parsed: %r', feed_url, parsed)
-            return
+def crawl(feed_url, indexing_queue):
+    logger.info('Crawling %r...', feed_url)
+    etag, modified = conditional_get_state(feed_url)
+    parsed = feedparser.parse(feed_url, etag=etag, modified=modified)
+    if not parsed.get('status'):
+        logger.warn('No status returned while crawling %s.  Parsed: %r', feed_url, parsed)
+        return
 
-        if parsed.status == 304:
-            return
+    if parsed.status == 304:
+        return
 
-        save_headers(feed_url, parsed.headers)
-        if parsed.status not in (200, 301, 302):
-            logger.warn('Status %s while crawling %s.', parsed.status, feed_url)
-            return
+    save_headers(feed_url, parsed.headers)
+    if parsed.status not in (200, 301, 302):
+        logger.warn('Status %s while crawling %s.', parsed.status, feed_url)
+        return
 
-        save_feed(feed_url, parsed.feed)
+    save_feed(feed_url, parsed.feed)
 
-        with dbm.open(url_index_file(feed_url), 'c') as url_index:
-            for entry in parsed.entries:
-                new_entry_url = entry_url(feed_url, entry)
-                entry_key = new_entry_url.encode('utf-8')
-                if entry_key in url_index:
-                    logger.info('%s has already been seen on %s', new_entry_url, feed_url)
-                    continue
+    with dbm.open(url_index_file(feed_url), 'c') as url_index:
+        for entry in parsed.entries:
+            new_entry_url = entry_url(feed_url, entry)
+            entry_key = new_entry_url.encode('utf-8')
+            if entry_key in url_index:
+                logger.info('%s has already been seen on %s', new_entry_url, feed_url)
+                continue
 
-                logger.info('New entry %s on %s', new_entry_url, feed_url)
+            logger.info('New entry %s on %s', new_entry_url, feed_url)
 
-                entry_full_path = save_entry(feed_url, parsed.feed, entry)
-                indexing_queue.put((feed_url, parsed.feed, entry, entry_full_path), block=True)
+            entry_full_path = save_entry(feed_url, parsed.feed, entry)
+            indexing_queue.put((feed_url, parsed.feed, entry, entry_full_path), block=True)
 
-                url_index[entry_key] = '1'
+            url_index[entry_key] = '1'
 
-        save_conditional_get_state(feed_url, parsed.get('etag'), parsed.get('modified'))
-    except Exception:
-        logger.error('Error crawling %r', feed_url, exc_info=True)
+    save_conditional_get_state(feed_url, parsed.get('etag'), parsed.get('modified'))
 
-def indexer(indexing_queue):
+
+def crawler(crawl_queue, indexing_queue):
+    logger.info('Starting crawler...')
+    while True:
+        feed_url = crawl_queue.get(block=True)
+        if feed_url is None:
+            break
+
+        try:
+            crawl(feed_url, indexing_queue)
+        except Exception:
+            logger.error('Error crawling %r', feed_url, exc_info=True)
+
+    indexing_queue.put((None, None, None, None), block=True)
+
+def indexer(indexing_queue, expected_to_finish):
     logger.info('Starting indexer...')
     index = search_index()
     writer = index.writer()
     indexed = 0
     while True:
         feed_url, feed, entry, filename = indexing_queue.get(block=True)
-        if entry == None:
-            break
+        if entry is None:
+            expected_to_finish -= 1
+            if expected_to_finish == 0:
+                break
+            else:
+                continue
 
         logger.info('Indexing %r', entry_url(feed_url, entry))
         writer.update_document(feed_path=os.path.relpath(feed_path(feed_url), STORAGE_ROOT),
@@ -183,33 +199,38 @@ def indexer(indexing_queue):
     logger.info('Final index commit.')
     writer.commit()
 
-def crawl_all():
-    manager = Manager()
-    indexing_queue = manager.Queue()
-    indexing_process = Process(target=indexer, args=(indexing_queue,), name='indexer')
-    indexing_process.start()
-
-    with Pool() as pool:
-        for feed_url in subscriptions():
-            logger.info('Queueing %s', feed_url)
-            pool.apply_async(crawler, (feed_url, indexing_queue))
-
-        pool.close()
-        pool.join()
-
-    indexing_queue.put((None, None, None, None), block=True)
-    indexing_process.join()
-
-def crawl_one(feed_url):
+def crawl_all(feed_urls=subscriptions):
+    CRAWLERS = 8
+    crawl_queue = Queue()
     indexing_queue = Queue()
-    crawler(feed_url, indexing_queue)
-    indexing_queue.put((None, None, None, None))
-    indexer(indexing_queue)
+
+    processes = [Process(target=crawler, args=(crawl_queue, indexing_queue,), name='crawler-%s' % i)
+                 for i in range(CRAWLERS)]
+    processes.append(Process(target=indexer, args=(indexing_queue, CRAWLERS), name='indexer'))
+
+    for process in processes:
+        process.start()
+
+    for feed_url in feed_urls():
+        logger.info('Queueing %s', feed_url)
+        crawl_queue.put(feed_url, block=True)
+
+    for _ in range(CRAWLERS):
+        crawl_queue.put(None, block=True)
+
+    try:
+        for process in processes:
+            process.join()
+    except:
+        for process in processes:
+            process.terminate()
+    finally:
+        for process in processes:
+            process.join()
 
 if __name__ == '__main__':
     logging_to_console(logging.getLogger(''))
     if len(sys.argv) > 1:
-        for feed_url in sys.argv[1:]:
-            crawl_one(feed_url)
+        crawl_all(lambda: sys.argv[1:])
     else:
         crawl_all()

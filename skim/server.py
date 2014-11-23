@@ -9,7 +9,7 @@ from flask import Flask, abort, render_template, redirect, request, url_for
 from flask.ext.assets import Environment, Bundle
 
 from skim.configuration import STORAGE_ROOT
-from skim.entries import entry_filenames_by_time, full_entry
+from skim.entries import entry_filenames_by_time, feed_entries, full_entry
 from skim.search import search
 
 app = Flask(__name__)
@@ -26,10 +26,11 @@ assets.register('javascripts', Bundle('skim.js',
                                       filters='rjsmin' if not app.config['DEBUG'] else None,
                                       output='build/skim.js'))
 
+
 @app.route('/')
 def index():
-    entry_filenames = entry_filenames_by_time(datetime.utcnow() - timedelta(hours=4))
-    all_entries = [full_entry(filename) for filename in entry_filenames]
+    entry_filenames = entry_filenames_by_time(datetime.utcnow() - timedelta(hours=24))
+    all_entries = [full_entry(filename) for filename in entry_filenames][:100]
     context = {
         'long_entries': [entry for entry in all_entries if len(entry['body']) > 1000],
         'short_entries': [entry for entry in all_entries if len(entry['body']) <= 1000]
@@ -40,6 +41,16 @@ def index():
 def search_query():
     results = search(request.args.get('q', ''))
     entry_filenames = [os.path.join(STORAGE_ROOT, result['path']) for result in results]
+    all_entries = [full_entry(filename) for filename in entry_filenames]
+    context = {
+        'long_entries': [entry for entry in all_entries if len(entry['body']) > 1000],
+        'short_entries': [entry for entry in all_entries if len(entry['body']) <= 1000]
+    }
+    return render_template('index.html', **context)
+
+@app.route('/feeds/<feed_slug>')
+def feed(feed_slug):
+    entry_filenames = feed_entries(feed_slug)
     all_entries = [full_entry(filename) for filename in entry_filenames]
     context = {
         'long_entries': [entry for entry in all_entries if len(entry['body']) > 1000],

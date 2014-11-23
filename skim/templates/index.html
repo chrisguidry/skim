@@ -7,7 +7,10 @@
             <li>
                 <article>
                     <h2><a href='{{ entry.url }}' target='_blank'>{{ entry.title }}</a></h2>
-                    <h3><time>{{ entry.published }}</time> at <span>{{ entry.feed.title }}</span></h3>
+                    <h3>
+                        <time>{{ entry.published }}</time> at
+                        <a href='{{ url_for('feed', feed_slug=entry.feed.slug) }}'>{{ entry.feed.title }}</a>
+                    </h3>
                     <section>
                     {{ entry.body|safe }}
                     </section>

@@ -25,6 +25,11 @@ def entry_filenames_by_time(through):
                       if filename >= through]
     return [fullpath for _, fullpath in sorted(all_files, reverse=True)]
 
+def feed_entries(feed_slug):
+    feed_entries_root = os.path.join(entries_root(), feed_slug)
+    return [os.path.join(feed_entries_root, filename)
+            for filename in sorted(os.listdir(feed_entries_root), reverse=True)]
+
 def entry_time(path):
     return datetime.fromtimestamp(os.path.getmtime(path))
 
@@ -33,6 +38,7 @@ def feed(feed_key):
          open(os.path.join(STORAGE_ROOT, 'subscriptions', 'all', feed_key), 'r') as subscription_file:
         return {
             'url': subscription_file.readline().strip(),
+            'slug': feed_key,
             'title': feed_file.readline().strip(),
             'subtitle': feed_file.readline().strip()
         }
