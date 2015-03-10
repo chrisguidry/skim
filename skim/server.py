@@ -12,6 +12,7 @@ from skim.configuration import STORAGE_ROOT
 from skim.entries import entry_filenames_by_time, feed_entries, full_entry
 from skim.search import search
 
+
 app = Flask(__name__)
 app.config.from_object('skim.configuration')
 

@@ -22,6 +22,7 @@ from skim.subscribe import subscriptions
 feedparser.USER_AGENT = 'Skim/{} +https://github.com/chrisguidry/skim/'.format(__version__)
 html2text.config.UNICODE_SNOB = 1
 html2text.config.SINGLE_LINE_BREAK = True
+HTML2TEXT_CONFIG = {'bodywidth': 0}
 
 logger = logging.getLogger(__name__)
 
@@ -71,11 +72,11 @@ def save_feed(feed_url, feed):
 def save_entry(feed_url, feed, entry):
     filename = entry_filename(feed_url, entry)
     with open(filename, 'w') as entry_file:
-        entry_file.write(entry_title(entry) + '\n')
-        entry_file.write(entry.get('link', '') + '\n')
+        entry_file.write('url: {}\n'.format(entry.get('link', '')))
+        entry_file.write('title: {}\n'.format(entry_title(entry)))
+        entry_file.write('published: {}\n'.format(entry_time(entry).isoformat() + 'Z'))
         entry_file.write('\n')
-        text = entry_text(entry)
-        entry_file.write(text)
+        entry_file.write(entry_text(entry))
 
     os.utime(filename,
              times=(time.mktime(time.gmtime()),
@@ -89,7 +90,7 @@ def entry_title(entry):
     title = entry.get('title')
     if not title:
         return '[untitled]'
-    return html2text.html2text(title, bodywidth=0).strip()
+    return html2text.html2text(title, **HTML2TEXT_CONFIG).strip()
 
 def entry_time(entry):
     entry_time = entry.get('updated_parsed', entry.get('published_parsed'))
@@ -117,7 +118,7 @@ def entry_text(entry):
     if not content.base.strip():
         console.warn('No baseurl for entry %r', entry)
 
-    return html2text.html2text(content.value, baseurl=content.base, bodywidth=0)
+    return html2text.html2text(content.value, baseurl=content.base, **HTML2TEXT_CONFIG)
 
 def crawl(feed_url, indexing_queue):
     logger.info('Crawling %r...', feed_url)

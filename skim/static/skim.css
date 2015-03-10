@@ -19,6 +19,7 @@ article section {
 }
 article h1, article h2, article h3, article h4, article h5, article h6 {
     font-family: Helvetica, sans-serif;
+    line-height: 1.1em;
 }
 article h1 code, article h2 code, article h3 code, article h4 code, article h5 code, article h6 code {
     font-size: inherit;
@@ -35,6 +36,7 @@ article .codehilite pre {
 }
 article img {
     max-width: 100%;
+    display: block;
 }
 article table {
     width: 100%;

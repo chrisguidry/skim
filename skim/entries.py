@@ -54,12 +54,21 @@ def full_entry(path):
                                        'markdown.extensions.smarty',
                                        'markdown.extensions.tables'])
     with open(path, 'r') as entry_file:
+        body = md.convert(entry_file.read().strip())
+        meta = md.Meta
+
+        published = meta.get('published', [None])[0]
+        if published:
+            published = datetime.strptime(published, '%Y-%m-%dT%H:%M:%SZ')
+        else:
+            published = entry_time(path)
+
         return {
             'feed': feed(os.path.basename(os.path.dirname(path))),
-            'title': entry_file.readline().strip(),
-            'url': entry_file.readline().strip(),
-            'published': entry_time(path),
-            'body': md.convert(entry_file.read().strip())
+            'title': meta.get('title', ['[untitled]'])[0],
+            'url': meta.get('url', [None])[0],
+            'published': published,
+            'body': body
         }
 
 
