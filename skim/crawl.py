@@ -228,6 +228,7 @@ def crawl_all(feed_urls=subscriptions):
         for process in processes:
             process.join()
 
+
 if __name__ == '__main__':
     logging_to_console(logging.getLogger(''))
     if len(sys.argv) > 1:

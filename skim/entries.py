@@ -50,8 +50,13 @@ def full_entry(path):
             'title': entry_file.readline().strip(),
             'url': entry_file.readline().strip(),
             'published': entry_time(path),
-            'body': markdown.markdown(entry_file.read().strip())
+            'body': markdown.markdown(entry_file.read().strip(),
+                                      extensions=['markdown.extensions.tables',
+                                                  'markdown.extensions.smart_strong',
+                                                  'markdown.extensions.smarty',
+                                                  'markdown.extensions.codehilite'])
         }
+
 
 if __name__ == '__main__':
     for entry_filename in entry_filenames_by_time():

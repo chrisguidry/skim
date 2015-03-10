@@ -19,6 +19,7 @@ assets = Environment(app)
 assets.register('stylesheets', Bundle('third-party/pure-release-0.5.0/base-min.css',
                                       'third-party/pure-release-0.5.0/grids-min.css',
                                       'third-party/pure-release-0.5.0/grids-responsive-min.css',
+                                      'third-party/pygments-css/github.css',
                                       'skim.css',
                                       filters='cssmin' if not app.config['DEBUG'] else None,
                                       output='build/skim.css'))
@@ -57,6 +58,7 @@ def feed(feed_slug):
         'short_entries': [entry for entry in all_entries if len(entry['body']) <= 1000]
     }
     return render_template('index.html', **context)
+
 
 if __name__ == '__main__':
     bind_address, bind_port = None, None

@@ -1,18 +1,49 @@
 html, body {
     background: white;
+    color: #222222;
 }
 html, button, input, select, textarea, .pure-g [class *= "pure-u"] {
-    font-family: sans-serif;
+    font-family: Helvetica, sans-serif;
 }
 
 article {
     clear: both;
+    margin: 0 1em 1em 1em;
+    padding: 0 1em 1em 1em;
 }
-article p {
-    font-family: serif;
+article section {
+    font-family: Georgia, serif;
+    font-size: 19px;
+    line-height: 24px;
+    border-bottom: 1px dashed #AAAAAA;
+}
+article h1, article h2, article h3, article h4, article h5, article h6 {
+    font-family: Helvetica, sans-serif;
+}
+article code {
+    font-family: "Lucida Console", Monaco, monospace;
+    font-size: 16px;
+}
+article .codehilite pre {
+    font-family: "Lucida Console", Monaco, monospace;
+    font-size: 15px;
+    line-height: 18px;
+    margin: 8px 0px;
 }
 article img {
     max-width: 100%;
+}
+article table {
+    width: 100%;
+}
+article table th, article table td {
+    padding: 0.25em;
+}
+article table th {
+    border-bottom: 1px dotted #BBBBBB;
+}
+article hr {
+    display: none;
 }
 
 .longform {
@@ -25,9 +56,15 @@ article img {
     overflow-y: scroll;
 }
 
+.soundbites li {
+    font-family: Helvetica, sans-serif;
+    font-size: 17px;
+    line-height: 21px;
+    margin-bottom: .25em;
+}
+
 ol {
     list-style-type: none;
     margin-left: 0;
     padding-left: 0;
 }
-

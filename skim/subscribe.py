@@ -60,5 +60,6 @@ def import_opml(opml_filename):
             subscribe(feed_url)
             categorize(feed_url, category)
 
+
 if __name__ == '__main__':
     import_opml(sys.argv[1])
