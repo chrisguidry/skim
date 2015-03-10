@@ -16,14 +16,13 @@ setup(
     version=__version__,
     packages=find_packages(),
     install_requires=[
-        'Flask==0.10.0',
+        'Flask==0.10.1',
         'Flask-Assets==0.10',
         'feedparser==5.1.3',
-        'html2text==2014.9.25',
-        'Markdown==2.5.1',
+        'html2text==2015.2.18',
+        'Markdown==2.6',
         'python-slugify==0.1.0',
         'Whoosh==2.6.0',
-        'nltk==3.0.0',
-        'gensim==0.10.3'
+        'nltk==3.0.0'
     ]
 )
