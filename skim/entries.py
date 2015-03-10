@@ -44,17 +44,22 @@ def feed(feed_key):
         }
 
 def full_entry(path):
+    md = markdown.Markdown(output_mode='html5',
+                           smart_emphasis=True,
+                           safe_mode='escape',
+                           extensions=['markdown.extensions.abbr',
+                                       'markdown.extensions.codehilite',
+                                       'markdown.extensions.meta',
+                                       'markdown.extensions.smart_strong',
+                                       'markdown.extensions.smarty',
+                                       'markdown.extensions.tables'])
     with open(path, 'r') as entry_file:
         return {
             'feed': feed(os.path.basename(os.path.dirname(path))),
             'title': entry_file.readline().strip(),
             'url': entry_file.readline().strip(),
             'published': entry_time(path),
-            'body': markdown.markdown(entry_file.read().strip(),
-                                      extensions=['markdown.extensions.tables',
-                                                  'markdown.extensions.smart_strong',
-                                                  'markdown.extensions.smarty',
-                                                  'markdown.extensions.codehilite'])
+            'body': md.convert(entry_file.read().strip())
         }
 
 

@@ -21,6 +21,7 @@ from skim.subscribe import subscriptions
 
 feedparser.USER_AGENT = 'Skim/{} +https://github.com/chrisguidry/skim/'.format(__version__)
 html2text.config.UNICODE_SNOB = 1
+html2text.config.SINGLE_LINE_BREAK = True
 
 logger = logging.getLogger(__name__)
 
