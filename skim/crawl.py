@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #coding: utf-8
-from datetime import datetime
+from datetime import datetime, timezone
 import dbm
 import logging
 from multiprocessing import Process, Queue
@@ -93,9 +93,14 @@ def entry_title(entry):
     return html2text.html2text(title, **HTML2TEXT_CONFIG).strip()
 
 def entry_time(entry):
+    try:
+        return entry['__date__']
+    except KeyError:
+        pass
+
     entry_time = entry.get('updated_parsed', entry.get('published_parsed'))
     if entry_time:
-        entry_time = datetime.fromtimestamp(time.mktime(entry_time))
+        entry_time = datetime(*entry_time[0:6])
     else:
         logger.warn('Substituting now for entry lacking a timestamp: %r', entry.get('link'))
         entry_time = datetime.utcnow()
@@ -103,6 +108,8 @@ def entry_time(entry):
     if entry_time > datetime.utcnow():
         logger.warn('Entry from the future; using now: %r', entry.get('link'))
         entry_time = datetime.utcnow()
+
+    entry['__date__'] = entry_time
 
     return entry_time
 

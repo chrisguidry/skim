@@ -63,9 +63,13 @@ article hr {
 
 .soundbites li {
     font-family: Helvetica, sans-serif;
-    font-size: 17px;
-    line-height: 21px;
-    margin-bottom: .25em;
+    font-size: 15px;
+    line-height: 18px;
+    margin-bottom: .2em;
+}
+.soundbites li article {
+    margin-bottom: 0;
+    padding: 0;
 }
 
 ol {

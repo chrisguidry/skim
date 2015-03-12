@@ -24,19 +24,24 @@ assets.register('stylesheets', Bundle('third-party/pure-release-0.5.0/base-min.c
                                       'skim.css',
                                       filters='cssmin' if not app.config['DEBUG'] else None,
                                       output='build/skim.css'))
-assets.register('javascripts', Bundle('skim.js',
+assets.register('javascripts', Bundle('third-party/moment-2.9.0.min.js',
+                                      'skim.js',
                                       filters='rjsmin' if not app.config['DEBUG'] else None,
                                       output='build/skim.js'))
+
+
+def entries_context(entries):
+    return {
+        'long_entries': [entry for entry in entries if len(entry['body']) > 1000],
+        'short_entries': [entry for entry in entries if len(entry['body']) <= 1000]
+    }
 
 
 @app.route('/')
 def index():
     entry_filenames = entry_filenames_by_time(datetime.utcnow() - timedelta(hours=24))
-    all_entries = [full_entry(filename) for filename in entry_filenames][:100]
-    context = {
-        'long_entries': [entry for entry in all_entries if len(entry['body']) > 1000],
-        'short_entries': [entry for entry in all_entries if len(entry['body']) <= 1000]
-    }
+    all_entries = [full_entry(filename) for filename in entry_filenames]
+    context = entries_context(all_entries)
     return render_template('index.html', **context)
 
 @app.route('/search')
@@ -44,20 +49,14 @@ def search_query():
     results = search(request.args.get('q', ''))
     entry_filenames = [os.path.join(STORAGE_ROOT, result['path']) for result in results]
     all_entries = [full_entry(filename) for filename in entry_filenames]
-    context = {
-        'long_entries': [entry for entry in all_entries if len(entry['body']) > 1000],
-        'short_entries': [entry for entry in all_entries if len(entry['body']) <= 1000]
-    }
+    context = entries_context(all_entries)
     return render_template('index.html', **context)
 
 @app.route('/feeds/<feed_slug>')
 def feed(feed_slug):
     entry_filenames = feed_entries(feed_slug)
     all_entries = [full_entry(filename) for filename in entry_filenames]
-    context = {
-        'long_entries': [entry for entry in all_entries if len(entry['body']) > 1000],
-        'short_entries': [entry for entry in all_entries if len(entry['body']) <= 1000]
-    }
+    context = entries_context(all_entries)
     return render_template('index.html', **context)
 
 

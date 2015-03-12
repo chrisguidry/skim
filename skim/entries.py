@@ -30,9 +30,6 @@ def feed_entries(feed_slug):
     return [os.path.join(feed_entries_root, filename)
             for filename in sorted(os.listdir(feed_entries_root), reverse=True)]
 
-def entry_time(path):
-    return datetime.fromtimestamp(os.path.getmtime(path))
-
 def feed(feed_key):
     with open(os.path.join(STORAGE_ROOT, 'feeds', feed_key, 'feed'), 'r') as feed_file,\
          open(os.path.join(STORAGE_ROOT, 'subscriptions', 'all', feed_key), 'r') as subscription_file:
@@ -42,6 +39,18 @@ def feed(feed_key):
             'title': feed_file.readline().strip(),
             'subtitle': feed_file.readline().strip()
         }
+
+def datetime_from_iso(string):
+    if not string:
+        return None
+
+    for format in ['%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%dT%H:%M:%S.%fZ']:
+        try:
+            return datetime.strptime(string, format)
+        except ValueError:
+            pass
+
+    return None
 
 def full_entry(path):
     md = markdown.Markdown(output_mode='html5',
@@ -56,18 +65,11 @@ def full_entry(path):
     with open(path, 'r') as entry_file:
         body = md.convert(entry_file.read().strip())
         meta = md.Meta
-
-        published = meta.get('published', [None])[0]
-        if published:
-            published = datetime.strptime(published, '%Y-%m-%dT%H:%M:%SZ')
-        else:
-            published = entry_time(path)
-
         return {
             'feed': feed(os.path.basename(os.path.dirname(path))),
-            'title': meta.get('title', ['[untitled]'])[0],
-            'url': meta.get('url', [None])[0],
-            'published': published,
+            'title': md.Meta['title'][0],
+            'url': md.Meta['url'][0],
+            'published': datetime_from_iso(md.Meta['published'][0]),
             'body': body
         }
 
