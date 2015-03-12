@@ -32,8 +32,7 @@ assets.register('javascripts', Bundle('third-party/moment-2.9.0.min.js',
 
 def entries_context(entries):
     return {
-        'long_entries': [entry for entry in entries if len(entry['body']) > 1000],
-        'short_entries': [entry for entry in entries if len(entry['body']) <= 1000]
+        'entries': entries
     }
 
 
