@@ -93,6 +93,8 @@ def youtube_entry(base, entry_url, soup):
     embed = PYEMBED.embed(video_href, max_width=1280)
     return '\n\n'.join([embed, description])
 
+
+
 class TargetBlankAnchors(markdown.treeprocessors.Treeprocessor):
     def run(self, root):
         for child in root:
@@ -108,11 +110,10 @@ class ImageAltsToTitles(markdown.treeprocessors.Treeprocessor):
                     child.set('title', child.get('alt'))
             self.run(child)
 
-
 class SkimExtension(markdown.extensions.Extension):
     def extendMarkdown(self, md, md_globals):
         md.treeprocessors.add('targetblankanchors', TargetBlankAnchors(md), '_end')
-        md.treeprocessors.add('targetblankanchors', ImageAltsToTitles(md), '_end')
+        md.treeprocessors.add('imagealtstotitles', ImageAltsToTitles(md), '_end')
 
 MARKDOWN = markdown.Markdown(output_format='html5',
                              smart_emphasis=True,
