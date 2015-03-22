@@ -1,19 +1,25 @@
 # coding: utf-8
 from html import unescape
-from urllib.parse import urljoin, urlparse
+from urllib.parse import parse_qs, urljoin, urlparse
 
 from bs4 import BeautifulSoup
 import html2text
 import markdown
-
+from pyembed.core import PyEmbed
 
 html2text.config.UNICODE_SNOB = 1
 html2text.config.SINGLE_LINE_BREAK = False
 HTML2TEXT_CONFIG = {'bodywidth': 0}
 
+PYEMBED = PyEmbed()
 
-def to_text(base, html):
+def to_text(base, entry_url, html):
     soup = BeautifulSoup(html)
+
+    if entry_url:
+        parsed = urlparse(entry_url)
+        if 'youtube.com' in parsed.netloc:
+            return youtube_entry(base, entry_url, soup)
 
     absolutize(base, soup)
     invert_linked_elements(base, soup)
@@ -75,6 +81,17 @@ def remove_trailer_parks(base, soup):
                 anchor.decompose()
                 break
 
+def youtube_entry(base, entry_url, soup):
+    try:
+        video, description, *_ = soup.find_all('td')
+        video_href = video.find('a')['href']
+        description = description.find('span').text
+    except ValueError:
+        video_href = entry_url
+        description = str(soup)
+
+    embed = PYEMBED.embed(video_href, max_width=1280)
+    return '\n\n'.join([embed, description])
 
 class TargetBlankAnchors(markdown.treeprocessors.Treeprocessor):
     def run(self, root):
@@ -97,9 +114,9 @@ class SkimExtension(markdown.extensions.Extension):
         md.treeprocessors.add('targetblankanchors', TargetBlankAnchors(md), '_end')
         md.treeprocessors.add('targetblankanchors', ImageAltsToTitles(md), '_end')
 
-MARKDOWN = markdown.Markdown(output_mode='html5',
+MARKDOWN = markdown.Markdown(output_format='html5',
                              smart_emphasis=True,
-                             safe_mode='escape',
+                             safe_mode=False,
                              extensions=['markdown.extensions.abbr',
                                          'markdown.extensions.codehilite',
                                          'markdown.extensions.meta',

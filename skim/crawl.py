@@ -67,7 +67,7 @@ def entry_title(entry):
     title = entry.get('title')
     if not title:
         return '[untitled]'
-    return to_text(None, title)
+    return to_text(None, None, title)
 
 def entry_time(entry):
     try:
@@ -75,7 +75,7 @@ def entry_time(entry):
     except KeyError:
         pass
 
-    entry_time = entry.get('updated_parsed', entry.get('published_parsed'))
+    entry_time = entry.get('published_parsed', entry.get('updated_parsed'))
     if entry_time:
         entry_time = datetime(*entry_time[0:6])
 
@@ -109,7 +109,7 @@ def entry_text(entry):
     else:
         return ''
 
-    return to_text(content.base, content.value)
+    return to_text(content.base, entry.get('link'), content.value)
 
 def crawl(feed_url):
     logger.info('Crawling %r...', feed_url)

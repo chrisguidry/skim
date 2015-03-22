@@ -23,6 +23,7 @@ setup(
         'feedparser==5.1.3',
         'html2text==2015.2.18',
         'Markdown==2.6',
+        'pyembed==1.1.2',
         'pygments==2.0.2'
     ]
 )

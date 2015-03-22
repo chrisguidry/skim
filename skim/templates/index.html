@@ -10,11 +10,11 @@
                         <h2><a href='{{ entry.url }}' target='_blank'>{{ entry.title }}</a></h2>
                         <h3>
                             <time title='{{ entry.published.isoformat() + "Z" }}' data-iso='{{ entry.published.isoformat() + "Z" }}'>{{ entry.published }}</time> at
-                            <a href='{{ url_for('index') }}?feed={{ entry.feed.url }}'>{{ entry.feed.title }}</a>
+                            <a href='{{ url_for('index') }}?feed={{ entry.feed.url|urlencode }}'>{{ entry.feed.title }}</a>
                         </h3>
                         <ul class='categories'>
                             {% for category in entry.feed.categories %}
-                            <li><a href='{{ url_for('index') }}?category={{ category }}'>{{category}}</a></li>
+                            <li><a href='{{ url_for('index') }}?category={{ category|urlencode }}'>{{category}}</a></li>
                             {% endfor %}
                         </ul>
                     </header>

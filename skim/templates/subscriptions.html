@@ -5,7 +5,7 @@
         <ul>
             {% for subscription in subscriptions %}
             <li>
-                <a href='{{ url_for('index') }}?feed={{ subscription.url }}'>{{ subscription.title or subscription.url }}</a>
+                <a href='{{ url_for('index') }}?feed={{ subscription.url|urlencode }}'>{{ subscription.title or subscription.url }}</a>
             </li>
             {% endfor %}
         </ul>
