@@ -4,8 +4,6 @@ import logging
 import sys
 from urllib.parse import urlsplit, urlunsplit
 
-from slugify import slugify
-
 from skim.configuration import elastic
 from skim.version import __version__
 
