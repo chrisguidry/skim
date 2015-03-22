@@ -32,9 +32,9 @@ def invert_linked_elements(base, soup):
                 anchor.wrap(unwrapped)
 
 def absolutize(base, soup):
-    for anchor in soup.find_all('a', 'href'):
+    for anchor in soup.find_all('a', href=True):
         anchor['href'] = urljoin(base, anchor['href'])
-    for image in soup.find_all('img', 'src'):
+    for image in soup.find_all('img', src=True):
         image['src'] = urljoin(base, image['src'])
 
 def remove_trailer_parks(base, soup):
@@ -46,7 +46,7 @@ def remove_trailer_parks(base, soup):
         ('www.gstatic.com', 'images/icons/gplus-16.png'),
         ('', 'social-media-feather/synved-social')
     ]
-    for image in soup.find_all('img', 'src'):
+    for image in soup.find_all('img', src=True):
         parsed = urlparse(image['src'])
         for domain, path in SHARING_IMAGES:
             if parsed.netloc.endswith(domain) and path in parsed.path:
@@ -54,6 +54,7 @@ def remove_trailer_parks(base, soup):
                     image.parent.decompose()
                 else:
                     image.decompose()
+                break
 
     SHARING_LINKS = [
         ('.feedsportal.com', '.htm', ''),
@@ -67,7 +68,7 @@ def remove_trailer_parks(base, soup):
         ('synved.com', 'wordpress-social-media-feather', ''),
         ('sharetodiaspora.github.com', '', 'url')
     ]
-    for anchor in soup.find_all('a', 'href'):
+    for anchor in soup.find_all('a', href=True):
         parsed = urlparse(anchor['href'])
         for domain, path, query in SHARING_LINKS:
             if parsed.netloc.endswith(domain) and path in parsed.path and query in parsed.query:
