@@ -7,7 +7,7 @@ import sys
 from flask import Flask, abort, render_template, redirect, request, url_for
 from flask.ext.assets import Environment, Bundle
 
-from skim import logging_to_console, entries, subscriptions
+from skim import entries, subscriptions
 
 app = Flask(__name__)
 app.config.from_object('skim.configuration')
@@ -51,7 +51,6 @@ def interesting():
 
 
 if __name__ == '__main__':
-    logging_to_console(logging.getLogger(''))
     bind_address, bind_port = None, None
     if len(sys.argv) == 2:
         if ':' in sys.argv[1]:

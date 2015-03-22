@@ -3,7 +3,6 @@ import logging
 import sys
 import time
 
-from skim import logging_to_console
 from skim.configuration import elastic, INDEX
 
 
@@ -75,7 +74,6 @@ def remove():
 
 
 if __name__ == '__main__':
-    logging_to_console(logging.getLogger(''))
     if sys.argv[1:] == ['recreate']:
         remove()
     ensure()

@@ -11,7 +11,7 @@ import time
 
 import feedparser
 
-from skim import __version__, logging_to_console, index
+from skim import __version__, index
 from skim.configuration import elastic, INDEX
 from skim.markup import to_text
 from skim.subscriptions import subscriptions
@@ -98,7 +98,7 @@ def entry_time(entry):
 def guess_time_from_url(url):
     match = re.search('((?P<year>2(\d{3}))/(?P<month>\d{1,2})(/(?P<day>\d{1,2}))?)', url)
     if match:
-        return datetime.datetime(int(match.group('year')), int(match.group('month')), int(match.group('day') or '1'))
+        return datetime(int(match.group('year')), int(match.group('month')), int(match.group('day') or '1'))
 
 def entry_text(entry):
     content = ''
@@ -142,7 +142,7 @@ def crawl(feed_url):
     save_conditional_get_state(feed_url, parsed.get('etag'), parsed.get('modified'))
 
 def crawl_all(feed_urls):
-    pool = multiprocessing.Pool(8)
+    pool = multiprocessing.Pool(16)
     results = []
     for feed_url in feed_urls:
         logger.info('Queueing %s', feed_url)
@@ -164,5 +164,4 @@ def recrawl(feed_url):
 if __name__ == '__main__':
     index.ensure()
 
-    logging_to_console(logging.getLogger(''))
     crawl_all(sys.argv[1:] or [s['url'] for s in subscriptions()])
