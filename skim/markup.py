@@ -22,7 +22,7 @@ def to_text(base, entry_url, html):
         if 'youtube.com' in parsed.netloc:
             return youtube_entry(base, entry_url, soup)
 
-    vice_com_images(base, soup)
+    vice_com_internal_markup(base, soup)
 
     absolutize(base, soup)
     invert_linked_elements(base, soup)
@@ -98,23 +98,33 @@ def remove_trailer_parks(base, soup):
                 anchor.decompose()
                 break
 
-def vice_com_images(base, soup):
+def _parse_vice_com_markup(markup):
+    return {m.group(0): m.group(1) for m in re.finditer(r"([a-zA-Z]+?)='(.+?)'", markup)}
+
+def vice_com_internal_markup(base, soup):
     if not base or 'www.vice.com/rss' not in base:
         return
 
     for imagep in soup.find_all('p', class_='has-image'):
-        internal_markup = imagep.text.strip()
-        if not internal_markup:
-            continue
+        info = _parse_vice_com_markup(imagep.text.strip())
         try:
-            print(repr(internal_markup))
-            path = re.search(r"path='(.+)'", internal_markup).group(1)
-            filename = re.search(r"filename='(.+)'", internal_markup).group(1)
-        except AttributeError:
+            url = 'https://assets2.vice.com/%s%s' % (info['path'], info['filename'])
+            imagep.replace_with(soup.new_tag('img', src=url))
+        except KeyError:
             continue
 
-        print(repr(path), repr(filename))
-        imagep.replace_with(soup.new_tag('img', src='https://assets2.vice.com/%s/%s' % (path, filename)))
+    if '[youtube src' in str(soup):
+        print(soup)
+    for youtubep in soup.find_all('p', text=re.compile(r'\s+\[youtube src', re.MULTILINE)):
+        print('HI THERE', repr(str(youtubep)))
+        info = _parse_vice_com_markup(youtubep.text.strip())
+        print(info)
+        try:
+            url = 'http://www.youtube.com/watch?v=' + info['src'].split('/')[-1]
+            youtubep.replace_with(PYEMBED.embed(url, max_width=1280))
+        except KeyError:
+            continue
+
 
 class TargetBlankAnchors(markdown.treeprocessors.Treeprocessor):
     def run(self, root):
