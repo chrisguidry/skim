@@ -1,5 +1,6 @@
 # coding: utf-8
 from html import unescape
+import re
 from urllib.parse import parse_qs, urljoin, urlparse
 
 from bs4 import BeautifulSoup
@@ -21,6 +22,8 @@ def to_text(base, entry_url, html):
         if 'youtube.com' in parsed.netloc:
             return youtube_entry(base, entry_url, soup)
 
+    vice_com_images(base, soup)
+
     absolutize(base, soup)
     invert_linked_elements(base, soup)
     remove_trailer_parks(base, soup)
@@ -28,6 +31,20 @@ def to_text(base, entry_url, html):
     text = html2text.html2text(str(soup), baseurl=base, **HTML2TEXT_CONFIG)
     text = unescape(text)
     return text.strip()
+
+
+def youtube_entry(base, entry_url, soup):
+    try:
+        video, description, *_ = soup.find_all('td')
+        video_href = video.find('a')['href']
+        description = description.find('span').text
+    except ValueError:
+        video_href = entry_url
+        description = str(soup)
+
+    embed = PYEMBED.embed(video_href, max_width=1280)
+    return '\n\n'.join([embed, description])
+
 
 def invert_linked_elements(base, soup):
     for tag_name in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'strong', 'em', 'i', 'b']:
@@ -81,19 +98,23 @@ def remove_trailer_parks(base, soup):
                 anchor.decompose()
                 break
 
-def youtube_entry(base, entry_url, soup):
-    try:
-        video, description, *_ = soup.find_all('td')
-        video_href = video.find('a')['href']
-        description = description.find('span').text
-    except ValueError:
-        video_href = entry_url
-        description = str(soup)
+def vice_com_images(base, soup):
+    if not base or 'www.vice.com/rss' not in base:
+        return
 
-    embed = PYEMBED.embed(video_href, max_width=1280)
-    return '\n\n'.join([embed, description])
+    for imagep in soup.find_all('p', class_='has-image'):
+        internal_markup = imagep.text.strip()
+        if not internal_markup:
+            continue
+        try:
+            print(repr(internal_markup))
+            path = re.search(r"path='(.+)'", internal_markup).group(1)
+            filename = re.search(r"filename='(.+)'", internal_markup).group(1)
+        except AttributeError:
+            continue
 
-
+        print(repr(path), repr(filename))
+        imagep.replace_with(soup.new_tag('img', src='https://assets2.vice.com/%s/%s' % (path, filename)))
 
 class TargetBlankAnchors(markdown.treeprocessors.Treeprocessor):
     def run(self, root):
