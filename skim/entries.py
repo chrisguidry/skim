@@ -55,6 +55,45 @@ def by_feed(feed_url):
     for entry in scrolled(index=INDEX, doc_type='entry', sort='published:desc', body=search):
         yield full_entry(feeds, entry)
 
+def interesting(since):
+    search = {
+        'query': {
+            'filtered': {
+                'filter': {
+                    'range': {
+                        'published': {'gte': since.isoformat() + 'Z'}
+                    }
+                }
+            }
+        },
+        'aggs': {
+            'most_sig': {
+                'significant_terms': {
+                    'field': 'title',
+                    'size': 20
+                }
+            }
+        }
+    }
+
+    feeds = feed_cache()
+    results = elastic().search(index=INDEX, doc_type='entry', body=search)
+    for bucket in results['aggregations']['most_sig']['buckets']:
+        search = {
+            'query': {
+                'filtered': {
+                    'query': {
+                        'match': {'title': bucket['key']}
+                    },
+                    'filter': {
+                        'range': {'published': {'gte': since.isoformat() + 'Z'}}
+                    }
+                }
+            }
+        }
+        for entry in scrolled(index=INDEX, doc_type='entry', body=search):
+            yield full_entry(feeds, entry)
+
 def datetime_from_iso(string):
     if not string:
         return None

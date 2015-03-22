@@ -1,6 +1,3 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
-
 Vagrant.configure(2) do |config|
     config.vm.box = "ubuntu/trusty64"
     config.vm.box_check_update = false  # only using this temporarily while on the train
@@ -16,6 +13,7 @@ Vagrant.configure(2) do |config|
         chef.add_recipe "apt"
         chef.add_recipe "java"
         chef.add_recipe "elasticsearch"
+        chef.add_recipe "elasticsearch::plugins"
 
         chef.json = {
             "java" => {
@@ -32,6 +30,9 @@ Vagrant.configure(2) do |config|
                 },
                 "custom_config" => {
                     "script.disable_dynamic" => false
+                },
+                "plugins" => {
+                    "mobz/elasticsearch-head" => {}
                 }
             }
         }

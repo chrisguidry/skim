@@ -39,9 +39,13 @@ def search_query():
 
 @app.route('/feeds')
 def feed():
-    feed_url = request.args.get('feed')
     return render_template('index.html',
-                           entries=entries.by_feed(feed_url))
+                           entries=entries.by_feed(request.args.get('feed')))
+
+@app.route('/interesting')
+def interesting():
+    return render_template('index.html',
+                           entries=entries.interesting(datetime.utcnow() - timedelta(hours=72)))
 
 
 if __name__ == '__main__':
