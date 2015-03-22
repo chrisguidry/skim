@@ -5,58 +5,47 @@ import os
 import os.path
 import time
 
-import markdown
-
-from skim import key
+from skim import scrolled, subscriptions
 from skim.configuration import elastic, INDEX
+from skim.markup import to_html
 
-
-def scrolled(*args, **kwargs):
-    es = elastic()
-    kwargs['scroll'] = kwargs.get('scroll') or '10s'
-    results = es.search(*args, **kwargs)
-    while results['hits']['hits']:
-        for hit in results['hits']['hits']:
-            yield hit['_source']
-        results = es.scroll(scroll_id=results['_scroll_id'], scroll=kwargs['scroll'])
 
 def feed_cache():
     return {feed['url']: feed for feed in scrolled(index=INDEX, doc_type='feed')}
 
 def search(query):
-    search = {
+    yield from full_entries(scrolled(index=INDEX, doc_type='entry', sort='published:desc', body={
         'query': {
             'query_string': {
                 'query': query
             }
         }
-    }
-    feeds = feed_cache()
-    for entry in scrolled(index=INDEX, doc_type='entry', sort='published:desc', body=search):
-        yield full_entry(feeds, entry)
+    }))
 
 def since(since):
-    search = {
+    yield from full_entries(scrolled(index=INDEX, doc_type='entry', sort='published:desc', body={
         'filter': {
             'range' : {'published' : {'gte' : since}}
         }
-    }
-    feeds = feed_cache()
-    for entry in scrolled(index=INDEX, doc_type='entry', sort='published:desc', body=search):
-        yield full_entry(feeds, entry)
+    }))
 
 def by_feed(feed_url):
-    search = {
+    yield from full_entries(scrolled(index=INDEX, doc_type='entry', sort='published:desc', body={
         'filter': {
             'term': {'feed': feed_url}
         }
-    }
-    feeds = feed_cache()
-    for entry in scrolled(index=INDEX, doc_type='entry', sort='published:desc', body=search):
-        yield full_entry(feeds, entry)
+    }))
+
+def by_category(category):
+    feed_urls = [feed['url'] for feed in subscriptions.by_category(category)]
+    yield from full_entries(scrolled(index=INDEX, doc_type='entry', sort='published:desc', body={
+        'filter': {
+            'terms': {'feed': feed_urls}
+        }
+    }))
 
 def interesting(since):
-    search = {
+    results = elastic().search(index=INDEX, doc_type='entry', body={
         'query': {
             'filtered': {
                 'filter': {
@@ -74,12 +63,9 @@ def interesting(since):
                 }
             }
         }
-    }
-
-    feeds = feed_cache()
-    results = elastic().search(index=INDEX, doc_type='entry', body=search)
+    })
     for bucket in results['aggregations']['most_sig']['buckets']:
-        search = {
+        yield from full_entries(scrolled(index=INDEX, doc_type='entry', body={
             'query': {
                 'filtered': {
                     'query': {
@@ -90,9 +76,7 @@ def interesting(since):
                     }
                 }
             }
-        }
-        for entry in scrolled(index=INDEX, doc_type='entry', body=search):
-            yield full_entry(feeds, entry)
+        }))
 
 def datetime_from_iso(string):
     if not string:
@@ -106,18 +90,10 @@ def datetime_from_iso(string):
 
     return None
 
-def full_entry(feeds, entry):
-    md = markdown.Markdown(output_mode='html5',
-                           smart_emphasis=True,
-                           safe_mode='escape',
-                           extensions=['markdown.extensions.abbr',
-                                       'markdown.extensions.codehilite',
-                                       'markdown.extensions.meta',
-                                       'markdown.extensions.smart_strong',
-                                       'markdown.extensions.smarty',
-                                       'markdown.extensions.tables'])
-
-    entry['feed'] = feeds[entry['feed']]
-    entry['body'] = md.convert(entry['text'])
-    entry['published'] = datetime_from_iso(entry['published'])
-    return entry
+def full_entries(entries):
+    feeds = feed_cache()
+    for entry in entries:
+        entry['feed'] = feeds[entry['feed']]
+        entry['body'] = to_html(entry['text'])
+        entry['published'] = datetime_from_iso(entry['published'])
+        yield entry

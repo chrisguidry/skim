@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<main class='pure-g'>
+    <section class='pure-u-1-1'>
+        <ul>
+            {% for subscription in subscriptions %}
+            <li>
+                <a href='{{ url_for('index') }}?feed={{ subscription.url }}'>{{ subscription.title or subscription.url }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+</main>
+{% endblock %}

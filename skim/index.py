@@ -9,51 +9,64 @@ from skim.configuration import elastic, INDEX
 
 logger = logging.getLogger(__name__)
 
+MAPPINGS = {
+    'mappings': {
+        'feed': {
+            'properties': {
+                'title': {
+                    'type': 'string',
+                    'fields': {
+                        'raw': {
+                            'type':  'string',
+                            'index': 'not_analyzed'
+                        }
+                    }
+                },
+                'etag': {
+                    'type': 'string',
+                    'index': 'not_analyzed'
+                },
+                'modified': {
+                    'type': 'string',
+                    'index': 'not_analyzed'
+                },
+                'categories': {
+                    'type': 'string',
+                    'index': 'not_analyzed'
+                }
+            }
+        },
+        'entry': {
+            'properties': {
+                'feed': {
+                    'type': 'string',
+                    'index': 'not_analyzed'
+                },
+                'published': {
+                    'type': 'date',
+                    'format': 'dateOptionalTime'
+                },
+                'url': {
+                    'type': 'string',
+                    'index': 'not_analyzed'
+                }
+            }
+        }
+    }
+}
 
 def ensure():
     logger.info('Ensuring index %r', INDEX)
     es = elastic()
     time.sleep(1)
-    es.indices.create(index=INDEX, ignore=400, body={
-        'mappings': {
-            'feed': {
-                'properties': {
-                    'etag': {
-                        'type': 'string',
-                        'index': 'not_analyzed'
-                    },
-                    'modified': {
-                        'type': 'string',
-                        'index': 'not_analyzed'
-                    }
-                }
-            },
-            'entry': {
-                'properties': {
-                    'feed': {
-                        'type': 'string',
-                        'index': 'not_analyzed'
-                    },
-                    'published': {
-                        'type': 'date',
-                        'format': 'dateOptionalTime'
-                    },
-                    'url': {
-                        'type': 'string',
-                        'index': 'not_analyzed'
-                    }
-                }
-            },
-            'subscription': {
-                'properties': {
-                    'url': {
-                        'type': 'string',
-                        'index': 'not_analyzed'
-                    }
-                }
-            }
-        }
-    })
+    es.indices.create(index=INDEX, ignore=400, body=MAPPINGS)
+    ensure_mapping();
+
+def ensure_mapping():
+    es = elastic()
+    time.sleep(1)
+    for doc_type, mapping in MAPPINGS['mappings'].items():
+        es.indices.put_mapping(index=INDEX, doc_type=doc_type, body=mapping)
 
 def remove():
     es = elastic()

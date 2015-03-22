@@ -4,23 +4,23 @@ import os
 import sys
 from xml.etree import ElementTree
 
-from skim import key
+from skim import scrolled
 from skim.configuration import elastic, INDEX
 
 
 def subscriptions():
-    es = elastic()
-    results = es.search(index=INDEX, doc_type='subscription', sort='url:asc', scroll='10s')
-    while results['hits']['hits']:
-        for hit in results['hits']['hits']:
-            yield hit['_source']
-        results = es.scroll(scroll_id=results['_scroll_id'], scroll='10s')
+    for subscription in scrolled(index=INDEX, doc_type='feed', sort='title.raw:asc'):
+        yield subscription
+
+def by_category(category):
+    search = {'filter': {'term': {'categories': category}}}
+    for subscription in scrolled(index=INDEX, doc_type='feed', sort='url:asc', body=search):
+        yield subscription
 
 def subscribe(feed_url):
-    elastic().update(index=INDEX, doc_type='subscription', id=feed_url, body={
+    elastic().update(index=INDEX, doc_type='feed', id=feed_url, body={
         'doc': {
-            'url': feed_url,
-            'categories': []
+            'url': feed_url
         },
         'doc_as_upsert': True
     })
@@ -29,8 +29,14 @@ def categorize(feed_url, category):
     if not category:
         return
 
-    elastic().update(index=INDEX, doc_type='subscription', id=feed_url, body={
-        'script' : 'ctx._source.categories.push(category)',
+    elastic().update(index=INDEX, doc_type='feed', id=feed_url, body={
+        'script' : '''
+            if (ctx._source.categories && !ctx._source.categories.contains(category)) {
+                ctx._source.categories.push(category);
+            } else {
+                ctx._source.categories = [category];
+            }
+        ''',
         'params': {
             'category': category
         },

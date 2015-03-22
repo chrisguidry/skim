@@ -16,13 +16,13 @@ setup(
     version=__version__,
     packages=find_packages(),
     install_requires=[
+        'beautifulsoup4==4.3.2',
         'elasticsearch==1.4.0',
         'Flask==0.10.1',
         'Flask-Assets==0.10',
         'feedparser==5.1.3',
         'html2text==2015.2.18',
         'Markdown==2.6',
-        'pygments==2.0.2',
-        'python-slugify==0.1.0'
+        'pygments==2.0.2'
     ]
 )

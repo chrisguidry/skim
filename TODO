@@ -1,0 +1,16 @@
+Cleaning
+--------
+
+* Strip social trailer parks
+** Feedburner's "email this", etc (http://feeds.feedburner.com/~ff/Torrentfreak?d=yIl2AUoC8zA)
+* YouTube rating star icons (http://gdata.youtube.com/static/images/icn_star_full_11x11.gif)
+* <code> and <a> tags; they don't render properly in either order of nesting (eg http://benno.id.au/blog/feed/)
+
+Feature ideas
+-------------
+
+* Full-text feeds for HN, Slashdot, etc
+* Full-image feeds for APOD, etc
+* Image caching, image size inlining, and smarter styling based on size
+** Stripping 1x1 trackers
+* Inline YouTube, Vimeo, etc. videos

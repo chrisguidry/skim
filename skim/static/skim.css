@@ -27,14 +27,14 @@ section > ol {
 
 article {
     clear: both;
+    position: relative;
 }
 article header {
-    box-sizing: border-box;
     position: absolute;
-    left: 0px;
-    width: 20%;
+    left: 0;
+    width: 17%;
     margin-left: 1em;
-    padding-right: 1em;
+    overflow-x: hidden;
 }
 article header h2 {
     font-size: 17px;
@@ -50,9 +50,9 @@ article section {
     font-family: Georgia, serif;
     font-size: 21px;
     line-height: 27px;
-    padding-bottom: 1em;
     border-bottom: 1px dashed #AAAAAA;
-    margin: .2em 4em 1em 1em;
+    margin: .2em 4em 1em 20%;
+    min-height: 9em;
 }
 article h1, article h2, article h3, article h4, article h5, article h6 {
     font-family: Helvetica, sans-serif;
@@ -90,4 +90,11 @@ article table th {
 }
 article hr {
     display: none;
+}
+article blockquote {
+    font-style: italic;
+}
+
+.math .mi, .math .mo {
+    color: #222222;
 }

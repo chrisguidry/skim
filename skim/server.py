@@ -7,8 +7,7 @@ import sys
 from flask import Flask, abort, render_template, redirect, request, url_for
 from flask.ext.assets import Environment, Bundle
 
-from skim import logging_to_console, entries
-
+from skim import logging_to_console, entries, subscriptions
 
 app = Flask(__name__)
 app.config.from_object('skim.configuration')
@@ -29,23 +28,26 @@ assets.register('javascripts', Bundle('third-party/moment-2.9.0.min.js',
 
 @app.route('/')
 def index():
-    return render_template('index.html',
-                           entries=entries.since(datetime.utcnow() - timedelta(hours=24)))
+    if 'feed' in request.args:
+        results = entries.by_feed(request.args.get('feed'))
+    elif 'category' in request.args:
+        results = entries.by_category(request.args.get('category'))
+    elif 'q' in request.args:
+        results = entries.search(request.args.get('q', ''))
+    else:
+        results = entries.since(datetime.utcnow() - timedelta(days=2))
 
-@app.route('/search')
-def search_query():
-    return render_template('index.html',
-                           entries=entries.search(request.args.get('q', '')))
+    return render_template('index.html', entries=results)
 
-@app.route('/feeds')
-def feed():
-    return render_template('index.html',
-                           entries=entries.by_feed(request.args.get('feed')))
+@app.route('/subscriptions')
+def all_subscriptions():
+    return render_template('subscriptions.html', subscriptions=subscriptions.subscriptions())
+
 
 @app.route('/interesting')
 def interesting():
     return render_template('index.html',
-                           entries=entries.interesting(datetime.utcnow() - timedelta(hours=72)))
+                           entries=entries.interesting(datetime.utcnow() - timedelta(days=2)))
 
 
 if __name__ == '__main__':

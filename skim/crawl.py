@@ -1,24 +1,22 @@
 #!/usr/bin/env python
 #coding: utf-8
 from datetime import datetime, timezone
+import json
 import logging
 import multiprocessing
 import os
+import re
 import sys
 import time
 
 import feedparser
-import html2text
-from slugify import slugify
 
-from skim import __version__, key, logging_to_console, index
+from skim import __version__, logging_to_console, index
 from skim.configuration import elastic, INDEX
-from skim.subscribe import subscriptions
+from skim.markup import to_text
+from skim.subscriptions import subscriptions
 
 feedparser.USER_AGENT = 'Skim/{} +https://github.com/chrisguidry/skim/'.format(__version__)
-html2text.config.UNICODE_SNOB = 1
-html2text.config.SINGLE_LINE_BREAK = False
-HTML2TEXT_CONFIG = {'bodywidth': 0}
 
 logger = logging.getLogger(__name__)
 
@@ -36,15 +34,6 @@ def save_conditional_get_state(feed_url, etag, modified):
             'url': feed_url,
             'etag': etag,
             'modified': modified
-        },
-        'doc_as_upsert': True
-    })
-
-def save_headers(feed_url, headers):
-    elastic().update(index=INDEX, doc_type='feed', id=feed_url, body={
-        'doc': {
-            'url': feed_url,
-            'headers': headers
         },
         'doc_as_upsert': True
     })
@@ -78,7 +67,7 @@ def entry_title(entry):
     title = entry.get('title')
     if not title:
         return '[untitled]'
-    return html2text.html2text(title, **HTML2TEXT_CONFIG).strip()
+    return to_text(None, title)
 
 def entry_time(entry):
     try:
@@ -89,7 +78,12 @@ def entry_time(entry):
     entry_time = entry.get('updated_parsed', entry.get('published_parsed'))
     if entry_time:
         entry_time = datetime(*entry_time[0:6])
-    else:
+
+    if not entry_time:
+        logger.warn('Guessing date for entry lacking a timestamp: %r', entry.get('link'))
+        entry_time = guess_time_from_url(entry.get('link'))
+
+    if not entry_time:
         logger.warn('Substituting now for entry lacking a timestamp: %r', entry.get('link'))
         entry_time = datetime.utcnow()
 
@@ -101,6 +95,11 @@ def entry_time(entry):
 
     return entry_time
 
+def guess_time_from_url(url):
+    match = re.search('((?P<year>2(\d{3}))/(?P<month>\d{1,2})(/(?P<day>\d{1,2}))?)', url)
+    if match:
+        return datetime.datetime(int(match.group('year')), int(match.group('month')), int(match.group('day') or '1'))
+
 def entry_text(entry):
     content = ''
     if 'content' in entry:
@@ -110,10 +109,7 @@ def entry_text(entry):
     else:
         return ''
 
-    if not content.base.strip():
-        console.warn('No baseurl for entry %r', entry)
-
-    return html2text.html2text(content.value, baseurl=content.base, **HTML2TEXT_CONFIG)
+    return to_text(content.base, content.value)
 
 def crawl(feed_url):
     logger.info('Crawling %r...', feed_url)
@@ -128,7 +124,6 @@ def crawl(feed_url):
         logger.info('Feed %s reported 304', feed_url)
         return
 
-    save_headers(feed_url, parsed.headers)
     if parsed.status not in (200, 301, 302):
         logger.warn('Status %s while crawling %s.', parsed.status, feed_url)
         return
@@ -148,11 +143,22 @@ def crawl(feed_url):
 
 def crawl_all(feed_urls):
     pool = multiprocessing.Pool(8)
+    results = []
     for feed_url in feed_urls:
         logger.info('Queueing %s', feed_url)
-        pool.apply_async(crawl, [feed_url])
+        results.append(pool.apply_async(crawl, [feed_url]))
     pool.close()
+    for result in results:
+        result.get()
     pool.join()
+
+def recrawl(feed_url):
+    es = elastic()
+    from skim.entries import by_feed
+    for entry in by_feed(feed_url):
+        es.delete(index=INDEX, doc_type='entry', id=entry['url'])
+    save_conditional_get_state(feed_url, None, None)
+    crawl(feed_url)
 
 
 if __name__ == '__main__':
