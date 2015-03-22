@@ -22,11 +22,11 @@ def to_text(base, entry_url, html):
         if 'youtube.com' in parsed.netloc:
             return youtube_entry(base, entry_url, soup)
 
-    vice_com_internal_markup(base, soup)
-
     absolutize(base, soup)
     invert_linked_elements(base, soup)
     remove_trailer_parks(base, soup)
+
+    vice_com_internal_markup(base, soup)
 
     text = html2text.html2text(str(soup), baseurl=base, **HTML2TEXT_CONFIG)
     text = unescape(text)
@@ -99,7 +99,7 @@ def remove_trailer_parks(base, soup):
                 break
 
 def _parse_vice_com_markup(markup):
-    return {m.group(0): m.group(1) for m in re.finditer(r"([a-zA-Z]+?)='(.+?)'", markup)}
+    return {m.group(1): m.group(2) for m in re.finditer(r"([\w]+?)='(.+?)'", markup)}
 
 def vice_com_internal_markup(base, soup):
     if not base or 'www.vice.com/rss' not in base:
@@ -109,21 +109,17 @@ def vice_com_internal_markup(base, soup):
         info = _parse_vice_com_markup(imagep.text.strip())
         try:
             url = 'https://assets2.vice.com/%s%s' % (info['path'], info['filename'])
-            imagep.replace_with(soup.new_tag('img', src=url))
         except KeyError:
             continue
+        imagep.replace_with(soup.new_tag('img', src=url))
 
-    if '[youtube src' in str(soup):
-        print(soup)
     for youtubep in soup.find_all('p', text=re.compile(r'\s+\[youtube src', re.MULTILINE)):
-        print('HI THERE', repr(str(youtubep)))
         info = _parse_vice_com_markup(youtubep.text.strip())
-        print(info)
         try:
             url = 'http://www.youtube.com/watch?v=' + info['src'].split('/')[-1]
-            youtubep.replace_with(PYEMBED.embed(url, max_width=1280))
         except KeyError:
             continue
+        youtubep.replace_with(BeautifulSoup(PYEMBED.embed(url, max_width=1280)))
 
 
 class TargetBlankAnchors(markdown.treeprocessors.Treeprocessor):
