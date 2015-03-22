@@ -1,16 +1,13 @@
 #!/usr/bin/env python
 #coding: utf-8
 from datetime import datetime, timedelta
-import os
-import os.path
+import logging
 import sys
 
 from flask import Flask, abort, render_template, redirect, request, url_for
 from flask.ext.assets import Environment, Bundle
 
-from skim.configuration import STORAGE_ROOT
-from skim.entries import entry_filenames_by_time, feed_entries, full_entry
-from skim.search import search
+from skim import logging_to_console, entries
 
 
 app = Flask(__name__)
@@ -30,36 +27,25 @@ assets.register('javascripts', Bundle('third-party/moment-2.9.0.min.js',
                                       output='build/skim.js'))
 
 
-def entries_context(entries):
-    return {
-        'entries': entries
-    }
-
-
 @app.route('/')
 def index():
-    entry_filenames = entry_filenames_by_time(datetime.utcnow() - timedelta(hours=24))
-    all_entries = [full_entry(filename) for filename in entry_filenames]
-    context = entries_context(all_entries)
-    return render_template('index.html', **context)
+    return render_template('index.html',
+                           entries=entries.since(datetime.utcnow() - timedelta(hours=24)))
 
 @app.route('/search')
 def search_query():
-    results = search(request.args.get('q', ''))
-    entry_filenames = [os.path.join(STORAGE_ROOT, result['path']) for result in results]
-    all_entries = [full_entry(filename) for filename in entry_filenames]
-    context = entries_context(all_entries)
-    return render_template('index.html', **context)
+    return render_template('index.html',
+                           entries=entries.search(request.args.get('q', '')))
 
-@app.route('/feeds/<feed_slug>')
-def feed(feed_slug):
-    entry_filenames = feed_entries(feed_slug)
-    all_entries = [full_entry(filename) for filename in entry_filenames]
-    context = entries_context(all_entries)
-    return render_template('index.html', **context)
+@app.route('/feeds')
+def feed():
+    feed_url = request.args.get('feed')
+    return render_template('index.html',
+                           entries=entries.by_feed(feed_url))
 
 
 if __name__ == '__main__':
+    logging_to_console(logging.getLogger(''))
     bind_address, bind_port = None, None
     if len(sys.argv) == 2:
         if ':' in sys.argv[1]:

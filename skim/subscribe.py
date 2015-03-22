@@ -1,41 +1,44 @@
 #!/usr/bin/env python
 #coding: utf-8
 import os
-import os.path
 import sys
 from xml.etree import ElementTree
 
 from skim import key
-from skim.configuration import STORAGE_ROOT
+from skim.configuration import elastic, INDEX
 
-
-def subscriptions_path():
-    path = os.path.join(STORAGE_ROOT, 'subscriptions')
-    if not os.path.exists(path):
-        os.makedirs(path)
-    if not os.path.exists(os.path.join(path, 'all')):
-        os.makedirs(os.path.join(path, 'all'))
-    return path
 
 def subscriptions():
-    root = os.path.join(subscriptions_path(), 'all')
-    for feed_filename in os.listdir(root):
-        with open(os.path.join(root, feed_filename), 'r') as feed_file:
-            yield feed_file.readline().strip()
+    es = elastic()
+    results = es.search(index=INDEX, doc_type='subscription', sort='url:asc', scroll='10s')
+    while results['hits']['hits']:
+        for hit in results['hits']['hits']:
+            yield hit['_source']
+        results = es.scroll(scroll_id=results['_scroll_id'], scroll='10s')
 
 def subscribe(feed_url):
-    with open(os.path.join(subscriptions_path(), 'all', key(feed_url)), 'w') as feed_file:
-        feed_file.write(feed_url + '\n')
+    elastic().update(index=INDEX, doc_type='subscription', id=feed_url, body={
+        'doc': {
+            'url': feed_url,
+            'categories': []
+        },
+        'doc_as_upsert': True
+    })
 
 def categorize(feed_url, category):
     if not category:
         return
-    category_path = os.path.join(subscriptions_path(), 'categories', *os.path.split(category))
-    if not os.path.exists(category_path):
-        os.makedirs(category_path)
-    if not os.path.exists(os.path.join(category_path, key(feed_url))):
-        os.symlink(os.path.relpath(os.path.join(subscriptions_path(), 'all', key(feed_url)), category_path),
-                   os.path.join(category_path, key(feed_url)))
+
+    elastic().update(index=INDEX, doc_type='subscription', id=feed_url, body={
+        'script' : 'ctx._source.categories.push(category)',
+        'params': {
+            'category': category
+        },
+        'upsert': {
+            'url': feed_url,
+            'categories': [category]
+        }
+    })
 
 def opml_feeds(opml_file):
     path = []

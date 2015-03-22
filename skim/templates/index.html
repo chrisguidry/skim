@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 <main class='pure-g'>
-    <section class='pure-u-1-3'>
+    <section class='pure-u-1-5'>
     </section>
-    <section class='pure-u-2-3'>
+    <section class='pure-u-4-5'>
         <ol>
             {% for entry in entries %}
             <li>
@@ -11,8 +11,8 @@
                     <header>
                         <h2><a href='{{ entry.url }}' target='_blank'>{{ entry.title }}</a></h2>
                         <h3>
-                            <time data-iso='{{ entry.published.isoformat() + "Z" }}'>{{ entry.published }}</time> at
-                            <a href='{{ url_for('feed', feed_slug=entry.feed.slug) }}'>{{ entry.feed.title }}</a>
+                            <time title='{{ entry.published.isoformat() + "Z" }}' data-iso='{{ entry.published.isoformat() + "Z" }}'>{{ entry.published }}</time> at
+                            <a href='{{ url_for('feed') }}?feed={{entry.feed.url}}'>{{ entry.feed.title }}</a>
                         </h3>
                     </header>
                     <section>

@@ -4,6 +4,7 @@
 html, body {
     background: white;
     color: #222222;
+    overflow-x: hidden;
 }
 html, button, input, select, textarea, .pure-g [class *= "pure-u"] {
     font-family: Helvetica, sans-serif;
@@ -31,7 +32,7 @@ article header {
     box-sizing: border-box;
     position: absolute;
     left: 0px;
-    width: 33.333333%;
+    width: 20%;
     margin-left: 1em;
     padding-right: 1em;
 }

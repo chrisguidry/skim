@@ -19,5 +19,5 @@ def logging_to_console(logger):
     logger.setLevel(logging.DEBUG)
     stream_handler = logging.StreamHandler(stream=sys.stdout)
     stream_handler.setLevel(logging.DEBUG)
-    stream_handler.setFormatter(logging.Formatter('%(asctime)s - %(processName)s - %(levelname)s - %(message)s'))
+    stream_handler.setFormatter(logging.Formatter('%(asctime)s - %(processName)s - %(levelname)s - %(name)s %(message)s'))
     logger.addHandler(stream_handler)

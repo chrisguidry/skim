@@ -2,4 +2,10 @@
 DEBUG = False
 ASSETS_DEBUG = False
 APPLICATION_ROOT = None  # may be /skim, for example, if running in a subdirectory
-STORAGE_ROOT = '/path/to/your/database/'  # must be a directory
+
+ELASTICSEARCH_HOSTS = ['localhost:9200']
+INDEX = 'skim'
+
+from elasticsearch import Elasticsearch
+def elastic():
+    return Elasticsearch(ELASTICSEARCH_HOSTS, sniff_on_start=True)
