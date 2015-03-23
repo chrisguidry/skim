@@ -22,14 +22,18 @@ def to_text(base, entry_url, html):
         if 'youtube.com' in parsed.netloc:
             return youtube_entry(base, entry_url, soup)
 
+    vice_com_internal_markup(base, soup)
+
     absolutize(base, soup)
     invert_linked_elements(base, soup)
+    tighten_inlines(base, soup)
     remove_trailer_parks(base, soup)
-
-    vice_com_internal_markup(base, soup)
 
     text = html2text.html2text(str(soup), baseurl=base, **HTML2TEXT_CONFIG)
     text = unescape(text)
+
+    text = vice_com_video_markup(base, text)
+
     return text.strip()
 
 
@@ -53,6 +57,13 @@ def invert_linked_elements(base, soup):
                 anchor = element.parent
                 unwrapped = element.unwrap()
                 anchor.wrap(unwrapped)
+
+def tighten_inlines(base, soup):
+    for tag_name in ['em', 'strong', 'i', 'b']:
+        for element in soup.find_all(tag_name):
+            if element.text.endswith(' '):
+                element.string = element.text.rstrip()
+                element.insert_after(' ')
 
 def absolutize(base, soup):
     for anchor in soup.find_all('a', href=True):
@@ -113,13 +124,23 @@ def vice_com_internal_markup(base, soup):
             continue
         imagep.replace_with(soup.new_tag('img', src=url))
 
-    for youtubep in soup.find_all('p', text=re.compile(r'\s+\[youtube src', re.MULTILINE)):
-        info = _parse_vice_com_markup(youtubep.text.strip())
-        try:
-            url = 'http://www.youtube.com/watch?v=' + info['src'].split('/')[-1]
-        except KeyError:
-            continue
-        youtubep.replace_with(BeautifulSoup(PYEMBED.embed(url, max_width=1280)))
+def vice_com_video_markup(base, text):
+    if not base or 'www.vice.com/rss' not in base:
+        return text
+
+    lines = []
+    for line in text.split('\n'):
+        for match in re.finditer(r"\[youtube src.+?\]", line):
+            info = _parse_vice_com_markup(match.group())
+            try:
+                url = 'http://www.youtube.com/watch?v=' + info['src'].split('/')[-1]
+            except KeyError:
+                continue
+
+            line = line.replace(match.group(), PYEMBED.embed(url, max_width=1280))
+        lines.append(line)
+    return '\n'.join(lines)
+
 
 
 class TargetBlankAnchors(markdown.treeprocessors.Treeprocessor):

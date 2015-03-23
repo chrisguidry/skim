@@ -41,10 +41,18 @@ article header h2 {
     margin: 0;
     font-weight: normal;
 }
+article header h2 a {
+    text-decoration: none;
+    font-style: italic;
+}
 article header h3 {
     font-weight: normal;
     font-size: 15px;
     margin: 0.3em 0;
+}
+article header h3 a {
+    text-decoration: none;
+    font-style: italic;
 }
 article section {
     font-family: Georgia, serif;
