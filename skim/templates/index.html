@@ -19,6 +19,14 @@
                         </ul>
                     </header>
                     <section>
+                    {% for enclosure in entry.enclosures %}
+                        {% if enclosure.type.startswith('video/') %}
+                        <video controls preload='metadata' src="{{ enclosure.url }}"{% if entry.image %}poster="{{ entry.image }}"{% endif %}></video>
+                        {% elif enclosure.type.startswith('audio/') %}
+                        <audio controls preload='metadata' src="{{ enclosure.url }}"></audio>
+                        {% endif %}
+                    {% endfor %}
+
                     {{ entry.body|safe }}
                     </section>
                 </article>

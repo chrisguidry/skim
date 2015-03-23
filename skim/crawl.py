@@ -54,14 +54,24 @@ def entry_exists(entry_url):
 def save_entry(feed_url, entry):
     elastic().index(index=INDEX, doc_type='entry', id=entry_url(feed_url, entry), body={
         'feed': feed_url,
-        'url': entry.get('link'),
+        'url': entry_link(entry),
         'title': entry_title(entry),
         'published': entry_time(entry).isoformat() + 'Z',
-        'text': entry_text(entry)
+        'text': entry_text(entry),
+        'image': entry.get('image', {}).get('href'),
+        'enclosures': [{'type': enc.type, 'url': enc.href}
+                       for enc in entry.get('enclosures') or []]
     })
 
 def entry_url(feed_url, entry):
-    return entry.get('link') or '{}#{}'.format(feed_url, entry_time(entry).isoformat() + 'Z')
+    return entry_link(entry) or '{}#{}'.format(feed_url, entry_time(entry).isoformat() + 'Z')
+
+def entry_link(entry):
+    if 'enclosures' in entry:
+        for enclosure in entry['enclosures']:
+            if enclosure.get('href'):
+                return enclosure['href']
+    return entry['link']
 
 def entry_title(entry):
     title = entry.get('title')
@@ -80,15 +90,15 @@ def entry_time(entry):
         entry_time = datetime(*entry_time[0:6])
 
     if not entry_time:
-        logger.warn('Guessing date for entry lacking a timestamp: %r', entry.get('link'))
-        entry_time = guess_time_from_url(entry.get('link'))
+        logger.warn('Guessing date for entry lacking a timestamp: %r', entry_link(entry))
+        entry_time = guess_time_from_url(entry_link(entry))
 
     if not entry_time:
-        logger.warn('Substituting now for entry lacking a timestamp: %r', entry.get('link'))
+        logger.warn('Substituting now for entry lacking a timestamp: %r', entry_link(entry))
         entry_time = datetime.utcnow()
 
     if entry_time > datetime.utcnow():
-        logger.warn('Entry from the future; using now: %r', entry.get('link'))
+        logger.warn('Entry from the future; using now: %r', entry_link(entry))
         entry_time = datetime.utcnow()
 
     entry['__date__'] = entry_time
@@ -109,7 +119,7 @@ def entry_text(entry):
     else:
         return ''
 
-    return to_text(content.base, entry.get('link'), content.value)
+    return to_text(content.base, entry_link(entry), content.value)
 
 def crawl(feed_url):
     logger.info('Crawling %r...', feed_url)

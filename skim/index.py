@@ -41,6 +41,10 @@ MAPPINGS = {
                     'type': 'string',
                     'index': 'not_analyzed'
                 },
+                'image': {
+                    'type': 'string',
+                    'index': 'not_analyzed'
+                },
                 'published': {
                     'type': 'date',
                     'format': 'dateOptionalTime'
@@ -48,6 +52,19 @@ MAPPINGS = {
                 'url': {
                     'type': 'string',
                     'index': 'not_analyzed'
+                },
+                'enclosures': {
+                    'type': 'nested',
+                    'properties': {
+                        'type': {
+                            'type': 'string',
+                            'index': 'not_analyzed'
+                        },
+                        'url': {
+                            'type': 'string',
+                            'index': 'not_analyzed'
+                        }
+                    }
                 }
             }
         }

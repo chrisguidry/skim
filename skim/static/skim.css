@@ -102,6 +102,15 @@ article hr {
 article blockquote {
     font-style: italic;
 }
+article video {
+    display: block;
+    width: 100%;
+    margin-bottom: 1em;
+}
+article audio {
+    display: block;
+    margin-bottom: 1em;
+}
 
 .math .mi, .math .mo {
     color: #222222;
