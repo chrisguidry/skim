@@ -24,6 +24,21 @@ section > ol {
     padding-left: 0;
 }
 
+footer {
+    position: fixed;
+    left: 0;
+    bottom: 0em;
+    padding: .5em;
+    width: 19%;
+    background-color: white;
+    border: 1px solid #EEEEEE;
+    box-shadow: rgba(0,0,0,0.1) 0px 1px 2px, inset rgba(0,0,0,0.1) 0px -1px 2px;
+}
+footer input {
+    width: 100%;
+    height: 2em;
+    padding: .02em;
+}
 
 article {
     clear: both;
@@ -44,6 +59,9 @@ article header h2 {
 article header h2 a {
     text-decoration: none;
     font-style: italic;
+}
+article header h2 a em {
+    font-style: normal;
 }
 article header h3 {
     font-weight: normal;
@@ -85,7 +103,6 @@ article .codehilite pre {
 }
 article img {
     max-width: 100%;
-    display: block;
 }
 article table {
     width: 100%;

@@ -18,5 +18,39 @@
   }
   setInterval(updateTimes, 60*1000);
   document.addEventListener('DOMContentLoaded', localizeTimes);
-  localizeTimes();
+
+  function subscribe() {
+    var subscribeInput = document.getElementById('subscribe'),
+        feedUrl = subscribeInput.value.trim(),
+        xhr;
+    if (!feedUrl) {
+      return;
+    }
+
+    subscribeInput.setAttribute('disabled', 'disabled');
+    xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState < 4) { return; }
+      if (xhr.status >= 400) {
+        console.warn('TODO: handle error', xhr);
+      } else {
+        subscribeInput.value = '';
+      }
+      subscribeInput.removeAttribute('disabled');
+    }
+    xhr.open('POST', '/subscriptions', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify({
+      'url': feedUrl
+    }));
+  }
+  function bindSubscribe() {
+    var subscribeInput = document.getElementById('subscribe');
+    subscribeInput.addEventListener('keyup', function(evt) {
+      if (evt.keyCode === 13) {
+        subscribe();
+      }
+    });
+  }
+  document.addEventListener('DOMContentLoaded', bindSubscribe);
 }(moment));

@@ -69,7 +69,7 @@ def entry_url(feed_url, entry):
 def entry_link(entry):
     if 'enclosures' in entry:
         for enclosure in entry['enclosures']:
-            if enclosure.get('href'):
+            if enclosure.get('type').startswith(('audio/', 'video/')) and enclosure.get('href'):
                 return enclosure['href']
     return entry['link']
 
@@ -151,13 +151,16 @@ def crawl(feed_url):
 
     save_conditional_get_state(feed_url, parsed.get('etag'), parsed.get('modified'))
 
-def crawl_all(feed_urls):
+def crawl_all(feed_urls, wait=True):
     pool = multiprocessing.Pool(16)
     results = []
     for feed_url in feed_urls:
         logger.info('Queueing %s', feed_url)
         results.append(pool.apply_async(crawl, [feed_url]))
     pool.close()
+
+    if not wait:
+        return
     for result in results:
         result.get()
     pool.join()

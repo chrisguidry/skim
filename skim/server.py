@@ -7,7 +7,7 @@ import sys
 from flask import Flask, abort, render_template, redirect, request, url_for
 from flask.ext.assets import Environment, Bundle
 
-from skim import entries, subscriptions
+from skim import crawl, entries, subscriptions
 
 app = Flask(__name__)
 app.config.from_object('skim.configuration')
@@ -39,10 +39,16 @@ def index():
 
     return render_template('index.html', entries=results)
 
-@app.route('/subscriptions')
+@app.route('/subscriptions', methods=['GET'])
 def all_subscriptions():
     return render_template('subscriptions.html', subscriptions=subscriptions.subscriptions())
 
+@app.route('/subscriptions', methods=['POST'])
+def subscribe():
+    url = request.json['url']
+    subscriptions.subscribe(url)
+    crawl.crawl_all([url], wait=False)
+    return '', 202
 
 @app.route('/interesting')
 def interesting():

@@ -174,5 +174,8 @@ MARKDOWN = markdown.Markdown(output_format='html5',
                                          'markdown.extensions.tables',
                                          SkimExtension()])
 
-def to_html(text):
-    return MARKDOWN.convert(text)
+def to_html(text, unwrap=False):
+    html = MARKDOWN.convert(text)
+    if unwrap:
+        html = html[3:-4]  # nixes the containing <p> and </p>
+    return html

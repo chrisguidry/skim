@@ -93,7 +93,8 @@ def datetime_from_iso(string):
 def full_entries(entries):
     feeds = feed_cache()
     for entry in entries:
-        entry['feed'] = feeds[entry['feed']]
+        entry['title'] = to_html(entry['title'], unwrap=True) or '[untitled]'
         entry['body'] = to_html(entry['text'])
+        entry['feed'] = feeds[entry['feed']]
         entry['published'] = datetime_from_iso(entry['published'])
         yield entry

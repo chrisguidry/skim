@@ -7,7 +7,7 @@
             <li>
                 <article>
                     <header>
-                        <h2><a href='{{ entry.url }}' target='_blank'>{{ entry.title }}</a></h2>
+                        <h2><a href='{{ entry.url }}' target='_blank'>{{ entry.title|safe }}</a></h2>
                         <h3>
                             <time title='{{ entry.published.isoformat() + "Z" }}' data-iso='{{ entry.published.isoformat() + "Z" }}'>{{ entry.published }}</time> at
                             <a href='{{ url_for('index') }}?feed={{ entry.feed.url|urlencode }}'>{{ entry.feed.title }}</a>
