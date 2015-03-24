@@ -20,6 +20,7 @@ setup(
         'elasticsearch==1.4.0',
         'Flask==0.10.1',
         'Flask-Assets==0.10',
+        'flask-debugtoolbar==0.9.2',
         'feedparser==5.1.3',
         'html2text==2015.2.18',
         'Markdown==2.6',

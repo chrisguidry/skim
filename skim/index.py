@@ -32,6 +32,14 @@ MAPPINGS = {
                 'categories': {
                     'type': 'string',
                     'index': 'not_analyzed'
+                },
+                'icon': {
+                    'type': 'string',
+                    'index': 'not_analyzed'
+                },
+                'image': {
+                    'type': 'string',
+                    'index': 'not_analyzed'
                 }
             }
         },

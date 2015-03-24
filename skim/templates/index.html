@@ -2,37 +2,45 @@
 {% block content %}
 <main class='pure-g'>
     <section class='pure-u-1-1'>
-        <ol>
-            {% for entry in entries %}
-            <li>
-                <article>
-                    <header>
-                        <h2><a href='{{ entry.url }}' target='_blank'>{{ entry.title|safe }}</a></h2>
-                        <h3>
-                            <time title='{{ entry.published.isoformat() + "Z" }}' data-iso='{{ entry.published.isoformat() + "Z" }}'>{{ entry.published }}</time> at
-                            <a href='{{ url_for('index') }}?feed={{ entry.feed.url|urlencode }}'>{{ entry.feed.title }}</a>
-                        </h3>
-                        <ul class='categories'>
-                            {% for category in entry.feed.categories %}
-                            <li><a href='{{ url_for('index') }}?category={{ category|urlencode }}'>{{category}}</a></li>
-                            {% endfor %}
-                        </ul>
-                    </header>
-                    <section>
-                    {% for enclosure in entry.enclosures %}
-                        {% if enclosure.type.startswith('video/') %}
-                        <video controls preload='metadata' src="{{ enclosure.url }}"{% if entry.image %}poster="{{ entry.image }}"{% endif %}></video>
-                        {% elif enclosure.type.startswith('audio/') %}
-                        <audio controls preload='metadata' src="{{ enclosure.url }}"></audio>
-                        {% endif %}
+        {% for entry in entries %}
+        <article class='pure-g'>
+            <header class='pure-u-1-5'>
+                <h2><a href='{{ entry.url }}' target='_blank'>{{ entry.title|safe }}</a></h2>
+                <h3>
+                    <time title='{{ entry.published.isoformat() + "Z" }}' data-iso='{{ entry.published.isoformat() + "Z" }}'>{{ entry.published }}</time>
+                    {% if entry.authors %}
+                    by <ul class='authors'>
+                        {% for author in entry.authors %}
+                        <li><a href='{{ url_for('index') }}?q={{author|urlencode}}'>{{author}}</a></li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    from <a href='{{ url_for('index') }}?feed={{ entry.feed.url|urlencode }}'>{{ entry.feed.title }}</a>
+                </h3>
+                <ul class='categories'>
+                    {% for category in entry.feed.categories %}
+                    <li><a href='{{ url_for('index') }}?category={{ category|urlencode }}'>{{category}}</a></li>
                     {% endfor %}
-
-                    {{ entry.body|safe }}
-                    </section>
-                </article>
-            </li>
+                </ul>
+                <ul class='tags'>
+                    {% for tag in entry.tags %}
+                    <li><a href='{{ url_for('index') }}?q={{tag|urlencode}}'>{{tag}}</a></li>
+                    {% endfor %}
+                </ul>
+            </header>
+            <section class='pure-u-4-5'>
+            {% for enclosure in entry.enclosures %}
+                {% if enclosure.type.startswith('video/') %}
+                <video controls preload='metadata' src="{{ enclosure.url }}"{% if entry.image %}poster="{{ entry.image }}"{% endif %}></video>
+                {% elif enclosure.type.startswith('audio/') %}
+                <audio controls preload='metadata' src="{{ enclosure.url }}"></audio>
+                {% endif %}
             {% endfor %}
-        </ol>
+
+            {{ entry.body|safe }}
+            </section>
+        </article>
+        {% endfor %}
     </section>
 </main>
 {% endblock %}

@@ -2,10 +2,17 @@ Cleaning
 --------
 
 * <code> and <a> tags; they don't render properly in either order of nesting (eg http://benno.id.au/blog/feed/)
+* Reddit snippets look strange:
+> | submitted by adv4nced
+> [link] [12 comments]
+> —|—
 
 Feature ideas
 -------------
 
+* Some sort of pagination/infinite scroll
+* Prerendering articles (Markdown is the overwhelming amount of time in rendering a page)
+* search result highlighting
 * Full-text feeds for HN, Slashdot, etc
 * Full-image feeds for APOD, etc
 * Image caching, image size inlining, and smarter styling based on size

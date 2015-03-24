@@ -18,12 +18,6 @@ a:hover {
     color: #666666;
 }
 
-section > ol {
-    list-style-type: none;
-    margin-left: 0;
-    padding-left: 0;
-}
-
 footer {
     position: fixed;
     left: 0;
@@ -33,23 +27,19 @@ footer {
     background-color: white;
     border: 1px solid #EEEEEE;
     box-shadow: rgba(0,0,0,0.1) 0px 1px 2px, inset rgba(0,0,0,0.1) 0px -1px 2px;
+    border-top-right-radius: 5px;
 }
 footer input {
     width: 100%;
     height: 2em;
-    padding: .02em;
+    padding: .2em .4em .1em .4em;
 }
 
+
 article {
-    clear: both;
-    position: relative;
 }
 article header {
-    position: absolute;
-    left: 0;
-    width: 17%;
-    margin-left: 1em;
-    overflow-x: hidden;
+    padding: 20px;
 }
 article header h2 {
     font-size: 17px;
@@ -72,18 +62,35 @@ article header h3 a {
     text-decoration: none;
     font-style: italic;
 }
-article section {
+article header ul.authors, article header ul.authors li {
+    display: inline;
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+    font-style: italic;
+}
+article header ul.categories, article header ul.tags {
+    padding-left: 20px;
+}
+
+article section, article.pure-g section[class *= "pure-u"] {
     font-family: Georgia, serif;
     font-size: 21px;
     line-height: 27px;
     border-bottom: 1px dashed #AAAAAA;
-    margin: .2em 4em 1em 20%;
+    padding: 20px 20px 20px 0;
     min-height: 9em;
 }
 article h1, article h2, article h3, article h4, article h5, article h6 {
     font-family: Helvetica, sans-serif;
     line-height: 1.2em;
     font-weight: normal;
+}
+article section>:first-child {
+    margin-top: 0;
+}
+article section>:last-child {
+    margin-bottom: 0;
 }
 article h1 code, article h2 code, article h3 code, article h4 code, article h5 code, article h6 code {
     font-size: inherit;
@@ -103,6 +110,7 @@ article .codehilite pre {
 }
 article img {
     max-width: 100%;
+    display: block;
 }
 article table {
     width: 100%;

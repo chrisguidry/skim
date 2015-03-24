@@ -30,12 +30,12 @@ def to_text(base, entry_url, html):
     remove_trailer_parks(base, soup)
 
     text = html2text.html2text(str(soup), baseurl=base, **HTML2TEXT_CONFIG)
-    text = unescape(text)
 
     text = vice_com_video_markup(base, text)
-
     return text.strip()
 
+def remove_tags(html):
+    return BeautifulSoup(html).text
 
 def youtube_entry(base, entry_url, soup):
     try:

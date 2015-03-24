@@ -13,13 +13,21 @@ import feedparser
 
 from skim import __version__, index
 from skim.configuration import elastic, INDEX
-from skim.markup import to_text
+from skim.markup import remove_tags, to_text
 from skim.subscriptions import subscriptions
 
 feedparser.USER_AGENT = 'Skim/{} +https://github.com/chrisguidry/skim/'.format(__version__)
 
 logger = logging.getLogger(__name__)
 
+
+def unique(iterable):
+    seen = set()
+    for item in iterable:
+        if item in seen:
+            continue
+        yield item
+        seen.add(item)
 
 def conditional_get_state(feed_url):
     doc = elastic().get_source(index=INDEX, doc_type='feed', id=feed_url,
@@ -43,7 +51,12 @@ def save_feed(feed_url, feed):
         'doc': {
             'url': feed_url,
             'title': feed.get('title', feed_url),
-            'subtitle': feed.get('subtitle')
+            'subtitle': feed.get('subtitle'),
+            'authors': author_names(feed),
+            'publisher': feed.get('publisher_detail', {}).get('name'),
+            'tags': tags(feed),
+            'icon': feed.get('icon'),
+            'image': feed.get('image', {}).get('href') or feed.get('logo')
         },
         'doc_as_upsert': True
     })
@@ -59,9 +72,26 @@ def save_entry(feed_url, entry):
         'published': entry_time(entry).isoformat() + 'Z',
         'text': entry_text(entry),
         'image': entry.get('image', {}).get('href'),
+        'authors': author_names(entry),
+        'tags': tags(entry),
         'enclosures': [{'type': enc.type, 'url': enc.href}
                        for enc in entry.get('enclosures') or []]
     })
+
+def author_names(feed_or_entry):
+    return list(unique(remove_tags(author.name)
+                       for author in authors(feed_or_entry)
+                       if author.get('name')))
+
+def authors(feed_or_entry):
+    if feed_or_entry.get('author_detail'):
+        yield feed_or_entry['author_detail']
+    for contributor in feed_or_entry.get('contributors', []):
+        yield contributor
+
+def tags(feed_or_entry):
+    return list(unique(tag.label or tag.term
+                       for tag in feed_or_entry.get('tags', [])))
 
 def entry_url(feed_url, entry):
     return entry_link(entry) or '{}#{}'.format(feed_url, entry_time(entry).isoformat() + 'Z')

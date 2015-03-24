@@ -6,11 +6,24 @@ import sys
 
 from flask import Flask, abort, render_template, redirect, request, url_for
 from flask.ext.assets import Environment, Bundle
+from flask_debugtoolbar import DebugToolbarExtension
 
 from skim import crawl, entries, subscriptions
 
 app = Flask(__name__)
 app.config.from_object('skim.configuration')
+
+app.config['DEBUG_TB_PROFILER_ENABLED'] = True
+app.config['DEBUG_TB_PANELS'] = [
+    'flask_debugtoolbar.panels.versions.VersionDebugPanel',
+    'flask_debugtoolbar.panels.timer.TimerDebugPanel',
+    'flask_debugtoolbar.panels.headers.HeaderDebugPanel',
+    'flask_debugtoolbar.panels.request_vars.RequestVarsDebugPanel',
+    'flask_debugtoolbar.panels.template.TemplateDebugPanel',
+    'flask_debugtoolbar.panels.logger.LoggingPanel',
+    'flask_debugtoolbar.panels.profiler.ProfilerDebugPanel'
+]
+toolbar = DebugToolbarExtension(app)
 
 assets = Environment(app)
 assets.register('stylesheets', Bundle('third-party/pure-release-0.5.0/base-min.css',
@@ -35,7 +48,7 @@ def index():
     elif 'q' in request.args:
         results = entries.search(request.args.get('q', ''))
     else:
-        results = entries.since(datetime.utcnow() - timedelta(days=2))
+        results = entries.since(datetime.utcnow() - timedelta(hours=4))
 
     return render_template('index.html', entries=results)
 
