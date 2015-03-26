@@ -15,7 +15,7 @@ HTML2TEXT_CONFIG = {'bodywidth': 0}
 PYEMBED = PyEmbed()
 
 def to_text(base, entry_url, html):
-    soup = BeautifulSoup(html)
+    soup = BeautifulSoup(html, 'html5lib')
 
     if entry_url:
         parsed = urlparse(entry_url)
@@ -26,8 +26,11 @@ def to_text(base, entry_url, html):
 
     absolutize(base, soup)
     invert_linked_elements(base, soup)
+    no_breaks_within_anchors(base, soup)
+    multiple_images_within_anchor(base, soup)
     tighten_inlines(base, soup)
     remove_trailer_parks(base, soup)
+    read_more_links(base, soup)
 
     text = html2text.html2text(str(soup), baseurl=base, **HTML2TEXT_CONFIG)
 
@@ -35,7 +38,7 @@ def to_text(base, entry_url, html):
     return text.strip()
 
 def remove_tags(html):
-    return BeautifulSoup(html).text
+    return BeautifulSoup(html, 'html5lib').text
 
 def youtube_entry(base, entry_url, soup):
     try:
@@ -57,6 +60,23 @@ def invert_linked_elements(base, soup):
                 anchor = element.parent
                 unwrapped = element.unwrap()
                 anchor.wrap(unwrapped)
+
+def no_breaks_within_anchors(base, soup):
+    for anchor in soup.find_all('a'):
+        for br in anchor.find_all('br'):
+            br.replace_with('\n')
+
+def multiple_images_within_anchor(base, soup):
+    for anchor in soup.find_all('a'):
+        if anchor.text.strip():
+            continue
+        images = anchor.find_all('img')
+        if len(images) <= 1:
+            continue
+
+        for image in images:
+            image.wrap(soup.new_tag('a', href=anchor['href']))
+        anchor.unwrap()
 
 def tighten_inlines(base, soup):
     for tag_name in ['em', 'strong', 'i', 'b']:
@@ -108,6 +128,11 @@ def remove_trailer_parks(base, soup):
             if parsed.netloc.endswith(domain) and path in parsed.path and query in parsed.query:
                 anchor.decompose()
                 break
+
+def read_more_links(base, soup):
+    for a in soup.find_all('a', text=re.compile(r'read more|continue reading', re.IGNORECASE)):
+        a.decompose()
+
 
 def _parse_vice_com_markup(markup):
     return {m.group(1): m.group(2) for m in re.finditer(r"([\w]+?)='(.+?)'", markup)}
@@ -168,7 +193,6 @@ MARKDOWN = markdown.Markdown(output_format='html5',
                              safe_mode=False,
                              extensions=['markdown.extensions.abbr',
                                          'markdown.extensions.codehilite',
-                                         'markdown.extensions.meta',
                                          'markdown.extensions.smart_strong',
                                          'markdown.extensions.smarty',
                                          'markdown.extensions.tables',
