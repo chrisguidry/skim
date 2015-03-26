@@ -14,6 +14,7 @@ MAPPINGS = {
             'properties': {
                 'title': {
                     'type': 'string',
+                    'analyzer': 'english',
                     'fields': {
                         'raw': {
                             'type':  'string',
@@ -45,6 +46,14 @@ MAPPINGS = {
         },
         'entry': {
             'properties': {
+                'title': {
+                    'type': 'string',
+                    'analyzer': 'english'
+                },
+                'text': {
+                    'type': 'string',
+                    'analyzer': 'english'
+                },
                 'feed': {
                     'type': 'string',
                     'index': 'not_analyzed'

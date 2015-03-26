@@ -101,7 +101,7 @@ def entry_link(entry):
         for enclosure in entry['enclosures']:
             if enclosure.get('type').startswith(('audio/', 'video/')) and enclosure.get('href'):
                 return enclosure['href']
-    return entry['link']
+    return entry.get('link')
 
 def entry_title(entry):
     title = entry.get('title')
