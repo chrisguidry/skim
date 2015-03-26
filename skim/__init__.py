@@ -4,11 +4,11 @@ import logging
 import sys
 from urllib.parse import urlsplit, urlunsplit
 
-from skim.configuration import elastic
 from skim.version import __version__
 
 
 def scrolled(*args, **kwargs):
+    from skim.configuration import elastic
     es = elastic()
     kwargs['scroll'] = kwargs.get('scroll') or '10s'
     results = es.search(*args, **kwargs)
