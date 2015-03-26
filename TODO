@@ -6,6 +6,8 @@ Cleaning
 > | submitted by adv4nced
 > [link] [12 comments]
 > —|—
+* Resolve the problems with HTML titles versus mis-interpreted markdown titles and markdown-wrapped-in-a-<p>
+* vice.com's entry tags are an embedded comma-separated list of tags
 
 Feature ideas
 -------------

@@ -112,6 +112,10 @@ article img {
     max-width: 100%;
     display: block;
 }
+article iframe {
+    max-width: 100%;
+    display: block;
+}
 article table {
     width: 100%;
 }

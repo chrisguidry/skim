@@ -97,7 +97,7 @@ def remove_trailer_parks(base, soup):
         ('.feedsportal.com', ''),
         ('a.fsdn.com', 'twitter_icon'),
         ('a.fsdn.com', 'facebook_icon'),
-        ('www.gstatic.com', 'images/icons/gplus-16.png'),
+        ('.gstatic.com', 'images/icons/gplus'),
         ('', 'social-media-feather/synved-social')
     ]
     for image in soup.find_all('img', src=True):
@@ -155,10 +155,15 @@ def vice_com_video_markup(base, text):
 
     lines = []
     for line in text.split('\n'):
-        for match in re.finditer(r"\[youtube src.+?\]", line):
+        for match in re.finditer(r"\[(youtube|vimeo) src.+?\]", line):
             info = _parse_vice_com_markup(match.group())
             try:
-                url = 'http://www.youtube.com/watch?v=' + info['src'].split('/')[-1]
+                if match.group(1) == 'youtube':
+                    url = 'http://www.youtube.com/watch?v=' + info['src'].split('/')[-1]
+                elif match.group(1) == 'vimeo':
+                    url = 'http://vimeo.com/' + info['src'].split('/')[-1]
+                else:
+                    continue
             except KeyError:
                 continue
 
@@ -198,8 +203,5 @@ MARKDOWN = markdown.Markdown(output_format='html5',
                                          'markdown.extensions.tables',
                                          SkimExtension()])
 
-def to_html(text, unwrap=False):
-    html = MARKDOWN.convert(text)
-    if unwrap:
-        html = html[3:-4]  # nixes the containing <p> and </p>
-    return html
+def to_html(text):
+    return MARKDOWN.convert(text)
