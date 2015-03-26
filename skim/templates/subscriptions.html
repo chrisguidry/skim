@@ -2,16 +2,41 @@
 {% block content %}
 <main class='pure-g'>
     <section class='pure-u-1-1'>
-        <ul>
+        <table class='subscriptions'>
+            <thead>
+                <tr>
+                    <th>Feed</th>
+                    <th>Entries</th>
+                    <th>To</th>
+                    <th>To</th>
+                </tr>
+            </thead>
+            <thead>
+                <tr>
+                    <th colspan='4'>
+                        <input id='subscribe' placeholder='subscribe to a new feed' />
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
             {% for subscription in subscriptions %}
-            <li>
-                <a href='{{ url_for('index') }}?feed={{ subscription.url|urlencode }}'>{{ subscription.title or subscription.url }}</a>
-            </li>
+                <tr>
+                    <td><a href='{{ url_for('index') }}?feed={{ subscription.url|urlencode }}'>{{ subscription.title or subscription.url }}</a></td>
+                    <td>{{ subscription.entry_count }}</td>
+                    <td>
+                        {% if subscription.first_entry %}
+                        <time title='{{ subscription.first_entry.isoformat() + "Z" }}' data-iso='{{ subscription.first_entry.isoformat() + "Z" }}'>{{ subscription.first_entry }}</time>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if subscription.latest_entry %}
+                        <time title='{{ subscription.latest_entry.isoformat() + "Z" }}' data-iso='{{ subscription.latest_entry.isoformat() + "Z" }}'>{{ subscription.latest_entry }}</time>
+                        {% endif %}
+                    </td>
+                </tr>
             {% endfor %}
-        </ul>
+            </tbody>
+        </table>
     </section>
 </main>
-<footer>
-    <input id='subscribe' placeholder='subscribe to a new feed' />
-</footer>
 {% endblock %}

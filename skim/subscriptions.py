@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 #coding: utf-8
+from datetime import datetime
 import os
 import sys
 from xml.etree import ElementTree
@@ -9,7 +10,30 @@ from skim.configuration import elastic, INDEX
 
 
 def subscriptions():
+    stats = elastic().search(index=INDEX, doc_type='entry', search_type='count', body={
+        "aggs": {
+            "by_feed": {
+                "terms": {"field": "feed", "size": 0},
+                "aggs": {
+                    "first": {
+                        "min": {"field": "published"}
+                    },
+                    "latest": {
+                        "max": {"field": "published"}
+                    }
+                }
+            }
+        }
+    })
+    by_feed = {
+        bucket['key']: (bucket['doc_count'], bucket['first']['value'], bucket['latest']['value'])
+        for bucket in stats['aggregations']['by_feed']['buckets']
+    }
     for subscription in scrolled(index=INDEX, doc_type='feed', sort='title.raw:asc'):
+        count, first, latest = by_feed.get(subscription['url'], (0, None, None))
+        subscription['entry_count'] = count
+        subscription['first_entry'] = datetime.utcfromtimestamp(first/1000.0) if first else None
+        subscription['latest_entry'] = datetime.utcfromtimestamp(latest/1000.0) if latest else None
         yield subscription
 
 def by_category(category):
