@@ -18,12 +18,40 @@ a:hover {
     color: #666666;
 }
 
+.subscriptions {
+    margin: 1em;
+    width: 100%;
+}
+.subscriptions th, .subscriptions td {
+    text-align: left;
+    padding: .2em 1.25em;
+}
+.subscriptions .entries {
+    text-align: right;
+}
 .subscriptions input {
     width: 100%;
     height: 2em;
     padding: .2em .4em .1em .4em;
 }
-
+.subscriptions th {
+    cursor: pointer;
+}
+.subscriptions th.sort:after {
+    font-size: 80%;
+}
+.subscriptions th.asc:after {
+    font-family: FontAwesome;
+    content: '\f0de';
+}
+.subscriptions th.desc:after {
+    font-family: FontAwesome;
+    content: '\f0dd';
+}
+.subscriptions tbody tr:hover {
+    background-color: #EEEEEE;
+    cursor: default;
+}
 
 article {
 }

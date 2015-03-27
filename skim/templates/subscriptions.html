@@ -2,13 +2,13 @@
 {% block content %}
 <main class='pure-g'>
     <section class='pure-u-1-1'>
-        <table class='subscriptions'>
+        <table id='subscriptions' class='subscriptions'>
             <thead>
                 <tr>
-                    <th>Feed</th>
-                    <th>Entries</th>
-                    <th>To</th>
-                    <th>To</th>
+                    <th class='feed sort' data-sort='feed'>Feed</th>
+                    <th class='entries sort' data-sort='entries'>Entries</th>
+                    <th class='oldest sort' data-sort='oldest'>Oldest</th>
+                    <th class='newest sort' data-sort='newest'>Newest</th>
                 </tr>
             </thead>
             <thead>
@@ -18,17 +18,17 @@
                     </th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class='list'>
             {% for subscription in subscriptions %}
                 <tr>
-                    <td><a href='{{ url_for('index') }}?feed={{ subscription.url|urlencode }}'>{{ subscription.title or subscription.url }}</a></td>
-                    <td>{{ subscription.entry_count }}</td>
-                    <td>
+                    <td class='feed'><a href='{{ url_for('index') }}?feed={{ subscription.url|urlencode }}'>{{ subscription.title or subscription.url }}</a></td>
+                    <td class='entries'>{{ subscription.entry_count }}</td>
+                    <td class='oldest'>
                         {% if subscription.first_entry %}
                         <time title='{{ subscription.first_entry.isoformat() + "Z" }}' data-iso='{{ subscription.first_entry.isoformat() + "Z" }}'>{{ subscription.first_entry }}</time>
                         {% endif %}
                     </td>
-                    <td>
+                    <td class='newest'>
                         {% if subscription.latest_entry %}
                         <time title='{{ subscription.latest_entry.isoformat() + "Z" }}' data-iso='{{ subscription.latest_entry.isoformat() + "Z" }}'>{{ subscription.latest_entry }}</time>
                         {% endif %}
