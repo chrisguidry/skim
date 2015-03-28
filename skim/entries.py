@@ -22,10 +22,22 @@ def search(query):
         }
     }))
 
-def since(since):
+def newest(age):
+    newest = elastic().search(index=INDEX, doc_type='entry', body={
+      "aggs": {
+        "latest": {
+          "max": {
+            "field": "published"
+          }
+        }
+      }
+    })
+    newest = datetime.utcfromtimestamp(newest['aggregations']['latest']['value'] / 1000)
+    print(newest)
+
     yield from full_entries(scrolled(index=INDEX, doc_type='entry', sort='published:desc', body={
         'filter': {
-            'range' : {'published' : {'gte' : since}}
+            'range' : {'published' : {'gte' : newest - age}}
         }
     }))
 
@@ -92,7 +104,7 @@ def datetime_from_iso(string):
     if not string:
         return None
 
-    for format in ['%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%dT%H:%M:%S.%fZ']:
+    for format in ['%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%d']:
         try:
             return datetime.strptime(string, format)
         except ValueError:

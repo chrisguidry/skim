@@ -40,13 +40,6 @@ assets.register('javascripts', Bundle('third-party/moment-2.9.0.min.js',
                                       filters='rjsmin' if not app.config['DEBUG'] else None,
                                       output='build/skim.js'))
 
-def datetime_from_iso(iso):
-    for format in ['%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%d']:
-        try:
-            return datetime.strptime(iso, format)
-        except ValueError:
-            continue
-
 @app.route('/')
 def index():
     if 'feed' in request.args:
@@ -56,9 +49,10 @@ def index():
     elif 'q' in request.args:
         results = entries.search(request.args.get('q', ''))
     elif 'older-than' in request.args:
-        results = entries.older_than(datetime_from_iso(request.args['older-than']), timedelta(hours=8))
+        results = entries.older_than(entries.datetime_from_iso(request.args['older-than']),
+                                     timedelta(hours=4))
     else:
-        results = entries.since(datetime.utcnow() - timedelta(hours=8))
+        results = entries.newest(timedelta(hours=4))
 
     return render_template('index.html', entries=results)
 
