@@ -23,6 +23,7 @@ def to_text(base, entry_url, html):
             return youtube_entry(base, entry_url, soup)
 
     vice_com_internal_markup(base, soup)
+    reddit_untable(base, soup)
 
     absolutize(base, soup)
     invert_linked_elements(base, soup)
@@ -133,6 +134,19 @@ def read_more_links(base, soup):
     for a in soup.find_all('a', text=re.compile(r'read more|continue reading', re.IGNORECASE)):
         a.decompose()
 
+
+def reddit_untable(base, soup):
+    if not base or 'www.reddit.com' not in base:
+        return
+
+    if len(list(soup.body.children)) != 1:
+        return
+
+    if not soup.body.table:
+        return
+
+    for cell in soup.body.table.find_all('td'):
+        cell.unwrap()
 
 def _parse_vice_com_markup(markup):
     return {m.group(1): m.group(2) for m in re.finditer(r"([\w]+?)='(.+?)'", markup)}

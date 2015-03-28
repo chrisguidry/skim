@@ -2,11 +2,6 @@ Cleaning
 --------
 
 * <code> and <a> tags; they don't render properly in either order of nesting (eg http://benno.id.au/blog/feed/)
-* Reddit snippets look strange:
-> | submitted by adv4nced
-> [link] [12 comments]
-> —|—
-* Resolve the problems with HTML titles versus mis-interpreted markdown titles and markdown-wrapped-in-a-<p>
 * vice.com's entry tags are an embedded comma-separated list of tags
 
 Feature ideas
@@ -20,3 +15,4 @@ Feature ideas
 * Image caching, image size inlining, and smarter styling based on size
 ** Stripping 1x1 trackers
 * Inline YouTube, Vimeo, etc. videos
+** partially done for vice.com, and PyEmbed is integrated

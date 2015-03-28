@@ -14,7 +14,7 @@ Vagrant.configure(2) do |config|
         chef.add_recipe "java"
         chef.add_recipe "elasticsearch"
         chef.add_recipe "elasticsearch::plugins"
-
+        chef.add_recipe "simple-kibana"
         chef.json = {
             "java" => {
                 "install_flavor" => "openjdk",
@@ -33,6 +33,11 @@ Vagrant.configure(2) do |config|
                 },
                 "plugins" => {
                     "mobz/elasticsearch-head" => {}
+                }
+            },
+            "kibana" => {
+                "config" => {
+                    "elasticsearch_url" => "http://10.0.4.2:9200"
                 }
             }
         }
