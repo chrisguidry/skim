@@ -18,6 +18,7 @@ a:hover {
     color: #666666;
 }
 
+
 .subscriptions {
     margin: 1em;
     width: 100%;
@@ -59,6 +60,13 @@ a:hover {
     font-family: FontAwesome;
     content: '\f00d';
 }
+
+
+footer {
+    text-align: right;
+    padding: 1em;
+}
+
 
 article {
 }

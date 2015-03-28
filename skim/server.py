@@ -40,6 +40,12 @@ assets.register('javascripts', Bundle('third-party/moment-2.9.0.min.js',
                                       filters='rjsmin' if not app.config['DEBUG'] else None,
                                       output='build/skim.js'))
 
+def datetime_from_iso(iso):
+    for format in ['%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%d']:
+        try:
+            return datetime.strptime(iso, format)
+        except ValueError:
+            continue
 
 @app.route('/')
 def index():
@@ -49,8 +55,10 @@ def index():
         results = entries.by_category(request.args.get('category'))
     elif 'q' in request.args:
         results = entries.search(request.args.get('q', ''))
+    elif 'older-than' in request.args:
+        results = entries.older_than(datetime_from_iso(request.args['older-than']), timedelta(hours=8))
     else:
-        results = entries.since(datetime.utcnow() - timedelta(hours=4))
+        results = entries.since(datetime.utcnow() - timedelta(hours=8))
 
     return render_template('index.html', entries=results)
 

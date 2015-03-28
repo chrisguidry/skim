@@ -29,6 +29,16 @@ def since(since):
         }
     }))
 
+def older_than(start, age):
+    yield from full_entries(scrolled(index=INDEX, doc_type='entry', sort='published:desc', body={
+        'filter': {
+            'range' : {'published' : {
+                'lt': start,
+                'gte' : start - age
+            }}
+        }
+    }))
+
 def by_feed(feed_url):
     yield from full_entries(scrolled(index=INDEX, doc_type='entry', sort='published:desc', body={
         'filter': {

@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
 <main class='pure-g'>
+    {% for entry in entries %}
     <section class='pure-u-1-1'>
-        {% for entry in entries %}
         <article class='pure-g'>
             <header class='pure-u-1-5'>
                 <h2><a href='{{ entry.url }}' target='_blank'>{{ entry.title|safe }}</a></h2>
@@ -40,7 +40,12 @@
             {{ entry.body|safe }}
             </section>
         </article>
-        {% endfor %}
+    {% if loop.last %}
     </section>
+    <footer class='pure-u-1-1'>
+        <a href='{{ url_for('index') }}?older-than={{ entry.published.isoformat() + "Z" }}'>Older</a>
+    </footer>
+    {% endif %}
+    {% endfor %}
 </main>
 {% endblock %}
