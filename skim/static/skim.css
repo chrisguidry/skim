@@ -52,6 +52,13 @@ a:hover {
     background-color: #EEEEEE;
     cursor: default;
 }
+.subscriptions .unsubscribe {
+    text-decoration: none;
+}
+.subscriptions .unsubscribe:after {
+    font-family: FontAwesome;
+    content: '\f00d';
+}
 
 article {
 }

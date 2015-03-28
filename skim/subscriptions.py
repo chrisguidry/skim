@@ -49,6 +49,9 @@ def subscribe(feed_url):
         'doc_as_upsert': True
     })
 
+def unsubscribe(feed_url):
+    elastic().delete(index=INDEX, doc_type='feed', id=feed_url, ignore=404)
+
 def categorize(feed_url, category):
     if not category:
         return

@@ -26,10 +26,6 @@
   userList.on('updated', function() {
     localizeTimes();
   });
-}(moment));
-
-(function() {
-  "use strict";
 
   function subscribe() {
     var subscribeInput = document.getElementById('subscribe'),
@@ -50,12 +46,24 @@
       }
       subscribeInput.removeAttribute('disabled');
     }
-    xhr.open('POST', '/subscriptions', true);
+    xhr.open('PUT', '/subscriptions?url=' + feedUrl, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify({
-      'url': feedUrl
     }));
   }
+
+  function unsubscribe(feedUrl) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState < 4) { return; }
+      if (xhr.status >= 400) {
+        console.warn('TODO: handle error', xhr);
+      }
+    }
+    xhr.open('DELETE', '/subscriptions?url=' + feedUrl, true);
+    xhr.send();
+  }
+
   function bindSubscribe() {
     var subscribeInput = document.getElementById('subscribe');
     if (!subscribeInput) {
@@ -66,6 +74,14 @@
         subscribe();
       }
     });
+
+    document.addEventListener('click', function(evt) {
+      if (evt.target.classList.contains('unsubscribe')) {
+        unsubscribe(evt.target.dataset.feed);
+        evt.target.parentNode.parentNode.remove();
+      }
+    });
   }
   document.addEventListener('DOMContentLoaded', bindSubscribe);
-}());
+
+}(moment));

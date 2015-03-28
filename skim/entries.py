@@ -98,3 +98,14 @@ def full_entries(entries):
         entry['feed'] = feeds[entry['feed']]
         entry['published'] = datetime_from_iso(entry['published'])
         yield entry
+
+
+def remove_all_from_feed(feed_url):
+    es = elastic()
+    search = {
+        'filter': {
+            'term': {'feed': feed_url}
+        }
+    }
+    for entry in scrolled(index=INDEX, doc_type='entry', sort='published:desc', body=search):
+        es.delete(index=INDEX, doc_type='entry', id=entry['url'])

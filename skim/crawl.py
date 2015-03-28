@@ -138,7 +138,10 @@ def entry_time(entry):
 def guess_time_from_url(url):
     match = re.search('((?P<year>2(\d{3}))/(?P<month>\d{1,2})(/(?P<day>\d{1,2}))?)', url)
     if match:
-        return datetime(int(match.group('year')), int(match.group('month')), int(match.group('day') or '1'))
+        try:
+            return datetime(int(match.group('year')), int(match.group('month')), int(match.group('day') or '1'))
+        except ValueError:
+            return None
 
 def entry_text(entry):
     content = ''
@@ -196,10 +199,8 @@ def crawl_all(feed_urls, wait=True):
     pool.join()
 
 def recrawl(feed_url):
-    es = elastic()
-    from skim.entries import by_feed
-    for entry in by_feed(feed_url):
-        es.delete(index=INDEX, doc_type='entry', id=entry['url'])
+    from skim.entries import remove_all_from_feed
+    remove_all_from_feed(feed_url)
     save_conditional_get_state(feed_url, None, None)
     crawl(feed_url)
 

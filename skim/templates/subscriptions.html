@@ -9,11 +9,12 @@
                     <th class='entries sort' data-sort='entries'>Entries</th>
                     <th class='oldest sort' data-sort='oldest'>Oldest</th>
                     <th class='newest sort' data-sort='newest'>Newest</th>
+                    <th></th>
                 </tr>
             </thead>
             <thead>
                 <tr>
-                    <th colspan='4'>
+                    <th colspan='5'>
                         <input id='subscribe' placeholder='subscribe to a new feed' />
                     </th>
                 </tr>
@@ -32,6 +33,9 @@
                         {% if subscription.latest_entry %}
                         <time title='{{ subscription.latest_entry.isoformat() + "Z" }}' data-iso='{{ subscription.latest_entry.isoformat() + "Z" }}'>{{ subscription.latest_entry }}</time>
                         {% endif %}
+                    </td>
+                    <td>
+                        <a class='unsubscribe' data-feed='{{ subscription.url }}' title='Unsubscribe'></a>
                     </td>
                 </tr>
             {% endfor %}

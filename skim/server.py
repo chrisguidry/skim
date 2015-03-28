@@ -58,12 +58,19 @@ def index():
 def all_subscriptions():
     return render_template('subscriptions.html', subscriptions=subscriptions.subscriptions())
 
-@app.route('/subscriptions', methods=['POST'])
+@app.route('/subscriptions', methods=['PUT'])
 def subscribe():
-    url = request.json['url']
+    url = request.args.get('url')
     subscriptions.subscribe(url)
     crawl.crawl_all([url], wait=False)
     return '', 202
+
+@app.route('/subscriptions', methods=['DELETE'])
+def unsubscribe():
+    url = request.args.get('url')
+    subscriptions.unsubscribe(url)
+    entries.remove_all_from_feed(url)
+    return '', 200
 
 @app.route('/interesting')
 def interesting():
