@@ -42,10 +42,17 @@
         </article>
     {% if loop.last %}
     </section>
-    <footer class='pure-u-1-1'>
-        <a href='{{ url_for('index') }}?older-than={{ entry.published.isoformat() + "Z" }}'>Older</a>
+    <footer class='pure-u-1-1 older'>
+        <a href='{{ url_for('index') }}?older-than={{ entry.published.isoformat() + "Z" }}'>
+            Older than <time title='{{ entry.published.isoformat() + "Z" }}' data-iso='{{ entry.published.isoformat() + "Z" }}'>{{ entry.published }}</time>
+        </a>
     </footer>
     {% endif %}
+    {% else %}
+    </section>
+    <footer class='pure-u-1-1'>
+        No entries found.  <a href='{{ url_for('index') }}'>Start Over</a>
+    </footer>
     {% endfor %}
 </main>
 {% endblock %}

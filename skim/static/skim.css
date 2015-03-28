@@ -63,8 +63,11 @@ a:hover {
 
 
 footer {
-    text-align: right;
+    text-align: center;
     padding: 1em;
+}
+footer.older {
+    text-align: right;
 }
 
 
