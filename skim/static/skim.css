@@ -66,12 +66,9 @@ footer {
     text-align: center;
     padding: 1em;
 }
-footer.older {
-    text-align: right;
-}
-
 
 article {
+    border-bottom: 1px dashed #BBBBBB;
 }
 article header {
     padding: 20px;
@@ -108,13 +105,12 @@ article header ul.categories, article header ul.tags {
     padding-left: 20px;
 }
 
+
 article section, article.pure-g section[class *= "pure-u"] {
     font-family: Georgia, serif;
     font-size: 21px;
     line-height: 27px;
-    border-bottom: 1px dashed #AAAAAA;
-    padding: 20px 20px 20px 0;
-    min-height: 9em;
+    padding: 20px;
 }
 article h1, article h2, article h3, article h4, article h5, article h6 {
     font-family: Helvetica, sans-serif;
@@ -178,4 +174,27 @@ article audio {
 
 .math .mi, .math .mo {
     color: #222222;
+}
+
+
+@media screen and (max-width: 48em) {
+    article section, article.pure-g section[class *= "pure-u"] {
+        padding-top: 0px;
+        font-size: 18px;
+        line-height: 24px;
+    }
+
+    article blockquote {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+    article code {
+        font-size: 17px;
+    }
+
+    article .codehilite pre {
+        font-size: 14px;
+        line-height: 19px;
+    }
 }
