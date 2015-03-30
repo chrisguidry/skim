@@ -34,7 +34,6 @@ assets.register('stylesheets', Bundle('third-party/pure-release-0.5.0/base-min.c
                                       'third-party/pure-release-0.5.0/grids-min.css',
                                       'third-party/pure-release-0.5.0/grids-responsive-min.css',
                                       'third-party/pygments-css/github.css',
-                                      'third-party/font-awesome-4.3.0/css/font-awesome.min.css',
                                       'skim.css',
                                       filters='cssmin' if not app.config['DEBUG'] else None,
                                       output='build/skim.css'))
