@@ -8,6 +8,7 @@ Feature ideas
 -------------
 
 * Some sort of pagination/infinite scroll
+** lame version implemented
 * Prerendering articles (Markdown is the overwhelming amount of time in rendering a page)
 * search result highlighting
 * Full-text feeds for HN, Slashdot, etc

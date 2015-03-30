@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 #coding: utf-8
+from collections import defaultdict
 from datetime import datetime, timedelta
+from email.utils import format_datetime
 import logging
 import sys
 
@@ -11,6 +13,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 from skim import crawl, entries, subscriptions
 
 app = Flask(__name__)
+app.jinja_env.trim_blocks = True
+app.jinja_env.lstrip_blocks = True
 app.config.from_object('skim.configuration')
 
 app.config['DEBUG_TB_PROFILER_ENABLED'] = True
@@ -59,6 +63,21 @@ def index():
 @app.route('/subscriptions', methods=['GET'])
 def all_subscriptions():
     return render_template('subscriptions.html', subscriptions=subscriptions.subscriptions())
+
+@app.route('/subscriptions.opml', methods=['GET'])
+def opml_subscriptions():
+    by_category = defaultdict(list)
+    for subscription in subscriptions.subscriptions():
+        if subscription.get('categories'):
+            for category in subscription['categories']:
+                by_category[category].append(subscription)
+        else:
+            by_category[''].append(subscription)
+    return (render_template('subscriptions.opml',
+                            by_category=by_category,
+                            now_rfc822=format_datetime(datetime.utcnow())),
+            200,
+            {'Content-Type': 'application/xml'})
 
 @app.route('/subscriptions', methods=['PUT'])
 def subscribe():

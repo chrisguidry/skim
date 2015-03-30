@@ -79,14 +79,14 @@ def opml_feeds(opml_file):
         if element.tag != 'outline':
             continue
 
-        title = element.get('title')
+        title = element.get('text')
         url = element.get('xmlUrl')
 
         if event == 'start' and url:
             yield os.path.join(*path) if path else '', url
 
         if event == 'start':
-            path.append(element.get('title'))
+            path.append(element.get('text'))
         elif event == 'end':
             path.pop()
 

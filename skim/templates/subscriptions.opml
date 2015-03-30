@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<opml version='1.0'>
+    <head>
+        <title>Skim Subscriptions</title>
+        <dateCreated>{{ now_rfc822 }}</dateCreated>
+        <dateModified>{{ now_rfc822 }}</dateModified>
+    </head>
+    <body>
+        {% for subscription in by_category[''] %}
+        <outline text='{{ subscription.title|e or subscription.url|e }}' type='rss' xmlUrl='{{ subscription.url|e }}' />
+        {% endfor %}
+        {% for category in by_category %}
+        {% if category %}
+        <outline text='{{ category|e }}'>
+            {% for subscription in by_category[category] %}
+            <outline text='{{ subscription.title|e or subscription.url|e }}' type='rss' xmlUrl='{{ subscription.url|e }}' />
+            {% endfor %}
+        </outline>
+        {% endif %}
+        {% endfor %}
+    </body>
+</opml>
