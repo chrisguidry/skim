@@ -32,8 +32,9 @@ def newest(age):
         }
       }
     })
+    if not newest['aggregations']['latest']['value']:
+        return
     newest = datetime.utcfromtimestamp(newest['aggregations']['latest']['value'] / 1000)
-    print(newest)
 
     yield from full_entries(scrolled(index=INDEX, doc_type='entry', sort='published:desc', body={
         'filter': {
