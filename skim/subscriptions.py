@@ -43,10 +43,18 @@ def by_category(category):
 
 def subscribe(feed_url):
     elastic().update(index=INDEX, doc_type='feed', id=feed_url, body={
-        'doc': {
-            'url': feed_url
+        'script' : '''
+            if (!ctx._source.title) {
+                ctc._source.title = feed_url
+            }
+        ''',
+        'params': {
+            'feed_url': feed_url
         },
-        'doc_as_upsert': True
+        'upsert': {
+            'url': feed_url,
+            'title': feed_url
+        }
     })
 
 def unsubscribe(feed_url):
