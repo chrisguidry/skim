@@ -45,7 +45,7 @@ def subscribe(feed_url):
     elastic().update(index=INDEX, doc_type='feed', id=feed_url, body={
         'script' : '''
             if (!ctx._source.title) {
-                ctc._source.title = feed_url
+                ctx._source.title = feed_url
             }
         ''',
         'params': {
