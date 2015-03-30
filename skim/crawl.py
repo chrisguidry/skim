@@ -185,7 +185,7 @@ def crawl(feed_url):
     save_conditional_get_state(feed_url, parsed.get('etag'), parsed.get('modified'))
 
 def crawl_all(feed_urls, wait=True):
-    pool = multiprocessing.Pool(16)
+    pool = multiprocessing.Pool(4)
     results = []
     for feed_url in feed_urls:
         logger.info('Queueing %s', feed_url)
