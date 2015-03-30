@@ -17,6 +17,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'beautifulsoup4==4.3.2',
+        'cssmin==0.2.0',
         'elasticsearch==1.4.0',
         'Flask==0.10.1',
         'Flask-Assets==0.10',
