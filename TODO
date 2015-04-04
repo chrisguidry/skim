@@ -9,6 +9,8 @@ Bugs
 
 * Overflowing feed titles (when they are just the URL of the feed) in the left column
 * Boost the line-height of articles; also the font-size (just a smidge)
+* Inlined videos are http:// and are blocked by chrome under https://
+* Minified javascript is busted
 
 Feature ideas
 -------------
