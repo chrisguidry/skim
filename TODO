@@ -4,6 +4,12 @@ Cleaning
 * <code> and <a> tags; they don't render properly in either order of nesting (eg http://benno.id.au/blog/feed/)
 * vice.com's entry tags are an embedded comma-separated list of tags
 
+Bugs
+----
+
+* Overflowing feed titles (when they are just the URL of the feed) in the left column
+* Boost the line-height of articles; also the font-size (just a smidge)
+
 Feature ideas
 -------------
 
