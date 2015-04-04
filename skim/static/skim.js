@@ -46,7 +46,7 @@
       }
       subscribeInput.removeAttribute('disabled');
     }
-    xhr.open('PUT', '/subscriptions?url=' + encodeURIComponent(feedUrl), true);
+    xhr.open('PUT', 'subscriptions?url=' + encodeURIComponent(feedUrl), true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify({
     }));
@@ -60,7 +60,7 @@
         console.warn('TODO: handle error', xhr);
       }
     }
-    xhr.open('DELETE', '/subscriptions?url=' + encodeURIComponent(feedUrl), true);
+    xhr.open('DELETE', 'subscriptions?url=' + encodeURIComponent(feedUrl), true);
     xhr.send();
   }
 
