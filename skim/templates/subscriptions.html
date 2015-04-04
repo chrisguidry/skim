@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% import 'macros.html' as macros %}
 {% block content %}
 <main class='pure-g'>
     <section class='pure-u-1-1'>
@@ -25,14 +26,10 @@
                     <td class='feed'><a href='{{ url_for('index') }}?feed={{ subscription.url|urlencode }}'>{{ subscription.title or subscription.url }}</a></td>
                     <td class='entries'>{{ subscription.entry_count }}</td>
                     <td class='oldest'>
-                        {% if subscription.first_entry %}
-                        <time title='{{ subscription.first_entry.isoformat() + "Z" }}' data-iso='{{ subscription.first_entry.isoformat() + "Z" }}'>{{ subscription.first_entry }}</time>
-                        {% endif %}
+                        {% if subscription.first_entry %}{{ macros.time(subscription.first_entry) }}{% endif %}
                     </td>
                     <td class='newest'>
-                        {% if subscription.latest_entry %}
-                        <time title='{{ subscription.latest_entry.isoformat() + "Z" }}' data-iso='{{ subscription.latest_entry.isoformat() + "Z" }}'>{{ subscription.latest_entry }}</time>
-                        {% endif %}
+                        {% if subscription.latest_entry %}{{ macros.time(subscription.latest_entry) }}{% endif %}
                     </td>
                     <td>
                         <a class='unsubscribe' data-feed='{{ subscription.url }}' title='Unsubscribe'></a>

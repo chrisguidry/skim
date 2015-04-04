@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% import 'macros.html' as macros %}
 {% block content %}
 <main>
     {% for entry in entries %}
@@ -9,7 +10,7 @@
             <header class='pure-u-1 pure-u-md-1-5'>
                 <h2><a href='{{ entry.url }}' target='_blank'>{{ entry.title|safe }}</a></h2>
                 <h3>
-                    <time title='{{ entry.published.isoformat() + "Z" }}' data-iso='{{ entry.published.isoformat() + "Z" }}'>{{ entry.published }}</time>
+                    {{ macros.time(entry.published) }}
                     {% if entry.authors %}
                     by <ul class='authors'>
                         {% for author in entry.authors %}
@@ -46,7 +47,7 @@
     </section>
     <footer>
         <a href='{{ url_for('index') }}?older-than={{ entry.published.isoformat() + "Z" }}'>
-            Older than <time title='{{ entry.published.isoformat() + "Z" }}' data-iso='{{ entry.published.isoformat() + "Z" }}'>{{ entry.published }}</time>
+            Older than {{ macros.time(entry.published) }}
         </a>
     </footer>
     {% endif %}
