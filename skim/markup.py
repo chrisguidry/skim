@@ -82,9 +82,16 @@ def multiple_images_within_anchor(base, soup):
 def tighten_inlines(base, soup):
     for tag_name in ['em', 'strong', 'i', 'b']:
         for element in soup.find_all(tag_name):
-            if element.text.endswith(' '):
-                element.string = element.text.rstrip()
-                element.insert_after(' ')
+            try:
+                text = element.text
+            except AttributeError:
+                continue
+            if text.endswith(' '):
+                element.string = text.rstrip()
+                try:
+                    element.insert_after(' ')
+                except ValueError:
+                    continue
 
 def absolutize(base, soup):
     for anchor in soup.find_all('a', href=True):
