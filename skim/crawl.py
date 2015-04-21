@@ -74,7 +74,7 @@ def save_entry(feed_url, entry):
         'image': entry.get('image', {}).get('href'),
         'authors': author_names(entry),
         'tags': tags(entry),
-        'enclosures': [{'type': enc.type, 'url': enc.href}
+        'enclosures': [{'type': enc.get('type', ''), 'url': enc.get('href')}
                        for enc in entry.get('enclosures') or []]
     })
 
@@ -97,10 +97,9 @@ def entry_url(feed_url, entry):
     return entry_link(entry) or '{}#{}'.format(feed_url, entry_time(entry).isoformat() + 'Z')
 
 def entry_link(entry):
-    if 'enclosures' in entry:
-        for enclosure in entry['enclosures']:
-            if enclosure.get('type', '').startswith(('audio/', 'video/')) and enclosure.get('href'):
-                return enclosure['href']
+    for enclosure in entry.get('enclosures', []):
+        if enclosure.get('type', '').startswith(('audio/', 'video/')) and enclosure.get('href'):
+            return enclosure['href']
     return entry.get('link')
 
 def entry_title(entry):
