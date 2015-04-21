@@ -99,7 +99,7 @@ def entry_url(feed_url, entry):
 def entry_link(entry):
     if 'enclosures' in entry:
         for enclosure in entry['enclosures']:
-            if enclosure.get('type').startswith(('audio/', 'video/')) and enclosure.get('href'):
+            if enclosure.get('type', '').startswith(('audio/', 'video/')) and enclosure.get('href'):
                 return enclosure['href']
     return entry.get('link')
 
