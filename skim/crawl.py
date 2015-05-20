@@ -32,6 +32,11 @@ def feed_file(feed_url, filename, mode):
     with open_file_from(feed_directory(feed_url), filename, mode) as f:
         yield f
 
+@contextmanager
+def entry_urls(feed_url):
+    with dbm.open(join(feed_directory(feed_url), 'entries.db'), 'c') as entry_url_db:
+        yield entry_url_db
+
 def entry_directory(feed_url, entry):
     timestamp = entry_time(entry).isoformat()
     entry_slug = slug(entry_url(feed_url, entry))
@@ -178,7 +183,7 @@ def crawl(feed_url):
 
     save_feed(feed_url, parsed.feed)
 
-    with dbm.open(join(feed_directory(feed_url), 'entries.db'), 'c') as entry_url_db:
+    with entry_urls(feed_url) as entry_url_db:
         for entry in parsed.entries:
             new_entry_url = entry_url(feed_url, entry)
             if new_entry_url.encode('utf-8') in entry_url_db:

@@ -31,7 +31,7 @@ def open_file_from(directory, filename, mode):
             with open(join(directory, filename), mode=mode) as f:
                 yield f
         except OSError:
-            if tried:
+            if tried or os.path.exists(directory):
                 raise
             os.makedirs(directory)
             continue

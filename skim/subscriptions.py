@@ -6,7 +6,7 @@ import os
 import sys
 from xml.etree import ElementTree
 
-from skim import open_file_from, unique
+from skim import open_file_from, slug, unique
 from skim.configuration import STORAGE_ROOT
 
 
