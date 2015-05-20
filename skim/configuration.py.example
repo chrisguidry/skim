@@ -1,16 +1,13 @@
 #coding: utf-8
+import os
+
+
 DEBUG = False
 ASSETS_DEBUG = False
 APPLICATION_ROOT = None  # may be /skim, for example, if running in a subdirectory
 SECRET_KEY = 'generate one of these with this: import binascii, os; print(binascii.hexlify(os.urandom(24)))'
 
-ELASTICSEARCH_HOSTS = ['localhost:9200']
-INDEX = 'skim'
-
-from elasticsearch import Elasticsearch
-def elastic():
-    return Elasticsearch(ELASTICSEARCH_HOSTS, sniff_on_start=True)
-
+STORAGE_ROOT = os.path.abspath(os.path.expanduser('~/.skim'))
 
 import logging.config
 logging.config.dictConfig({

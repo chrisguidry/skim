@@ -18,7 +18,6 @@ setup(
     install_requires=[
         'beautifulsoup4==4.3.2',
         'cssmin==0.2.0',
-        'elasticsearch==1.4.0',
         'Flask==0.10.1',
         'Flask-Assets==0.10',
         'flask-debugtoolbar==0.9.2',
@@ -26,6 +25,7 @@ setup(
         'html2text==2015.2.18',
         'html5lib==0.999',
         'Markdown==2.6',
+        'python-slugify==1.0.2',
         'pyembed==1.1.2',
         'pygments==2.0.2'
     ]

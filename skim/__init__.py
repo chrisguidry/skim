@@ -1,18 +1,38 @@
 #coding: utf-8
-from hashlib import md5
-import logging
-import sys
-from urllib.parse import urlsplit, urlunsplit
+
+from contextlib import contextmanager
+import os
+from os.path import join
+from urllib.parse import urlparse
+
+from slugify import slugify
 
 from skim.version import __version__
 
 
-def scrolled(*args, **kwargs):
-    from skim.configuration import elastic
-    es = elastic()
-    kwargs['scroll'] = kwargs.get('scroll') or '10s'
-    results = es.search(*args, **kwargs)
-    while results['hits']['hits']:
-        for hit in results['hits']['hits']:
-            yield hit['_source']
-        results = es.scroll(scroll_id=results['_scroll_id'], scroll=kwargs['scroll'])
+def slug(url):
+    scheme, netloc, *components = urlparse(url)
+    netloc = '.'.join(reversed(netloc.split('.')))
+    return slugify('-'.join((scheme, netloc) + tuple(components)))
+
+def unique(iterable, key=lambda x: x):
+    seen = set()
+    for item in iterable:
+        value = key(item)
+        if value in seen:
+            continue
+        yield item
+        seen.add(value)
+
+@contextmanager
+def open_file_from(directory, filename, mode):
+    for tried in (False, True):
+        try:
+            with open(join(directory, filename), mode=mode) as f:
+                yield f
+        except OSError:
+            if tried:
+                raise
+            os.makedirs(directory)
+            continue
+        return
