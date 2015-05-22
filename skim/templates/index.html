@@ -18,7 +18,7 @@
                         {% endfor %}
                     </ul>
                     {% endif %}
-                    from <a href='{{ url_for('index') }}?feed={{ entry.feed.url|urlencode }}'>{{ entry.feed.title }}</a>
+                    from <a href='{{ url_for('index') }}?feed={{ entry.feed.slug }}'>{{ entry.feed.title }}</a>
                 </h3>
                 <ul class='categories'>
                     {% for category in entry.feed.categories %}
@@ -46,7 +46,7 @@
     {% if loop.last %}
     </section>
     <footer>
-        <a href='{{ url_for('index') }}?older-than={{ entry.published.isoformat() + "Z" }}'>
+        <a href='{{ url_for('index') }}?{% if scope %}{{scope}}&{% endif %}older-than={{ entry.published.isoformat() + "Z" }}'>
             Older than {{ macros.time(entry.published) }}
         </a>
     </footer>

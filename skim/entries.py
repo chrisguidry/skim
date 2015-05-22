@@ -1,63 +1,28 @@
 #!/usr/bin/env python
 #coding: utf-8
 from datetime import datetime
+import json
 import os
-import os.path
+from os.path import join
+import sys
 import time
 
+from whoosh import query, sorting
+
 from skim.configuration import STORAGE_ROOT
+from skim.index import query_parser, searcher
 from skim.markup import to_html
 
 
-# def feed_cache():
-#     return {feed['url']: feed for feed in scrolled(index=INDEX, doc_type='feed')}
-#
-# def search(query):
-#     yield from full_entries(scrolled(index=INDEX, doc_type='entry', sort='published:desc', body={
-#         'query': {
-#             'query_string': {
-#                 'query': query
-#             }
-#         }
-#     }))
-#
-# def newest(age):
-#     newest = elastic().search(index=INDEX, doc_type='entry', body={
-#       "aggs": {
-#         "latest": {
-#           "max": {
-#             "field": "published"
-#           }
-#         }
-#       }
-#     })
-#     if not newest['aggregations']['latest']['value']:
-#         return
-#     newest = datetime.utcfromtimestamp(newest['aggregations']['latest']['value'] / 1000)
-#
-#     yield from full_entries(scrolled(index=INDEX, doc_type='entry', sort='published:desc', body={
-#         'filter': {
-#             'range' : {'published' : {'gte' : newest - age}}
-#         }
-#     }))
-#
-# def older_than(start, age):
-#     yield from full_entries(scrolled(index=INDEX, doc_type='entry', sort='published:desc', body={
-#         'filter': {
-#             'range' : {'published' : {
-#                 'lt': start,
-#                 'gte' : start - age
-#             }}
-#         }
-#     }))
-#
-# def by_feed(feed_url):
-#     yield from full_entries(scrolled(index=INDEX, doc_type='entry', sort='published:desc', body={
-#         'filter': {
-#             'term': {'feed': feed_url}
-#         }
-#     }))
-#
+def older_than(start, age):
+    yield from paged(query.Every(), start, age)
+
+def by_feed(feed_slug, start, age):
+    yield from paged(query.Term('feed', feed_slug), start, age)
+
+def search(q, start, age):
+    yield from paged(query_parser.parse(q), start, age)
+
 # def by_category(category):
 #     feed_urls = [feed['url'] for feed in subscriptions.by_category(category)]
 #     yield from full_entries(scrolled(index=INDEX, doc_type='entry', sort='published:desc', body={
@@ -65,61 +30,64 @@ from skim.markup import to_html
 #             'terms': {'feed': feed_urls}
 #         }
 #     }))
-#
-# def interesting(since):
-#     results = elastic().search(index=INDEX, doc_type='entry', body={
-#         'query': {
-#             'filtered': {
-#                 'filter': {
-#                     'range': {
-#                         'published': {'gte': since.isoformat() + 'Z'}
-#                     }
-#                 }
-#             }
-#         },
-#         'aggs': {
-#             'most_sig': {
-#                 'significant_terms': {
-#                     'field': 'title',
-#                     'size': 20
-#                 }
-#             }
-#         }
-#     })
-#     for bucket in results['aggregations']['most_sig']['buckets']:
-#         yield from full_entries(scrolled(index=INDEX, doc_type='entry', body={
-#             'query': {
-#                 'filtered': {
-#                     'query': {
-#                         'match': {'title': bucket['key']}
-#                     },
-#                     'filter': {
-#                         'range': {'published': {'gte': since.isoformat() + 'Z'}}
-#                     }
-#                 }
-#             }
-#         }))
-#
-# def datetime_from_iso(string):
-#     if not string:
-#         return None
-#
-#     for format in ['%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%d']:
-#         try:
-#             return datetime.strptime(string, format)
-#         except ValueError:
-#             pass
-#
-#     return None
-#
-# def full_entries(entries):
-#     feeds = feed_cache()
-#     for entry in entries:
-#         entry['title'] = entry['title']
-#         entry['body'] = to_html(entry['text'])
-#         entry['feed'] = feeds[entry['feed']]
-#         entry['published'] = datetime_from_iso(entry['published'])
-#         yield entry
+
+
+def full_entry(feed_slug, entry_slug):
+    feed_dir = join(STORAGE_ROOT, 'feeds', feed_slug)
+    with open(join(feed_dir, 'feed.json')) as feed_file, \
+         open(join(feed_dir, entry_slug, 'entry.json')) as entry_file, \
+         open(join(feed_dir, entry_slug, 'entry.html')) as entry_html:
+
+        entry = json.load(entry_file)
+        entry['published'] = datetime_from_iso(entry['published'])
+        entry['feed'] = json.load(feed_file)
+        entry['feed']['slug'] = feed_slug
+        entry['body'] = entry_html.read()
+        return entry
+
+def datetime_from_iso(string):
+    if not string:
+        return None
+
+    for format in ['%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%d']:
+        try:
+            return datetime.strptime(string, format)
+        except ValueError:
+            pass
+
+    return None
+
+def newest_before(searcher, q, start):
+    results = searcher.search(q,
+                              filter=query.DateRange('published', None, start),
+                              sortedby=sorting.FieldFacet('slug', reverse=True),
+                              limit=1)
+    if not len(results):
+        return None
+    return results[0]['published']
+
+def paged(q, start, age):
+    with searcher() as s:
+        start = newest_before(s, q, start)
+        if not start:
+            return
+
+        for i in range(1, sys.maxsize):
+            results = s.search_page(
+                q,
+                i, pagelen=250,
+                filter=query.DateRange('published', start - age, start),
+                sortedby=sorting.FieldFacet('slug', reverse=True) # note sorting by date seemed to be broken
+            )
+            for result in results:
+                if result['published'] > start:
+                    continue
+                if result['published'] < (start - age):
+                    return
+                yield full_entry(result['feed'], result['slug'])
+
+            if results.is_last_page():
+                return
 #
 #
 # def remove_all_from_feed(feed_url):

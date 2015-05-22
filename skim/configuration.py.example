@@ -36,7 +36,7 @@ logging.config.dictConfig({
             'level': 'WARN',
             'propagate': False
         },
-        'elasticsearch': {
+        'MARKDOWN': {
             'handlers': ['default'],
             'level': 'WARN',
             'propagate': False

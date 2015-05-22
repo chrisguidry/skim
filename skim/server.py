@@ -45,19 +45,27 @@ assets.register('javascripts', Bundle('third-party/moment-2.9.0.min.js',
 
 @app.route('/')
 def index():
-    if 'feed' in request.args:
-        results = entries.by_feed(request.args.get('feed'))
-    elif 'category' in request.args:
-        results = entries.by_category(request.args.get('category'))
-    elif 'q' in request.args:
-        results = entries.search(request.args.get('q', ''))
-    elif 'older-than' in request.args:
-        results = entries.older_than(entries.datetime_from_iso(request.args['older-than']),
-                                     timedelta(hours=4))
+    age = timedelta(hours=4)
+    if 'older-than' in request.args:
+        start = entries.datetime_from_iso(request.args['older-than'])
+        start -= timedelta(microseconds=1)
     else:
-        results = entries.newest(timedelta(hours=4))
+        start = datetime.utcnow()
 
-    return render_template('index.html', entries=results)
+    if 'feed' in request.args:
+        scope = 'feed=' + request.args.get('feed')
+        results = entries.by_feed(request.args.get('feed'), start, age)
+    elif 'category' in request.args:
+        scope = 'category=' + request.args.get('category')
+        results = entries.by_category(request.args.get('category'), start, age)
+    elif 'q' in request.args:
+        scope = 'q=' + request.args.get('q', '')
+        results = entries.search(request.args.get('q', ''), start, age)
+    else:
+        scope = ''
+        results = entries.older_than(start, age)
+
+    return render_template('index.html', scope=scope, entries=results)
 
 @app.route('/subscriptions', methods=['GET'])
 def all_subscriptions():
@@ -91,11 +99,6 @@ def unsubscribe():
     subscriptions.unsubscribe(url)
     entries.remove_all_from_feed(url)
     return '', 200
-
-@app.route('/interesting')
-def interesting():
-    return render_template('index.html',
-                           entries=entries.interesting(datetime.utcnow() - timedelta(days=2)))
 
 
 if __name__ == '__main__':

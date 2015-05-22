@@ -1,7 +1,7 @@
 __pycache__
 .environment
 .tox
-.vagrant
+.coverage
 configuration.py
 skim.egg-info
 dist

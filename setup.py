@@ -27,6 +27,7 @@ setup(
         'Markdown==2.6',
         'python-slugify==1.0.2',
         'pyembed==1.1.2',
-        'pygments==2.0.2'
+        'pygments==2.0.2',
+        'Whoosh==2.7.0'
     ]
 )

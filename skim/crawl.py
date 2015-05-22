@@ -1,11 +1,11 @@
-#coding: utf-8
+# coding: utf-8
 
 from contextlib import contextmanager
 from datetime import datetime, timezone
 import dbm
 import json
 import logging
-import multiprocessing
+from multiprocessing.pool import ThreadPool
 import os
 from os.path import join
 import re
@@ -14,9 +14,11 @@ import time
 
 import feedparser
 
+
 from skim import __version__, open_file_from, slug, unique
 from skim.configuration import STORAGE_ROOT
-from skim.markup import remove_tags, to_text
+from skim.index import async_writer, buffered_writer
+from skim.markup import remove_tags, to_html, to_text
 from skim.subscriptions import subscription_urls
 
 feedparser.USER_AGENT = 'Skim/{} +https://github.com/chrisguidry/skim/'.format(__version__)
@@ -37,11 +39,14 @@ def entry_urls(feed_url):
     with dbm.open(join(feed_directory(feed_url), 'entries.db'), 'c') as entry_url_db:
         yield entry_url_db
 
-def entry_directory(feed_url, entry):
+def entry_slug(feed_url, entry):
     timestamp = entry_time(entry).isoformat()
     entry_slug = slug(entry_url(feed_url, entry))
     directory_name = '-'.join([timestamp, entry_slug])[:255]
-    return join(STORAGE_ROOT, 'feeds', slug(feed_url), directory_name)
+    return directory_name
+
+def entry_directory(feed_url, entry):
+    return join(STORAGE_ROOT, 'feeds', slug(feed_url), entry_slug(feed_url, entry))
 
 @contextmanager
 def entry_file(feed_url, entry, filename, mode):
@@ -75,11 +80,17 @@ def save_feed(feed_url, feed):
         }, f, indent=4)
 
 def save_entry(feed_url, entry):
+    text = entry_text(entry)
+    try:
+        html = to_html(text)
+    except Exception:
+        logger.exception('Error extracting HTML of entry %s', entry_url(feed_url, entry))
+        html = ''
+
     with entry_file(feed_url, entry, 'entry.json', 'w') as f:
         json.dump({
             'title': entry_title(entry),
             'published': entry_time(entry).isoformat() + 'Z',
-            'text': entry_text(entry),
             'image': entry.get('image', {}).get('href'),
             'authors': author_names(entry),
             'tags': tags(entry),
@@ -87,6 +98,22 @@ def save_entry(feed_url, entry):
                            for enc in entry.get('enclosures') or []]
         }, f, indent=4)
 
+    with entry_file(feed_url, entry, 'entry.md', 'w') as f:
+        f.write(text)
+
+    with entry_file(feed_url, entry, 'entry.html', 'w') as f:
+        f.write(html)
+
+def index_entry(feed_url, entry, writer):
+    writer.add_document(**{
+        'feed': slug(feed_url),
+        'slug': entry_slug(feed_url, entry),
+        'title': entry_title(entry),
+        'published': entry_time(entry),
+        'text': entry_text(entry),
+        'authors': ' '.join(author_names(entry)),
+        'tags': ','.join(tags(entry)),
+    })
 
 def author_names(feed_or_entry):
     return list(unique(remove_tags(author.name)
@@ -164,7 +191,7 @@ def entry_text(entry):
     return to_text(content.base, entry_link(entry), content.value)
 
 
-def crawl(feed_url):
+def crawl(feed_url, writer):
     logger.info('Crawling %r...', feed_url)
 
     etag, modified = conditional_get_state(feed_url)
@@ -191,23 +218,32 @@ def crawl(feed_url):
                 continue
 
             logger.info('New entry %s on %s', new_entry_url, feed_url)
-            entry_url_db[new_entry_url.encode('utf-8')] = b'1'
+            entry_url_db[new_entry_url] = entry_time(entry).isoformat() + 'Z'
             save_entry(feed_url, entry)
+            index_entry(feed_url, entry, writer)
 
     save_conditional_get_state(feed_url, parsed.get('etag'), parsed.get('modified'))
 
 def crawl_all(feed_urls, wait=True):
-    pool = multiprocessing.Pool(4)
+    if wait:
+        writer = buffered_writer()
+    else:
+        writer = async_writer()
+
+    pool = ThreadPool(8)
     results = []
     for feed_url in feed_urls:
         logger.info('Queueing %s', feed_url)
-        results.append(pool.apply_async(crawl, [feed_url]))
+        results.append(pool.apply_async(crawl, [feed_url, writer]))
     pool.close()
 
     if not wait:
         return
-    for result in results:
+
+    for index, result in enumerate(results):
         result.get()
+        logger.info('Finished crawling %s/%s', index+1, len(feed_urls))
+    writer.close()
     pool.join()
 
 def recrawl(feed_url):
