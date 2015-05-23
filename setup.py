@@ -24,6 +24,7 @@ setup(
         'feedparser==5.2.0.post1',
         'html2text==2015.4.14',
         'html5lib==0.999',
+        'lxml==3.4.4',
         'Markdown==2.6',
         'python-slugify==1.0.2',
         'pyembed==1.1.2',

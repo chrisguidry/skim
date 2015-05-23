@@ -4,12 +4,13 @@ from datetime import datetime
 import json
 import os
 from os.path import join
+import shutil
 import sys
 import time
 
 from whoosh import query, sorting
 
-from skim import datetime_from_iso
+from skim import datetime_from_iso, slug
 from skim.configuration import STORAGE_ROOT
 from skim.index import query_parser, searcher
 from skim.markup import to_html
@@ -23,15 +24,6 @@ def by_feed(feed_slug, start, age):
 
 def search(q, start, age):
     yield from paged(query_parser.parse(q), start, age)
-
-
-# def by_category(category):
-#     feed_urls = [feed['url'] for feed in subscriptions.by_category(category)]
-#     yield from full_entries(scrolled(index=INDEX, doc_type='entry', sort='published:desc', body={
-#         'filter': {
-#             'terms': {'feed': feed_urls}
-#         }
-#     }))
 
 
 def full_entry(feed_slug, entry_slug):
@@ -79,12 +71,5 @@ def paged(q, start, age):
             if results.is_last_page():
                 return
 
-# def remove_all_from_feed(feed_url):
-#     es = elastic()
-#     search = {
-#         'filter': {
-#             'term': {'feed': feed_url}
-#         }
-#     }
-#     for entry in scrolled(index=INDEX, doc_type='entry', sort='published:desc', body=search):
-#         es.delete(index=INDEX, doc_type='entry', id=entry['url'])
+def remove_all_from_feed(feed_url):
+    shutil.rmtree(join(STORAGE_ROOT, 'feeds', slug(feed_url)))

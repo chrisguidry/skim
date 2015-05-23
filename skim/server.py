@@ -55,9 +55,6 @@ def index():
     if 'feed' in request.args:
         scope = 'feed=' + request.args.get('feed')
         results = entries.by_feed(request.args.get('feed'), start, age)
-    elif 'category' in request.args:
-        scope = 'category=' + request.args.get('category')
-        results = entries.by_category(request.args.get('category'), start, age)
     elif 'q' in request.args:
         scope = 'q=' + request.args.get('q', '')
         results = entries.search(request.args.get('q', ''), start, age)
