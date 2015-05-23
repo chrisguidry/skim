@@ -16,7 +16,7 @@ import feedparser
 
 from skim import __version__, open_file_from, slug, unique
 from skim.configuration import STORAGE_ROOT
-from skim.index import async_writer, buffered_writer
+from skim.index import async_writer, buffered_writer, index_writer
 from skim.markup import remove_tags, to_html, to_text
 from skim.subscriptions import subscription_urls
 
@@ -192,7 +192,12 @@ def entry_text(entry):
     return to_text(content.base, entry_link(entry), content.value)
 
 
-def crawl(feed_url, writer):
+def crawl(feed_url, writer=None):
+    close_writer = False
+    if not writer:
+        writer = index_writer()
+        close_writer = True
+
     logger.info('Crawling %r...', feed_url)
 
     etag, modified = conditional_get_state(feed_url)
@@ -224,6 +229,9 @@ def crawl(feed_url, writer):
             index_entry(feed_url, entry, writer)
 
     save_conditional_get_state(feed_url, parsed.get('etag'), parsed.get('modified'))
+
+    if close_writer:
+        writer.commit()
 
 def crawl_all(feed_urls, wait=True):
     if wait:

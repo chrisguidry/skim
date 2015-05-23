@@ -85,10 +85,10 @@ def test_crawl_basic_file_structure(storage, simple_feed):
     assert isfile(join(feed_dir, 'conditional-get'))
     assert isfile(join(feed_dir, 'entries.db'))
 
-    assert isdir(join(feed_dir, '2015-05-10T00:00:00-http-com-example-entry-1'))
-    assert isdir(join(feed_dir, '2015-05-11T00:00:00-http-com-example-entry-2'))
+    assert isdir(join(feed_dir, '2015-05-10T00:00:00Z-http-com-example-entry-1'))
+    assert isdir(join(feed_dir, '2015-05-11T00:00:00Z-http-com-example-entry-2'))
 
-    entry_dir = join(feed_dir, '2015-05-10T00:00:00-http-com-example-entry-1')
+    entry_dir = join(feed_dir, '2015-05-10T00:00:00Z-http-com-example-entry-1')
     assert isfile(join(entry_dir, 'entry.json'))
 
 def test_crawl_basic_bookkeeping(storage, simple_feed):

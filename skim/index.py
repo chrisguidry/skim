@@ -38,3 +38,6 @@ def async_writer():
 
 def buffered_writer():
     return BufferedWriter(ensure_index())
+
+def index_writer():
+    return ensure_index().writer()
