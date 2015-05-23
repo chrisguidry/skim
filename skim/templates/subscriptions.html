@@ -23,7 +23,7 @@
             <tbody class='list'>
             {% for subscription in subscriptions %}
                 <tr>
-                    <td class='feed'><a href='{{ url_for('index') }}?feed={{ subscription.url|urlencode }}'>{{ subscription.title or subscription.url }}</a></td>
+                    <td class='feed'><a href='{{ url_for('index') }}?feed={{ subscription.slug }}'>{{ subscription.title or subscription.url }}</a></td>
                     <td class='entries'>{{ subscription.entry_count }}</td>
                     <td class='oldest'>
                         {% if subscription.first_entry %}{{ macros.time(subscription.first_entry) }}{% endif %}

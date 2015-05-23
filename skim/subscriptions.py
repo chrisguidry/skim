@@ -3,47 +3,64 @@
 from collections import defaultdict
 from datetime import datetime
 import os
+from os.path import exists, join
 import sys
 from xml.etree import ElementTree
 
-from skim import open_file_from, slug, unique
+from skim import datetime_from_iso, open_file_from, slug, unique
 from skim.configuration import STORAGE_ROOT
 
 
 def subscription_urls():
     try:
         with open_file_from(STORAGE_ROOT, 'subscriptions.opml', 'r') as f:
-            return list(unique(feed_url for _, feed_url in opml_feeds(f)))
+            return list(unique(feed_url for _, _, feed_url in opml_feeds(f)))
     except OSError:
         return []
 
+def feed_stats(feed_url):
+    try:
+        listing = os.listdir(join(STORAGE_ROOT, 'feeds', slug(feed_url)))
+    except OSError:
+        listing = []
+
+    listing = listing[:-3]
+
+    if not listing:
+        return 0, None, None
+
+    return len(listing), date_from_entry_slug(listing[0]), date_from_entry_slug(listing[-1])
+
+def date_from_entry_slug(entry_slug):
+    if entry_slug[19] == '.':
+        date_part = entry_slug[:26]
+    else:
+        date_part = entry_slug[:19]
+    return datetime_from_iso(date_part + 'Z')
+
 def subscriptions():
-    raise NotImplementedError()
-    # stats = elastic().search(index=INDEX, doc_type='entry', search_type='count', body={
-    #     "aggs": {
-    #         "by_feed": {
-    #             "terms": {"field": "feed", "size": 0},
-    #             "aggs": {
-    #                 "first": {
-    #                     "min": {"field": "published"}
-    #                 },
-    #                 "latest": {
-    #                     "max": {"field": "published"}
-    #                 }
-    #             }
-    #         }
-    #     }
-    # })
-    # by_feed = {
-    #     bucket['key']: (bucket['doc_count'], bucket['first']['value'], bucket['latest']['value'])
-    #     for bucket in stats['aggregations']['by_feed']['buckets']
-    # }
-    # for subscription in scrolled(index=INDEX, doc_type='feed', sort='title.raw:asc'):
-    #     count, first, latest = by_feed.get(subscription['url'], (0, None, None))
-    #     subscription['entry_count'] = count
-    #     subscription['first_entry'] = datetime.utcfromtimestamp(first/1000.0) if first else None
-    #     subscription['latest_entry'] = datetime.utcfromtimestamp(latest/1000.0) if latest else None
-    #     yield subscription
+    by_url = {}
+    try:
+        with open_file_from(STORAGE_ROOT, 'subscriptions.opml', 'r') as f:
+            for category, title, feed_url in opml_feeds(f):
+                if feed_url not in by_url:
+                    by_url[feed_url] = {
+                        'url': feed_url,
+                        'slug': slug(feed_url),
+                        'title': title,
+                        'categories': []
+                    }
+
+                    entry_count, first_entry, latest_entry = feed_stats(feed_url)
+                    by_url[feed_url].update({
+                        'entry_count': entry_count,
+                        'first_entry': first_entry,
+                        'latest_entry': latest_entry
+                    })
+                by_url[feed_url]['categories'].append(category)
+        return sorted(by_url.values(), key=lambda s: s['slug'])
+    except OSError:
+        return []
 
 def opml_feeds(opml_file):
     path = []
@@ -51,10 +68,11 @@ def opml_feeds(opml_file):
         if element.tag != 'outline':
             continue
 
+        title = element.get('text')
         url = element.get('xmlUrl')
 
         if event == 'start' and url:
-            yield os.path.join(*path) if path else '', url
+            yield os.path.join(*path) if path else '', title or url, url
 
         if event == 'start':
             path.append(element.get('text'))

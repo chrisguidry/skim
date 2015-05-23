@@ -14,7 +14,6 @@ import time
 
 import feedparser
 
-
 from skim import __version__, open_file_from, slug, unique
 from skim.configuration import STORAGE_ROOT
 from skim.index import async_writer, buffered_writer
@@ -40,7 +39,7 @@ def entry_urls(feed_url):
         yield entry_url_db
 
 def entry_slug(feed_url, entry):
-    timestamp = entry_time(entry).isoformat()
+    timestamp = entry_time(entry).isoformat() + 'Z'
     entry_slug = slug(entry_url(feed_url, entry))
     directory_name = '-'.join([timestamp, entry_slug])[:255]
     return directory_name
@@ -70,6 +69,7 @@ def save_conditional_get_state(feed_url, etag, modified):
 def save_feed(feed_url, feed):
     with feed_file(feed_url, 'feed.json', 'w') as f:
         json.dump({
+            'url': feed_url,
             'title': feed.get('title', feed_url),
             'subtitle': feed.get('subtitle'),
             'authors': author_names(feed),
@@ -89,6 +89,7 @@ def save_entry(feed_url, entry):
 
     with entry_file(feed_url, entry, 'entry.json', 'w') as f:
         json.dump({
+            'url': entry_link(entry),
             'title': entry_title(entry),
             'published': entry_time(entry).isoformat() + 'Z',
             'image': entry.get('image', {}).get('href'),

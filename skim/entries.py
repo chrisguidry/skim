@@ -9,6 +9,7 @@ import time
 
 from whoosh import query, sorting
 
+from skim import datetime_from_iso
 from skim.configuration import STORAGE_ROOT
 from skim.index import query_parser, searcher
 from skim.markup import to_html
@@ -22,6 +23,7 @@ def by_feed(feed_slug, start, age):
 
 def search(q, start, age):
     yield from paged(query_parser.parse(q), start, age)
+
 
 # def by_category(category):
 #     feed_urls = [feed['url'] for feed in subscriptions.by_category(category)]
@@ -44,18 +46,6 @@ def full_entry(feed_slug, entry_slug):
         entry['feed']['slug'] = feed_slug
         entry['body'] = entry_html.read()
         return entry
-
-def datetime_from_iso(string):
-    if not string:
-        return None
-
-    for format in ['%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%d']:
-        try:
-            return datetime.strptime(string, format)
-        except ValueError:
-            pass
-
-    return None
 
 def newest_before(searcher, q, start):
     results = searcher.search(q,
@@ -88,8 +78,7 @@ def paged(q, start, age):
 
             if results.is_last_page():
                 return
-#
-#
+
 # def remove_all_from_feed(feed_url):
 #     es = elastic()
 #     search = {
