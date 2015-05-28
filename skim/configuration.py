@@ -1,13 +1,17 @@
 #coding: utf-8
+import configparser
 import os
 
+parser = configparser.ConfigParser()
+parser.read('skim.ini')
+config = parser['skim']
 
-DEBUG = False
-ASSETS_DEBUG = False
-APPLICATION_ROOT = None  # may be /skim, for example, if running in a subdirectory
-SECRET_KEY = 'generate one of these with this: import binascii, os; print(binascii.hexlify(os.urandom(24)))'
+APPLICATION_ROOT = config.get('application_root') or None
+SECRET_KEY = config['secret_key']
+STORAGE_ROOT = os.path.abspath(os.path.expanduser(config['storage_root']))
 
-STORAGE_ROOT = os.path.abspath(os.path.expanduser('~/.skim'))
+DEBUG = os.environ.get('ENV') == 'development'
+ASSETS_DEBUG = DEBUG
 
 import logging.config
 logging.config.dictConfig({

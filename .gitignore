@@ -1,9 +1,7 @@
 __pycache__
-.environment
-.tox
 .coverage
-configuration.py
 skim.egg-info
 dist
 skim/static/build
 skim/static/.webassets-cache
+skim.ini

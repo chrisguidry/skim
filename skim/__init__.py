@@ -41,7 +41,8 @@ def datetime_from_iso(string):
 def open_file_from(directory, filename, mode):
     for tried in (False, True):
         try:
-            with open(join(directory, filename), mode=mode) as f:
+            encoding = 'utf-8' if 'b' not in mode else None
+            with open(join(directory, filename), mode=mode, encoding=encoding) as f:
                 yield f
         except OSError:
             if tried or os.path.exists(directory):

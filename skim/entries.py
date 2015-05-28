@@ -10,7 +10,7 @@ import time
 
 from whoosh import query, sorting
 
-from skim import datetime_from_iso, slug
+from skim import datetime_from_iso, open_file_from, slug
 from skim.configuration import STORAGE_ROOT
 from skim.index import query_parser, searcher
 from skim.markup import to_html
@@ -28,9 +28,11 @@ def search(q, start, age):
 
 def full_entry(feed_slug, entry_slug):
     feed_dir = join(STORAGE_ROOT, 'feeds', feed_slug)
-    with open(join(feed_dir, 'feed.json')) as feed_file, \
-         open(join(feed_dir, entry_slug, 'entry.json')) as entry_file, \
-         open(join(feed_dir, entry_slug, 'entry.html')) as entry_html:
+    entry_dir = join(feed_dir, entry_slug)
+
+    with open_file_from(feed_dir, 'feed.json', 'r') as feed_file, \
+         open_file_from(entry_dir, 'entry.json', 'r') as entry_file, \
+         open_file_from(entry_dir, 'entry.html', 'r') as entry_html:
 
         entry = json.load(entry_file)
         entry['published'] = datetime_from_iso(entry['published'])

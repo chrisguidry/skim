@@ -1,4 +1,0 @@
---index-url https://pypi.python.org/simple/
--e .
-ipython==2.4.1
-tox==1.9

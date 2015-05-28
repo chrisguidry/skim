@@ -1,0 +1,3 @@
+[skim]
+storage_root = /storage
+secret_key = generate one of these with this: import binascii, os; print(binascii.hexlify(os.urandom(24)))
