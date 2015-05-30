@@ -17,6 +17,7 @@ RUN echo 'deb http://us.archive.ubuntu.com/ubuntu/ trusty multiverse' >> /etc/ap
 
 # extra tools that aren't install_requires of skim
 RUN pip3 install ipython==2.4.1
+RUN pip3 install tox==2.0.1
 
 ADD . /skim
 VOLUME /skim
