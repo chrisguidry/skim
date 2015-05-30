@@ -12,6 +12,7 @@
         {% assets 'stylesheets' %}
         <link rel='stylesheet' type='text/css' href='{{ ASSET_URL }}' />{% endassets %}
         <link rel='stylesheet' type='text/css' href='{{ url_for('static', filename='third-party/font-awesome-4.3.0/css/font-awesome.min.css') }}'>
+        {% assets 'libraries' %}<script type='text/javascript' src='{{ ASSET_URL }}' defer></script>{% endassets %}
         {% assets 'javascripts' %}<script type='text/javascript' src='{{ ASSET_URL }}' defer></script>{% endassets %}
 
         <script type="text/x-mathjax-config">

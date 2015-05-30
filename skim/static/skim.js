@@ -1,4 +1,4 @@
-(function() {
+(function(moment, List) {
   "use strict";
   console.info('Welcome to skim.');
 
@@ -84,4 +84,4 @@
   }
   document.addEventListener('DOMContentLoaded', bindSubscribe);
 
-}(moment));
+}(moment, List));

@@ -66,7 +66,7 @@ def feed_stats(feed_url):
     except OSError:
         listing = []
 
-    listing = listing[:-3]
+    listing = [l for l in listing if l.startswith('2')]
 
     if not listing:
         return 0, None, None

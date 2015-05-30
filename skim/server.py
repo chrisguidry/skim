@@ -37,9 +37,11 @@ assets.register('stylesheets', Bundle('third-party/pure-release-0.5.0/base-min.c
                                       'skim.css',
                                       filters='cssmin' if not app.config['DEBUG'] else None,
                                       output='build/skim.css'))
-assets.register('javascripts', Bundle('third-party/moment-2.9.0.min.js',
-                                      'third-party/list-1.1.1.min.js',
-                                      'skim.js',
+assets.register('libraries', Bundle('third-party/moment-2.10.3.js',
+                                    'third-party/list-1.1.1.js',
+                                    filters='rjsmin' if not app.config['DEBUG'] else None,
+                                    output='build/libraries.js'))
+assets.register('javascripts', Bundle('skim.js',
                                       filters='rjsmin' if not app.config['DEBUG'] else None,
                                       output='build/skim.js'))
 
