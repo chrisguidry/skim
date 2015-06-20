@@ -1,0 +1,7 @@
+FROM skim:latest
+MAINTAINER chris@theguidrys.us
+
+ENTRYPOINT ["/skim/webserver"]
+
+# 3333: web, 4444: uwsgi
+EXPOSE 3333 4444
