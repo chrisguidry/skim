@@ -14,19 +14,22 @@ RUN apt-get update && \
         uwsgi-plugin-python3 \
     && rm -rf /var/lib/apt/lists/*
 
+ENTRYPOINT ["/skim/webserver"]
+
+# 3333: web, 4444: uwsgi
+EXPOSE 3333 4444
+
 # extra tools that aren't install_requires of skim
 RUN pip3 install ipython==2.4.1
 RUN pip3 install tox==2.0.1
+
+ADD requirements.txt /tmp/requirements.txt
+RUN pip3 install -r /tmp/requirements.txt
+
+VOLUME /storage
 
 ADD . /skim
 VOLUME /skim
 WORKDIR /skim
 
-VOLUME /storage
-
 RUN pip3 install -e .
-
-ENTRYPOINT ["/skim/webserver"]
-
-# 3333: web, 4444: uwsgi
-EXPOSE 3333 4444
