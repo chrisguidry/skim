@@ -32,4 +32,4 @@ ADD . /skim
 VOLUME /skim
 WORKDIR /skim
 
-RUN pip3 install -e .
+#RUN pip3 install -e .
