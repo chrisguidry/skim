@@ -1,0 +1,6 @@
+.git
+skim.egg-info
+.dockerignore
+__pycache__
+skim/__pycache__
+tests/__pycache__
