@@ -26,7 +26,7 @@ VOLUME /storage
 
 RUN pip3 install -e .
 
-CMD /skim/webserver
+ENTRYPOINT ["/skim/webserver"]
 
 # 3333: web, 4444: uwsgi
 EXPOSE 3333 4444

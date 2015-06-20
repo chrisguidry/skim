@@ -9,5 +9,5 @@ if [ "$ENV" = 'development' ]; then
         python3.4 -m skim.server 0.0.0.0:3333 || true
     done
 else
-    uwsgi --ini /skim/uwsgi.ini
+    uwsgi --ini /skim/uwsgi.ini "$@"
 fi
