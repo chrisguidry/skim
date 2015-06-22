@@ -68,5 +68,6 @@ def ensure_timeseries():
 
 def add_to_timeseries(feed_slug, entry_slug, entry_time):
     with timeseries() as ts:
+        ts.execute('PRAGMA busy_timeout = 15000;')
         ts.execute('INSERT INTO timeseries(feed, entry, time) VALUES (?, ?, ?)',
                    (feed_slug, entry_slug, entry_time.isoformat() + 'Z'))
