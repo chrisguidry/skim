@@ -45,6 +45,11 @@ assets.register('javascripts', Bundle('skim.js',
                                       filters='rjsmin' if not app.config['DEBUG'] else None,
                                       output='build/skim.js'))
 
+@app.before_first_request
+def ensure_timeseries():
+    from skim.index import ensure_timeseries
+    ensure_timeseries()
+
 @app.route('/')
 def index():
     age = timedelta(hours=4)

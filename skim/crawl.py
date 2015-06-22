@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 import dbm
 import json
 import logging
-from multiprocessing import Pool
+from multiprocessing import Lock, Pool
 import os
 from os.path import join
 import re
@@ -183,6 +183,7 @@ def entry_text(entry):
     return to_text(content.base, entry_link(entry), content.value)
 
 
+timeseries_lock = Lock()
 def crawl(feed_url):
     socket.setdefaulttimeout(DEFAULT_TIMEOUT)
     logger.info('Crawling %r...', feed_url)
@@ -213,7 +214,8 @@ def crawl(feed_url):
             logger.info('New entry %s on %s', new_entry_url, feed_url)
             entry_url_db[new_entry_url] = entry_time(entry).isoformat() + 'Z'
             save_entry(feed_url, entry)
-            add_to_timeseries(slug(feed_url), entry_slug(feed_url, entry), entry_time(entry))
+            with timeseries_lock:
+                add_to_timeseries(slug(feed_url), entry_slug(feed_url, entry), entry_time(entry))
 
     save_conditional_get_state(feed_url, parsed.get('etag'), parsed.get('modified'))
 

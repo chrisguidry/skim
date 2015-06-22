@@ -53,21 +53,18 @@ def timeseries():
         yield c
 
 def ensure_timeseries():
-    index_filename = join(STORAGE_ROOT, 'timeseries.sqlite3')
-    if not isfile(index_filename):
-        with timeseries() as ts:
-            ts.execute('''
-            CREATE TABLE IF NOT EXISTS timeseries (
-                feed TEXT NOT NULL,
-                entry TEXT NOT NULL,
-                time TEXT NOT NULL
-            );''')
-            ts.execute('CREATE UNIQUE INDEX IF NOT EXISTS timeseries_all ON timeseries (time, feed, entry);')
-            ts.execute('CREATE INDEX IF NOT EXISTS timeseries_time ON timeseries (time);')
-            ts.execute('CREATE INDEX IF NOT EXISTS timeseries_time_feed ON timeseries (time, feed);')
+    with timeseries() as ts:
+        ts.execute('''
+        CREATE TABLE IF NOT EXISTS timeseries (
+            feed TEXT NOT NULL,
+            entry TEXT NOT NULL,
+            time TEXT NOT NULL
+        );''')
+        ts.execute('CREATE UNIQUE INDEX IF NOT EXISTS timeseries_all ON timeseries (time, feed, entry);')
+        ts.execute('CREATE INDEX IF NOT EXISTS timeseries_time ON timeseries (time);')
+        ts.execute('CREATE INDEX IF NOT EXISTS timeseries_time_feed ON timeseries (time, feed);')
 
 def add_to_timeseries(feed_slug, entry_slug, entry_time):
     with timeseries() as ts:
-        ts.execute('PRAGMA busy_timeout = 15000;')
         ts.execute('INSERT INTO timeseries(feed, entry, time) VALUES (?, ?, ?)',
                    (feed_slug, entry_slug, entry_time.isoformat() + 'Z'))
