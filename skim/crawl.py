@@ -5,10 +5,11 @@ from datetime import datetime, timezone
 import dbm
 import json
 import logging
-from multiprocessing.pool import ThreadPool
+from multiprocessing import Pool
 import os
 from os.path import join
 import re
+import socket
 import sys
 import time
 
@@ -16,10 +17,11 @@ import feedparser
 
 from skim import __version__, open_file_from, slug, unique
 from skim.configuration import STORAGE_ROOT
-from skim.index import async_writer, buffered_writer, index_writer
+from skim.index import add_to_timeseries, ensure_timeseries
 from skim.markup import remove_tags, to_html, to_text
 from skim.subscriptions import subscription_urls
 
+DEFAULT_TIMEOUT = 30
 feedparser.USER_AGENT = 'Skim/{} +https://github.com/chrisguidry/skim/'.format(__version__)
 
 logger = logging.getLogger(__name__)
@@ -105,17 +107,6 @@ def save_entry(feed_url, entry):
     with entry_file(feed_url, entry, 'entry.html', 'w') as f:
         f.write(html)
 
-def index_entry(feed_url, entry, writer):
-    writer.add_document(**{
-        'feed': slug(feed_url),
-        'slug': entry_slug(feed_url, entry),
-        'title': entry_title(entry),
-        'published': entry_time(entry),
-        'text': entry_text(entry),
-        'authors': ' '.join(author_names(entry)),
-        'tags': ','.join(tags(entry)),
-    })
-
 def author_names(feed_or_entry):
     return list(unique(remove_tags(author.name)
                        for author in authors(feed_or_entry)
@@ -192,12 +183,8 @@ def entry_text(entry):
     return to_text(content.base, entry_link(entry), content.value)
 
 
-def crawl(feed_url, writer=None):
-    close_writer = False
-    if not writer:
-        writer = index_writer()
-        close_writer = True
-
+def crawl(feed_url):
+    socket.setdefaulttimeout(DEFAULT_TIMEOUT)
     logger.info('Crawling %r...', feed_url)
 
     etag, modified = conditional_get_state(feed_url)
@@ -226,24 +213,16 @@ def crawl(feed_url, writer=None):
             logger.info('New entry %s on %s', new_entry_url, feed_url)
             entry_url_db[new_entry_url] = entry_time(entry).isoformat() + 'Z'
             save_entry(feed_url, entry)
-            index_entry(feed_url, entry, writer)
+            add_to_timeseries(slug(feed_url), entry_slug(feed_url, entry), entry_time(entry))
 
     save_conditional_get_state(feed_url, parsed.get('etag'), parsed.get('modified'))
 
-    if close_writer:
-        writer.commit()
-
 def crawl_all(feed_urls, wait=True):
-    if wait:
-        writer = buffered_writer()
-    else:
-        writer = async_writer()
-
-    pool = ThreadPool(8)
+    pool = Pool(8)
     results = []
     for feed_url in feed_urls:
         logger.info('Queueing %s', feed_url)
-        results.append(pool.apply_async(crawl, [feed_url, writer]))
+        results.append(pool.apply_async(crawl, [feed_url]))
     pool.close()
 
     if not wait:
@@ -252,7 +231,6 @@ def crawl_all(feed_urls, wait=True):
     for index, result in enumerate(results):
         result.get()
         logger.info('Finished crawling %s/%s', index+1, len(feed_urls))
-    writer.close()
     pool.join()
 
 def recrawl(feed_url):
@@ -263,4 +241,5 @@ def recrawl(feed_url):
 
 
 if __name__ == '__main__':
+    ensure_timeseries()
     crawl_all(sys.argv[1:] or subscription_urls())

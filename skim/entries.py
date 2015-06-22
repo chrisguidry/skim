@@ -2,6 +2,7 @@
 #coding: utf-8
 from datetime import datetime
 import json
+import logging
 import os
 from os.path import join
 import shutil
@@ -12,18 +13,54 @@ from whoosh import query, sorting
 
 from skim import datetime_from_iso, open_file_from, slug
 from skim.configuration import STORAGE_ROOT
-from skim.index import query_parser, searcher
+from skim.index import query_parser, searcher, timeseries
 from skim.markup import to_html
 
 
+logger = logging.getLogger(__name__)
+
+
 def older_than(start, age):
-    yield from paged(query.Every(), start, age)
+    query = '''
+    SELECT  feed, entry
+    FROM    timeseries
+    WHERE   time > ? AND time <= ?
+    ORDER BY time DESC;
+    '''
+    with timeseries() as ts:
+        (latest,), = ts.execute(('SELECT time '
+                                 'FROM timeseries '
+                                 'WHERE time <= ? '
+                                 'ORDER BY time DESC '
+                                 'LIMIT 1;'),
+                                (start.isoformat() + 'Z',))
+        latest = datetime_from_iso(latest)
+        arguments = ((latest - age).isoformat() + 'Z', latest.isoformat() + 'Z')
+        print(arguments)
+        yield from from_timeseries_cursor(ts.execute(query, arguments))
 
 def by_feed(feed_slug, start, age):
-    yield from paged(query.Term('feed', feed_slug), start, age)
+    query = '''
+    SELECT  feed, entry
+    FROM    timeseries
+    WHERE   feed = ? AND
+            time > ? AND time <= ?
+    ORDER BY time DESC;
+    '''
+    latest = start.isoformat() + 'Z'
+    with timeseries() as ts:
+        (latest,), = ts.execute(('SELECT time '
+                                 'FROM timeseries '
+                                 'WHERE time <= ? '
+                                 'ORDER BY time DESC '
+                                 'LIMIT 1;'),
+                                (start.isoformat() + 'Z',))
+        latest = datetime_from_iso(latest)
+        arguments = (feed_slug, (latest - age).isoformat() + 'Z', latest.isoformat() + 'Z')
+        yield from from_timeseries_cursor(ts.execute(query, arguments))
 
 def search(q, start, age):
-    yield from paged(query_parser.parse(q), start, age)
+    yield from paged_search(query_parser.parse(q), start, age)
 
 
 def full_entry(feed_slug, entry_slug):
@@ -50,7 +87,15 @@ def newest_before(searcher, q, start):
         return None
     return results[0]['published']
 
-def paged(q, start, age):
+def from_timeseries_cursor(cursor):
+    for feed_slug, entry_slug in cursor:
+        try:
+            yield full_entry(feed_slug, entry_slug)
+        except IOError:
+            logger.exception('Error reading %s %s', result['feed'], result['slug'])
+
+
+def paged_search(q, start, age):
     with searcher() as s:
         start = newest_before(s, q, start)
         if not start:
@@ -68,10 +113,17 @@ def paged(q, start, age):
                     continue
                 if result['published'] < (start - age):
                     return
-                yield full_entry(result['feed'], result['slug'])
+
+                try:
+                    yield full_entry(result['feed'], result['slug'])
+                except IOError:
+                    logger.exception('Error reading %s %s', result['feed'], result['slug'])
 
             if results.is_last_page():
                 return
 
 def remove_all_from_feed(feed_url):
-    shutil.rmtree(join(STORAGE_ROOT, 'feeds', slug(feed_url)))
+    feed_slug = slug(feed_url)
+    shutil.rmtree(join(STORAGE_ROOT, 'feeds', feed_slug))
+    with timeseries() as ts:
+        ts.execute('DELETE FROM timeseries WHERE feed = ?', [feed_slug])

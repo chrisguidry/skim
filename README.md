@@ -21,4 +21,5 @@ Directory structure
     |- feed-slug-b
     |- ...
     |- index
-       |- search index files
+       |- timeseries.sqlite3                # the master timeseries of entries
+       |- search index files                # Whoosh search index files

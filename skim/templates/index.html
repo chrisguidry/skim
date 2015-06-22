@@ -49,6 +49,11 @@
         <a href='{{ url_for('index') }}?{% if scope %}{{scope}}&{% endif %}older-than={{ entry.published.isoformat() + "Z" }}'>
             Older than {{ macros.time(entry.published) }}
         </a>
+        <br />
+        <br />
+        <a href='{{ url_for('index') }}'>
+            Start Over
+        </a>
     </footer>
     {% endif %}
     {% else %}

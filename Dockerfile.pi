@@ -24,5 +24,4 @@ RUN pip3 install -r /tmp/requirements.txt
 VOLUME /storage
 
 ADD . /skim
-VOLUME /skim
 WORKDIR /skim

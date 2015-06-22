@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e
+
+docker build -t skim:latest .
+docker build -t skim-web:latest -f Dockerfile.web .
+docker build -t skim-crawl:latest -f Dockerfile.crawl .
