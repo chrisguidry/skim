@@ -9,9 +9,11 @@ from lxml.etree import Element, ElementTree, fromstring, iterparse, parse
 
 from skim import datetime_from_iso, open_file_from, slug, unique
 from skim.configuration import STORAGE_ROOT
+from skim.index import timeseries
 
 
 def subscriptions():
+    feed_stats_by_slug = feed_stats()
     by_url = {}
     try:
         with open_file_from(STORAGE_ROOT, 'subscriptions.opml', 'rb') as f:
@@ -24,7 +26,7 @@ def subscriptions():
                         'categories': []
                     }
 
-                    entry_count, first_entry, latest_entry = feed_stats(feed_url)
+                    entry_count, first_entry, latest_entry = feed_stats_by_slug[slug(feed_url)]
                     by_url[feed_url].update({
                         'entry_count': entry_count,
                         'first_entry': first_entry,
@@ -60,26 +62,22 @@ def opml_feeds(opml_file):
         elif event == 'end':
             path.pop()
 
-def feed_stats(feed_url):
-    try:
-        listing = os.listdir(join(STORAGE_ROOT, 'feeds', slug(feed_url)))
-    except OSError:
-        listing = []
-
-    listing = [l for l in listing if l.startswith('2')]
-
-    if not listing:
-        return 0, None, None
-
-    return len(listing), date_from_entry_slug(listing[0]), date_from_entry_slug(listing[-1])
-
-def date_from_entry_slug(entry_slug):
-    if entry_slug[19] == '.':
-        date_part = entry_slug[:26]
-    else:
-        date_part = entry_slug[:19]
-    return datetime_from_iso(date_part + 'Z')
-
+def feed_stats():
+    query = """
+    SELECT  feed,
+            COUNT(*),
+            MIN(time),
+            MAX(time)
+    FROM    timeseries
+    GROUP BY feed;
+    """
+    stats = defaultdict(lambda: (0, None, None))
+    with timeseries() as ts:
+        stats.update({
+            feed_slug: (count, datetime_from_iso(min_time), datetime_from_iso(max_time))
+            for feed_slug, count, min_time, max_time in ts.execute(query)
+        })
+    return stats
 
 EMPTY_OPML = """<?xml version="1.0"?>
 <opml version="1.0">
