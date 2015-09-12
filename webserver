@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+if [ ! -f /storage/subscriptions.opml ]; then
+    if [ -f /tmp/seed.opml ]; then
+        cp /tmp/seed.opml /storage/subscriptions.opml
+    else
+        echo 'No seed.opml and no subscriptions.opml'
+    fi
+fi
+
 cd /skim
 export PYTHONPATH=/skim/:$PYTHONPATH
 if [ "$ENV" = 'development' ]; then

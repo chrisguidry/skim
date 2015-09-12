@@ -22,7 +22,5 @@ RUN pip3 install tox==2.0.1
 ADD requirements.txt /tmp/requirements.txt
 RUN pip3 install -r /tmp/requirements.txt
 
-VOLUME /storage
-
 ADD . /skim
 WORKDIR /skim

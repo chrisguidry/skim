@@ -21,43 +21,56 @@ logger = logging.getLogger(__name__)
 
 
 def older_than(start, age):
-    query = '''
+    latest_query = '''
+        SELECT time
+        FROM timeseries
+        WHERE time <= ?
+        ORDER BY time DESC
+        LIMIT 1;
+    '''
+    entries_query = '''
     SELECT  feed, entry
     FROM    timeseries
     WHERE   time > ? AND time <= ?
     ORDER BY time DESC;
     '''
     with timeseries() as ts:
-        (latest,), = ts.execute(('SELECT time '
-                                 'FROM timeseries '
-                                 'WHERE time <= ? '
-                                 'ORDER BY time DESC '
-                                 'LIMIT 1;'),
-                                (start.isoformat() + 'Z',))
-        latest = datetime_from_iso(latest)
+        arguments = (start.isoformat() + 'Z',)
+        try:
+            (latest,), = ts.execute(latest_query, arguments)
+        except ValueError:
+            latest = start
+        else:
+            latest = datetime_from_iso(latest)
         arguments = ((latest - age).isoformat() + 'Z', latest.isoformat() + 'Z')
-        print(arguments)
-        yield from from_timeseries_cursor(ts.execute(query, arguments))
+        yield from from_timeseries_cursor(ts.execute(entries_query, arguments))
 
 def by_feed(feed_slug, start, age):
-    query = '''
-    SELECT  feed, entry
-    FROM    timeseries
-    WHERE   feed = ? AND
-            time > ? AND time <= ?
-    ORDER BY time DESC;
+    latest_query = '''
+        SELECT time
+        FROM timeseries
+        WHERE feed = ? AND
+              time <= ?
+        ORDER BY time DESC
+        LIMIT 1;
     '''
-    latest = start.isoformat() + 'Z'
+    entries_query = '''
+        SELECT  feed, entry
+        FROM    timeseries
+        WHERE   feed = ? AND
+                time > ? AND time <= ?
+        ORDER BY time DESC;
+    '''
     with timeseries() as ts:
-        (latest,), = ts.execute(('SELECT time '
-                                 'FROM timeseries '
-                                 'WHERE time <= ? '
-                                 'ORDER BY time DESC '
-                                 'LIMIT 1;'),
-                                (start.isoformat() + 'Z',))
-        latest = datetime_from_iso(latest)
+        arguments = (feed_slug, start.isoformat() + 'Z')
+        try:
+            (latest,), = ts.execute(latest_query, arguments)
+        except ValueError:
+            latest = start
+        else:
+            latest = datetime_from_iso(latest)
         arguments = (feed_slug, (latest - age).isoformat() + 'Z', latest.isoformat() + 'Z')
-        yield from from_timeseries_cursor(ts.execute(query, arguments))
+        yield from from_timeseries_cursor(ts.execute(entries_query, arguments))
 
 def search(q, start, age):
     yield from paged_search(query_parser.parse(q), start, age)
