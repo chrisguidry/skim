@@ -162,11 +162,11 @@ def enforce_retention():
 
     logger.info('Enforcing retention...')
     with timeseries() as ts:
-        for feed_slug in ts.execute(feeds_to_clean_query, [PER_FEED_RETENTION]):
+        for feed_slug, in ts.execute(feeds_to_clean_query, [PER_FEED_RETENTION]):
             logger.info('Enforcing retention on %r', feed_slug)
             arguments = [feed_slug, PER_FEED_RETENTION]
             feed_root = join(STORAGE_ROOT, 'feeds', feed_slug)
-            for entry in ts.execute(entries_to_nuke_query, arguments):
+            for entry, in ts.execute(entries_to_nuke_query, arguments):
                 entry_root = join(feed_root, entry)
                 logger.info('Removing entry %r', entry_root)
                 shutil.rmtree(entry_root)
