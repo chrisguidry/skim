@@ -17,6 +17,7 @@ import feedparser
 
 from skim import __version__, open_file_from, slug, unique
 from skim.configuration import STORAGE_ROOT
+from skim.entries import enforce_retention
 from skim.index import add_to_timeseries, ensure_timeseries
 from skim.markup import remove_tags, to_html, to_text
 from skim.subscriptions import subscription_urls
@@ -245,3 +246,4 @@ def recrawl(feed_url):
 if __name__ == '__main__':
     ensure_timeseries()
     crawl_all(sys.argv[1:] or subscription_urls())
+    enforce_retention()

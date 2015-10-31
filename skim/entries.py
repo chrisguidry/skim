@@ -140,3 +140,35 @@ def remove_all_from_feed(feed_url):
     shutil.rmtree(join(STORAGE_ROOT, 'feeds', feed_slug))
     with timeseries() as ts:
         ts.execute('DELETE FROM timeseries WHERE feed = ?', [feed_slug])
+
+PER_FEED_RETENTION = 250
+def enforce_retention():
+    feeds_to_clean_query = '''
+        SELECT feed
+        FROM   timeseries
+        GROUP BY feed
+        HAVING count(*) > ?;
+    '''
+
+    entries_to_nuke_query = '''
+    SELECT  entry
+    FROM    timeseries
+    WHERE   feed = ?
+    ORDER BY time DESC
+    LIMIT 4294967296 OFFSET ?;
+    '''
+
+    delete_entry_query = 'DELETE FROM timeseries WHERE feed = ? AND entry = ?;'
+
+    logger.info('Enforcing retention...')
+    with timeseries() as ts:
+        for feed_slug in ts.execute(feeds_to_clean_query, [PER_FEED_RETENTION]):
+            logger.info('Enforcing retention on %r', feed_slug)
+            arguments = [feed, PER_FEED_RETENTION]
+            feed_root = join(STORAGE_ROOT, 'feeds', feed_slug)
+            for entry in ts.execute(entries_to_nuke_query, arguments):
+                entry_root = join(feed_root, entry)
+                logger.info('Removing entry %r', entry_root)
+                shutil.rmtree(entry_root)
+                ts.execute(delete_entry_query, [feed, entry])
+    logger.info('Finished enforcing retention.')
