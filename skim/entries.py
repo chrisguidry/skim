@@ -169,6 +169,9 @@ def enforce_retention():
             for entry, in ts.execute(entries_to_nuke_query, arguments):
                 entry_root = join(feed_root, entry)
                 logger.info('Removing entry %r', entry_root)
-                shutil.rmtree(entry_root)
+                try:
+                    shutil.rmtree(entry_root)
+                except FileNotFoundError:
+                    pass
                 ts.execute(delete_entry_query, [feed_slug, entry])
     logger.info('Finished enforcing retention.')

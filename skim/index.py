@@ -63,6 +63,7 @@ def ensure_timeseries():
         ts.execute('CREATE UNIQUE INDEX IF NOT EXISTS timeseries_all ON timeseries (time, feed, entry);')
         ts.execute('CREATE INDEX IF NOT EXISTS timeseries_time ON timeseries (time);')
         ts.execute('CREATE INDEX IF NOT EXISTS timeseries_time_feed ON timeseries (time, feed);')
+        ts.execute('CREATE INDEX IF NOT EXISTS timeseries_feed_entry ON timeseries (feed, entry);')
 
 def add_to_timeseries(feed_slug, entry_slug, entry_time):
     with timeseries() as ts:
