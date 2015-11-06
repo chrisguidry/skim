@@ -1,3 +1,3 @@
 [skim]
-storage_root = /storage
+storage_root = /storage is what you want when running as Docker containers 
 secret_key = generate one of these with this: import binascii, os; print(binascii.hexlify(os.urandom(24)))
