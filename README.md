@@ -47,6 +47,7 @@ container.  To copy it into the storage area:
 $ docker run --rm -v ~/your.subscriptions.opml:/tmp/subscriptions.opml --volumes-from skim-storage skim:latest cp /tmp/subscriptions.opml /storage/subscriptions.opml
 ```
 
+```
 $ docker create --name skim-crawl --restart no --volumes-from skim-storage skim-crawl:latest
 $ docker run -d --name skim-web --volumes-from skim-storage -p 3333:3333 skim-web:latest
 $ docker start -a skim-crawl  # schedule this command via cron every 15 minutes or so
