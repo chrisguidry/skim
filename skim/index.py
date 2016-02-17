@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from contextlib import contextmanager
+import logging
 import os
 from os.path import isdir, isfile, join
 import sqlite3
@@ -12,6 +13,9 @@ from whoosh.writing import AsyncWriter, BufferedWriter
 
 from skim import slug
 from skim.configuration import STORAGE_ROOT
+
+
+logger = logging.getLogger(__name__)
 
 
 schema = Schema(
@@ -67,5 +71,9 @@ def ensure_timeseries():
 
 def add_to_timeseries(feed_slug, entry_slug, entry_time):
     with timeseries() as ts:
-        ts.execute('INSERT INTO timeseries(feed, entry, time) VALUES (?, ?, ?)',
-                   (feed_slug, entry_slug, entry_time.isoformat() + 'Z'))
+        try:
+            ts.execute('INSERT INTO timeseries(feed, entry, time) VALUES (?, ?, ?)',
+                       (feed_slug, entry_slug, entry_time.isoformat() + 'Z'))
+        except sqlite3.IntegrityError:
+            logger.info('Duplicate detected inserting (%r, %r, %r)',
+                        feed_slug, entry_slug, entry_time)
