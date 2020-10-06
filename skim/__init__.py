@@ -1,52 +1,31 @@
-#coding: utf-8
-
-from contextlib import contextmanager
-from datetime import datetime
 import os
-from os.path import join
-from urllib.parse import urlparse
 
-from slugify import slugify
-
-from skim.version import __version__
+import aiofiles
+from quart import Quart, request
 
 
-def slug(url):
-    scheme, netloc, *components = urlparse(url)
-    netloc = '.'.join(reversed(netloc.split('.')))
-    return slugify('-'.join((scheme, netloc) + tuple(components)))
+app = Quart(__name__)
+app.debug = (os.environ.get('DEBUG') or 'false').lower() == 'true'
 
-def unique(iterable, key=lambda x: x):
-    seen = set()
-    for item in iterable:
-        value = key(item)
-        if value in seen:
-            continue
-        yield item
-        seen.add(value)
 
-def datetime_from_iso(string):
-    if not string:
-        return None
+@app.route('/subscriptions', methods=['GET'])
+async def get_subscriptions():
+    try:
+        async with aiofiles.open('/feeds/subscriptions.opml', 'r') as opmlfile:
+            contents = await opmlfile.read()
+    except FileNotFoundError:
+        contents = '<opml></opml>'
 
-    for format in ['%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%dT%H:%M:%S.%fZ', '%Y-%m-%d']:
-        try:
-            return datetime.strptime(string, format)
-        except ValueError:
-            pass
+    return contents, 200, {'Content-Type': 'text/x-opml'}
 
-    return None
+@app.route('/subscriptions', methods=['PUT', 'DELETE'])
+async def rewrite_subscriptions():
+    async with aiofiles.open('/feeds/subscriptions.opml', 'w') as opmlfile:
+        if request.method == 'DELETE':
+            contents = '<opml></opml>'
+        else:
+            contents = await request.get_data()
+            contents = contents.decode('utf-8')
+        await opmlfile.write(contents)
 
-@contextmanager
-def open_file_from(directory, filename, mode):
-    for tried in (False, True):
-        try:
-            encoding = 'utf-8' if 'b' not in mode else None
-            with open(join(directory, filename), mode=mode, encoding=encoding) as f:
-                yield f
-        except OSError:
-            if tried or os.path.exists(directory):
-                raise
-            os.makedirs(directory)
-            continue
-        return
+    return await get_subscriptions()

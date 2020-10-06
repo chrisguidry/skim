@@ -1,21 +1,27 @@
-web:
-  restart: on-failure
-  build: .
-  ports:
-    - "3333:3333"
-  volumes:
-    - .:/skim/
-    - example.opml:/tmp/seed.opml
-  volumes_from:
-    - storage
-  environment:
-    - PYTHONPATH=/skim/
-    - ENV=development
-  command: /skim/webserver
-
-storage:
-  restart: no
-  image: busybox:latest
-  volumes:
-    - /storage/
-  command: /bin/true
+version: "3.8"
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+    - 5000:5000
+    environment:
+      DEBUG: "True"
+    volumes:
+    - feeds:/feeds/
+    - ./:/skim/
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DEBUG: "True"
+    volumes:
+    - ./:/skim/
+    entrypoint:
+    - /usr/local/bin/pytest
+    - --cov
+    - --cov-report=term-missing
+volumes:
+  feeds:

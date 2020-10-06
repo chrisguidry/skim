@@ -1,3 +1,0 @@
-[submodule "skim/static/third-party/pygments-css"]
-	path = skim/static/third-party/pygments-css
-	url = https://github.com/richleland/pygments-css

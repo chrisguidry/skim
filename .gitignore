@@ -1,7 +1,3 @@
 __pycache__
-.coverage
-skim.egg-info
-dist
-skim/static/build
-skim/static/.webassets-cache
-skim.ini
+.pytest_cache
+.pyc

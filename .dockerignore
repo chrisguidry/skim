@@ -1,6 +1,5 @@
 .git
-skim.egg-info
 .dockerignore
+docker-compose.yml
+Dockerfile
 __pycache__
-skim/__pycache__
-tests/__pycache__

@@ -1,4 +1,0 @@
-FROM skim:latest
-MAINTAINER chris@theguidrys.us
-
-CMD ["python3.4", "-m", "skim.crawl"]
