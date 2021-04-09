@@ -1,4 +1,4 @@
-FROM python:3.8-slim
+FROM python:3.9-slim
 LABEL maintainer="chris@theguidrys.us"
 
 VOLUME /feeds/
@@ -11,5 +11,5 @@ RUN pip install -r /skim/requirements.txt
 
 COPY . /skim/
 
-ENTRYPOINT ["/usr/local/bin/python"]
-CMD ["-m", "skim"]
+ENTRYPOINT ["/usr/local/bin/python", "-m"]
+CMD ["skim"]
