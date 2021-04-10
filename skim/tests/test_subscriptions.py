@@ -59,28 +59,21 @@ async def test_put_subscriptions(client, empty_subscriptions):
 
 async def test_delete_subscriptions(client, example_subscriptions):
     response = await client.get('/subscriptions')
-    assert response.status == 200
-    assert response.headers['Content-Type'] == 'text/x-opml; charset=utf-8'
     assert await response.text() == EXAMPLE_SUBSCRIPTIONS
 
     response = await client.delete('/subscriptions')
     assert response.status == 204
 
     response = await client.get('/subscriptions')
-    assert response.status == 200
-    assert response.headers['Content-Type'] == 'text/x-opml; charset=utf-8'
     assert await response.text() == EMPTY_SUBSCRIPTIONS
+
 
 async def test_delete_subscriptions_idempotent(client, empty_subscriptions):
     response = await client.get('/subscriptions')
-    assert response.status == 200
-    assert response.headers['Content-Type'] == 'text/x-opml; charset=utf-8'
     assert await response.text() == EMPTY_SUBSCRIPTIONS
 
     response = await client.delete('/subscriptions')
     assert response.status == 204
 
     response = await client.get('/subscriptions')
-    assert response.status == 200
-    assert response.headers['Content-Type'] == 'text/x-opml; charset=utf-8'
     assert await response.text() == EMPTY_SUBSCRIPTIONS
