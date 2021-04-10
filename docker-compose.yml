@@ -1,5 +1,15 @@
 version: "3.8"
 services:
+  manage:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      PYTHONUNBUFFERED: 1
+    entrypoint: python -m manage
+    volumes:
+    - feeds:/feeds/
+    - ./:/skim/
   server:
     build:
       context: .
@@ -7,7 +17,8 @@ services:
     ports:
     - 5000:5000
     environment:
-      DEBUG: "True"
+      PYTHONUNBUFFERED: 1
+    command: watchgod skim.__main__.run
     volumes:
     - feeds:/feeds/
     - ./:/skim/
@@ -15,12 +26,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      DEBUG: "True"
     volumes:
     - ./:/skim/
     entrypoint:
-    - /usr/local/bin/pytest
+    - pytest
     - --cov
     - --cov-report=term-missing
 volumes:

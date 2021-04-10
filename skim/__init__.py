@@ -1,31 +1,36 @@
 import os
 
 import aiofiles
-from quart import Quart, request
+import aiofiles.os
+from aiohttp import web
 
 
-app = Quart(__name__)
-app.debug = (os.environ.get('DEBUG') or 'false').lower() == 'true'
+routes = web.RouteTableDef()
 
 
-@app.route('/subscriptions', methods=['GET'])
-async def get_subscriptions():
+@routes.get('/subscriptions')
+async def get_subscriptions(request):
     try:
         async with aiofiles.open('/feeds/subscriptions.opml', 'r') as opmlfile:
             contents = await opmlfile.read()
     except FileNotFoundError:
         contents = '<opml></opml>'
 
-    return contents, 200, {'Content-Type': 'text/x-opml'}
+    return web.Response(text=contents, content_type='text/x-opml')
 
-@app.route('/subscriptions', methods=['PUT', 'DELETE'])
-async def rewrite_subscriptions():
+@routes.put('/subscriptions')
+async def set_subscriptions(request):
     async with aiofiles.open('/feeds/subscriptions.opml', 'w') as opmlfile:
-        if request.method == 'DELETE':
-            contents = '<opml></opml>'
-        else:
-            contents = await request.get_data()
-            contents = contents.decode('utf-8')
+        contents = await request.text()
         await opmlfile.write(contents)
 
-    return await get_subscriptions()
+    return await get_subscriptions(request)
+
+@routes.delete('/subscriptions')
+async def delete_subscriptions(request):
+    try:
+        await aiofiles.os.remove('/feeds/subscriptions.opml')
+    except FileNotFoundError:
+        pass
+
+    return web.Response(text='', status=204)

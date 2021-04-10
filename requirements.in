@@ -1,6 +1,9 @@
 aiofiles
-quart
+aiohttp[speedups]
+aiosqlite
 pip-tools
 pytest
 pytest-asyncio
+pytest-aiohttp
 pytest-cov
+watchgod
