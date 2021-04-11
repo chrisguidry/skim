@@ -30,7 +30,9 @@ services:
     - ./:/skim/
     entrypoint:
     - pytest
-    - --cov
+    - --cov=/skim/
+    - --cov-branch
     - --cov-report=term-missing
+    - --cov-fail-under=100
 volumes:
   feeds:

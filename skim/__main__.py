@@ -7,9 +7,5 @@ app = web.Application()
 app.add_routes(routes)
 
 
-def run():
+if __name__ == '__main__':  # pragma: no cover
     web.run_app(app, host='0.0.0.0', port=5000)
-
-
-if __name__ == '__main__':
-    run()
