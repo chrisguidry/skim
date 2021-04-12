@@ -1,79 +1,44 @@
-import aiofiles
-import aiofiles.os
+import os
+
+import aiosqlite
 import pytest
-from aiohttp import web
 
-from skim import routes
-
-
-@pytest.fixture
-def client(loop, aiohttp_client):
-    app = web.Application()
-    app.add_routes(routes)
-    return loop.run_until_complete(aiohttp_client(app))
+from skim import migrations, subscriptions
 
 
-EMPTY_SUBSCRIPTIONS = '<opml></opml>'
+@pytest.fixture(autouse=True)
+async def test_db():
+    TEST_PATH = '/tmp/test.db'
 
-@pytest.fixture
-async def empty_subscriptions():
+    original = subscriptions.DATABASE_PATH
+
+    migrations.DATABASE_PATH = TEST_PATH
+    subscriptions.DATABASE_PATH = TEST_PATH
+
     try:
-        await aiofiles.os.remove('/feeds/subscriptions.opml')
+        os.remove(TEST_PATH)
     except FileNotFoundError:
         pass
 
+    await migrations.migrate()
 
-EXAMPLE_SUBSCRIPTIONS = """<?xml version='1.0' encoding='UTF-8'?>
-<opml>
-    <body>
-        <outline text='Example A' type='rss' xmlUrl='https://example.com/feedA.xml' />
-        <outline text='Example B' type='rss' xmlUrl='https://example.com/feedB.xml' />
-    </body>
-</opml>
-"""
-
-@pytest.fixture
-async def example_subscriptions():
-    async with aiofiles.open('/feeds/subscriptions.opml', 'w') as opmlfile:
-        await opmlfile.write(EXAMPLE_SUBSCRIPTIONS)
+    try:
+        yield TEST_PATH
+    finally:
+        migrations.DATABASE_PATH = original
+        subscriptions.DATABASE_PATH = original
 
 
-async def test_get_subscriptions_empty(client, empty_subscriptions):
-    response = await client.get('/subscriptions')
-    assert response.status == 200
-    assert response.headers['Content-Type'] == 'text/x-opml; charset=utf-8'
-    assert await response.text() == EMPTY_SUBSCRIPTIONS
+async def test_subscriptions_editing(test_db):
+    before = [s['feed'] async for s in subscriptions.all()]
+    assert 'https://example.com' not in before
 
+    await subscriptions.add('https://example.com')
 
-async def test_put_subscriptions(client, empty_subscriptions):
-    response = await client.put('/subscriptions', data=EXAMPLE_SUBSCRIPTIONS)
-    assert response.status == 200
-    assert response.headers['Content-Type'] == 'text/x-opml; charset=utf-8'
-    assert await response.text() == EXAMPLE_SUBSCRIPTIONS
+    after = [s['feed'] async for s in subscriptions.all()]
+    assert 'https://example.com' in after
 
-    response = await client.get('/subscriptions')
-    assert response.status == 200
-    assert response.headers['Content-Type'] == 'text/x-opml; charset=utf-8'
-    assert await response.text() == EXAMPLE_SUBSCRIPTIONS
+    await subscriptions.remove('https://example.com')
 
-
-async def test_delete_subscriptions(client, example_subscriptions):
-    response = await client.get('/subscriptions')
-    assert await response.text() == EXAMPLE_SUBSCRIPTIONS
-
-    response = await client.delete('/subscriptions')
-    assert response.status == 204
-
-    response = await client.get('/subscriptions')
-    assert await response.text() == EMPTY_SUBSCRIPTIONS
-
-
-async def test_delete_subscriptions_idempotent(client, empty_subscriptions):
-    response = await client.get('/subscriptions')
-    assert await response.text() == EMPTY_SUBSCRIPTIONS
-
-    response = await client.delete('/subscriptions')
-    assert response.status == 204
-
-    response = await client.get('/subscriptions')
-    assert await response.text() == EMPTY_SUBSCRIPTIONS
+    after = [s['feed'] async for s in subscriptions.all()]
+    assert 'https://example.com' not in after

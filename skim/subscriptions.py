@@ -1,0 +1,32 @@
+import aiosqlite
+
+
+DATABASE_PATH = '/feeds/skim.db'
+
+
+async def all():
+    async with aiosqlite.connect(DATABASE_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        async with db.execute('SELECT * FROM subscriptions') as cursor:
+            async for row in cursor:
+                yield row
+
+
+async def add(feed):
+    async with aiosqlite.connect(DATABASE_PATH) as db:
+        query = """
+        INSERT INTO subscriptions (feed) VALUES (?)
+        """
+        parameters = [feed]
+        await db.execute(query, parameters)
+        await db.commit()
+
+
+async def remove(feed):
+    async with aiosqlite.connect(DATABASE_PATH) as db:
+        query = """
+        DELETE FROM subscriptions WHERE feed = ?
+        """
+        parameters = [feed]
+        await db.execute(query, parameters)
+        await db.commit()

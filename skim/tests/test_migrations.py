@@ -18,17 +18,17 @@ def example_migrations():
 
 @pytest.fixture(autouse=True)
 def example_database():
-    original = migrations.DATABASE
-    migrations.DATABASE = '/tmp/example.db'
+    original = migrations.DATABASE_PATH
+    migrations.DATABASE_PATH = '/tmp/example.db'
     try:
-        os.remove(migrations.DATABASE)
+        os.remove(migrations.DATABASE_PATH)
     except FileNotFoundError:
         pass
 
     try:
-        yield migrations.DATABASE
+        yield migrations.DATABASE_PATH
     finally:
-        migrations.DATABASE = original
+        migrations.DATABASE_PATH = original
 
 
 async def test_listing_migrations():
