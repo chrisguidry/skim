@@ -31,6 +31,30 @@ def dbshell():
         'sqlite3 /feeds/skim.db'
     )
 
+def feeds():
+    """Lists the current feeds"""
+    from skim import subscriptions
+    async def print_feeds():
+        async for subscription in subscriptions.all():
+            print(subscription['feed'])
+    loop.run_until_complete(print_feeds())
+
+def add_feed():
+    """Subscribes to a new feed"""
+    from skim import subscriptions
+    loop.run_until_complete(subscriptions.add(sys.argv[2]))
+
+def remove_feed():
+    """Unsubscribes from a feed"""
+    from skim import subscriptions
+    loop.run_until_complete(subscriptions.remove(sys.argv[2]))
+
+def crawl():
+    """Runs one full crawl"""
+    from skim.crawl import crawl
+    loop.run_until_complete(crawl())
+
+
 available_commands = {
     name: function
     for name, function in locals().items()
