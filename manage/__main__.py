@@ -51,8 +51,11 @@ def remove_feed():
 
 def crawl():
     """Runs one full crawl"""
-    from skim.crawl import crawl
-    loop.run_until_complete(crawl())
+    from skim import crawl
+    if len(sys.argv) == 3:
+        loop.run_until_complete(crawl.fetch(sys.argv[2]))
+    else:
+        loop.run_until_complete(crawl.crawl())
 
 
 available_commands = {

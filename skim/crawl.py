@@ -7,18 +7,18 @@ from skim import parse, subscriptions
 
 async def crawl():
     tasks = [
-        fetch(subscription)
+        fetch(subscription['feed'])
         async for subscription
         in subscriptions.all()
     ]
     await asyncio.gather(*tasks)
 
-async def fetch(subscription):
+async def fetch(feed_url):
     headers = {
         'User-Agent': 'skim/0'
     }
     async with ClientSession(headers=headers) as session:
-        async with session.get(subscription['feed']) as response:
+        async with session.get(feed_url) as response:
             if response.status != 200:
                 print(
                     'TODO: Error status codes',

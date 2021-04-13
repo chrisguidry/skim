@@ -2,7 +2,12 @@ import asyncio
 from xml.etree import ElementTree
 
 
-XML_FEEDS = {'application/rss+xml', 'application/atom+xml'}
+XML_FEEDS = {
+    'application/atom+xml',
+    'application/rss+xml',
+    'application/xml',
+    'text/xml'
+}
 
 
 async def parse(response):
@@ -13,9 +18,10 @@ async def parse(response):
 
     else:
         raise NotImplementedError(
-            f'Parsing content of type "{response.content_type}" is not '
+            f'Parsing feeds of type "{response.content_type}" is not '
             'implemented'
         )
+
 
 async def xml_elements_from_response(response):
     parser = ElementTree.XMLPullParser(['start', 'end'])
@@ -24,72 +30,86 @@ async def xml_elements_from_response(response):
         for event, element in parser.read_events():
             yield event, element
 
+
+ATOM_NS = '{http://www.w3.org/2005/Atom}'
+XML_FORMATS = {
+    'application/rss+xml': {
+        'feed_path': ['rss', 'channel'],
+        'entries_key': 'item'
+    },
+    'application/atom+xml': {
+        'feed_path': ['feed'],
+        'entries_key': 'entry'
+    }
+}
+
 async def parse_xml_feed(response):
     """Parse an XML-based feed, like an RSS or Atom feed, returning a feed and
     its entries as a pair"""
     stack = [{}]
 
-    ATOM = '{http://www.w3.org/2005/Atom}'
-
-    if response.content_type == 'application/rss+xml':
-        FEED_PATH = ['rss', 'channel']
-        ENTRIES_KEY = 'item'
-
-    elif response.content_type == 'application/atom+xml':
-        FEED_PATH = ['feed']
-        ENTRIES_KEY = 'entry'
-
-    else:
-        raise NotImplementedError(
-            f'XML parsing content of type "{response.content_type}" is not '
-            'implemented'
-        )
+    xml_format = XML_FORMATS.get(response.content_type)
 
     async for event, element in xml_elements_from_response(response):
-        tag = element.tag.replace(ATOM, '')
+        tag = element.tag.replace(ATOM_NS, '')
+        child_name = tag
+
+        # since we couldn't determine the feed format from the Content-Type,
+        # guess it from the root element, or stop now
+        if not xml_format:
+            for xml_format in XML_FORMATS.values():
+                if tag == xml_format['feed_path'][0]:
+                    break
+            else:
+                raise NotImplementedError(
+                    f'Unrecognized XML feed format "{response.content_type}"'
+                )
 
         if event == 'start':
             stack.append({})
 
         elif event == 'end':
+            child = stack.pop()
+
             # process text elements
 
             # TODO: handle Atom's type="text" and type="html"
             # TODO: handle Atom's link tag more accurately, including rel=
-
-            current = stack[-1]
-            if f'{ATOM}href' in element.attrib:
-                current['__value__'] = element.attrib[f'{ATOM}href']
+            if f'{ATOM_NS}href' in element.attrib:
+                child['__value__'] = element.attrib[f'{ATOM_NS}href']
+            elif 'href' in element.attrib:
+                child['__value__'] = element.attrib['href']
             else:
-                current['__value__'] = element.text
+                child['__value__'] = (element.text or '').strip()
 
-            # we're finished with this child element, let's pop back up to
-            # its parent and integrate it
-            child = stack.pop()
+            if f'{ATOM_NS}rel' in element.attrib:
+                child_name = f'{child_name}:{element.attrib[f"{ATOM_NS}rel"]}'
+            elif 'rel' in element.attrib:
+                child_name = f'{child_name}:{element.attrib["rel"]}'
 
             # if the only thing in this child is a `__value__` key, just use
             # that as the child
             if set(child.keys()) == {'__value__'}:
                 child = child['__value__']
-            elif child['__value__'] is None:
+            elif not child['__value__']:
                 child.pop('__value__')
 
             # integrate the new child into the parent
             parent = stack[-1]
-            if tag in parent:
-                if isinstance(parent[tag], list):
-                    parent[tag].append(child)
+            if child_name in parent:
+                if isinstance(parent[child_name], list):
+                    parent[child_name].append(child)
                 else:
-                    parent[tag] = [parent[tag], child]
+                    parent[child_name] = [parent[child_name], child]
             else:
-                parent[tag] = child
+                parent[child_name] = child
 
     assert len(stack) == 1
 
     feed = stack[0]
-    for step in FEED_PATH:
+    for step in xml_format['feed_path']:
         feed = feed[step]
 
-    entries = feed.pop(ENTRIES_KEY)
+    entries = feed.pop(xml_format['entries_key'])
 
     return feed, entries

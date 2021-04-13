@@ -8,14 +8,14 @@
             <outline text='Tiny Desk Concerts - Video' type='rss' xmlUrl='http://www.npr.org/templates/rss/podcast.php?id=510292' />
         </outline>
         <outline text='Science'>
-            <outline text='What If?' type='rss' xmlUrl='http://whatif.xkcd.com/feed.atom' />
+            <outline text='What If?' type='rss' xmlUrl='https://whatif.xkcd.com/feed.atom' />
             <outline text='Astronomy News' type='rss' xmlUrl='http://nineplanets.org/news/feed/' />
             <outline text='Astronomy Blog' type='rss' xmlUrl='http://www.strudel.org.uk/blog/astro/rss.xml' />
         </outline>
         <outline text='Comics'>
-            <outline text='Saturday Morning Breakfast Cereal' type='rss' xmlUrl='http://www.smbc-comics.com/rss.php' />
-            <outline text='xkcd.com' type='rss' xmlUrl='http://xkcd.com/atom.xml' />
-            <outline text='What If?' type='rss' xmlUrl='http://whatif.xkcd.com/feed.atom' />
+            <outline text='Saturday Morning Breakfast Cereal' type='rss' xmlUrl='https://www.smbc-comics.com/comic/rss' />
+            <outline text='xkcd.com' type='rss' xmlUrl='https://xkcd.com/atom.xml' />
+            <outline text='What If?' type='rss' xmlUrl='https://whatif.xkcd.com/feed.atom' />
         </outline>
     </body>
 </opml>
