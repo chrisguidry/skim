@@ -10,23 +10,23 @@ XML_FEEDS = {
 }
 
 
-async def parse(response):
-    """Given an HTTP Response, parse the feed and entries of the RSS feed,
-    yielding each as a pair."""
-    if response.content_type in XML_FEEDS:
-        return await parse_xml_feed(response)
+async def parse(content_type, charset, stream):
+    """Given the type, character set, and a stream of content, parse the feed
+    and entries of the feed, yielding each as a pair."""
+    if content_type in XML_FEEDS:
+        return await parse_xml_feed(content_type, charset, stream)
 
     else:
         raise NotImplementedError(
-            f'Parsing feeds of type "{response.content_type}" is not '
+            f'Parsing feeds of type "{content_type}" is not '
             'implemented'
         )
 
 
-async def xml_elements_from_response(response):
+async def xml_elements_from_stream(stream):
     parser = ElementTree.XMLPullParser(['start', 'end'])
-    while not response.content.at_eof():
-        parser.feed(await response.content.read(1024))
+    while chunk := await stream.read(1024):
+        parser.feed(chunk)
         for event, element in parser.read_events():
             yield event, element
 
@@ -43,14 +43,14 @@ XML_FORMATS = {
     }
 }
 
-async def parse_xml_feed(response):
+async def parse_xml_feed(content_type, charset, stream):
     """Parse an XML-based feed, like an RSS or Atom feed, returning a feed and
     its entries as a pair"""
     stack = [{}]
 
-    xml_format = XML_FORMATS.get(response.content_type)
+    xml_format = XML_FORMATS.get(content_type)
 
-    async for event, element in xml_elements_from_response(response):
+    async for event, element in xml_elements_from_stream(stream):
         tag = element.tag.replace(ATOM_NS, '')
         child_name = tag
 
@@ -62,7 +62,7 @@ async def parse_xml_feed(response):
                     break
             else:
                 raise NotImplementedError(
-                    f'Unrecognized XML feed format "{response.content_type}"'
+                    f'Unrecognized XML feed format "{content_type}"'
                 )
 
         if event == 'start':
@@ -107,6 +107,10 @@ async def parse_xml_feed(response):
     assert len(stack) == 1
 
     feed = stack[0]
+
+    if not xml_format or not feed:
+        return {}, []
+
     for step in xml_format['feed_path']:
         feed = feed[step]
 

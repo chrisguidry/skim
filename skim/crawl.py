@@ -80,7 +80,11 @@ async def fetch(feed_url):
                 )
                 return feed_url, None, None
 
-            feed, entries = await parse.parse(response)
+            feed, entries = await parse.parse(
+                response.content_type,
+                response.charset,
+                response.content
+            )
 
             print(f'--- {feed_url} ({response.content_type}) ---')
             import pprint
