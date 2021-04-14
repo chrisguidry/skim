@@ -43,6 +43,7 @@ XML_FORMATS = {
     }
 }
 
+
 async def parse_xml_feed(content_type, charset, stream):
     """Parse an XML-based feed, like an RSS or Atom feed, returning a feed and
     its entries as a pair"""

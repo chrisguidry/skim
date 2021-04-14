@@ -1,6 +1,5 @@
 import os
 
-import aiosqlite
 import pytest
 
 from skim import migrations, subscriptions

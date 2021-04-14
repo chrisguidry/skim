@@ -15,6 +15,7 @@ def client(loop, aiohttp_client):
 
 EMPTY_SUBSCRIPTIONS = '<opml></opml>'
 
+
 @pytest.fixture
 async def empty_subscriptions():
     try:
@@ -26,11 +27,16 @@ async def empty_subscriptions():
 EXAMPLE_SUBSCRIPTIONS = """<?xml version='1.0' encoding='UTF-8'?>
 <opml>
     <body>
-        <outline text='Example A' type='rss' xmlUrl='https://example.com/feedA.xml' />
-        <outline text='Example B' type='rss' xmlUrl='https://example.com/feedB.xml' />
+        <outline text='Example A'
+                 type='rss'
+                 xmlUrl='https://example.com/feedA.xml' />
+        <outline text='Example B'
+                 type='rss'
+                 xmlUrl='https://example.com/feedB.xml' />
     </body>
 </opml>
 """
+
 
 @pytest.fixture
 async def example_subscriptions():

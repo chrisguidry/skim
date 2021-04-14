@@ -10,6 +10,7 @@ from skim import parse
 
 EXAMPLES_PATH = '/skim/skim/tests/examples/'
 
+
 @pytest.mark.parametrize(
     'example,content_type',
     [
@@ -25,7 +26,7 @@ async def test_parsing_standard_examples(example, content_type):
     expected_filename = os.path.join(EXAMPLES_PATH, example + '.json')
 
     async with aiofiles.open(expected_filename, 'r') as file:
-       expected = json.loads(await file.read())
+        expected = json.loads(await file.read())
 
     async with aiofiles.open(example_filename, 'r') as file:
         feed, entries = await parse.parse(content_type, 'utf-8', file)
@@ -49,7 +50,7 @@ async def test_parsing_standard_examples_generic_xml_type(example):
     expected_filename = os.path.join(EXAMPLES_PATH, example + '.json')
 
     async with aiofiles.open(expected_filename, 'r') as file:
-       expected = json.loads(await file.read())
+        expected = json.loads(await file.read())
 
     async with aiofiles.open(example_filename, 'r') as file:
         feed, entries = await parse.parse('text/xml', 'utf-8', file)

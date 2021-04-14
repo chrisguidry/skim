@@ -38,6 +38,7 @@ def normalize_feed(feed):
         'icon': feed.get('logo')
     }
 
+
 def normalize_entry(entry):
     return {
         'id': (

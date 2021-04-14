@@ -16,6 +16,7 @@ def example_migrations():
     finally:
         migrations.MIGRATIONS_BASE = original
 
+
 @pytest.fixture(autouse=True)
 def example_database():
     original = migrations.DATABASE_PATH
@@ -55,12 +56,14 @@ async def test_applying_migrations_increments_user_version(example_database):
 
         assert current_version == 3
 
+
 async def test_applying_migrations_executes_scripts(example_database):
     await migrations.migrate()
 
     async with aiosqlite.connect(example_database) as db:
         # will raise if migration 0001.foo.sql hasn't run
         await db.execute('SELECT * FROM testing;')
+
 
 async def test_skips_applied_migrations(example_database):
     async with aiosqlite.connect(example_database) as db:
