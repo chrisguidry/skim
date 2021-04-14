@@ -51,7 +51,6 @@ async def parse_xml_feed(content_type, charset, stream):
 
     async for event, element in xml_elements_from_stream(stream):
         tag = element.tag.replace(ATOM_NS, '')
-        child_name = tag
 
         # since we couldn't determine the feed format from the Content-Type,
         # guess it from the root element, or stop now
@@ -67,30 +66,31 @@ async def parse_xml_feed(content_type, charset, stream):
         if event == 'start':
             stack.append({})
 
-        elif event == 'end':
+        # `elif event == 'end'`, but we're only listening for start/end
+        # so just use `else` here.
+        else:
             child = stack.pop()
 
             # process text elements
-
             # TODO: handle Atom's type="text" and type="html"
-            # TODO: handle Atom's link tag more accurately, including rel=
-            if f'{ATOM_NS}href' in element.attrib:
-                child['__value__'] = element.attrib[f'{ATOM_NS}href']
-            elif 'href' in element.attrib:
+
+            if 'rel' in element.attrib:
+                child_name = f'{tag}:{element.attrib["rel"]}'
+            else:
+                child_name = tag
+
+            if 'href' in element.attrib:
                 child['__value__'] = element.attrib['href']
             else:
                 child['__value__'] = (element.text or '').strip()
 
-            if f'{ATOM_NS}rel' in element.attrib:
-                child_name = f'{child_name}:{element.attrib[f"{ATOM_NS}rel"]}'
-            elif 'rel' in element.attrib:
-                child_name = f'{child_name}:{element.attrib["rel"]}'
+            # decide what happens with the __value__
 
             # if the only thing in this child is a `__value__` key, just use
             # that as the child
             if set(child.keys()) == {'__value__'}:
                 child = child['__value__']
-            elif not child['__value__']:
+            else:
                 child.pop('__value__')
 
             # integrate the new child into the parent

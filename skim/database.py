@@ -10,7 +10,6 @@ MIGRATIONS_BASE = '/skim/skim/migrations/'
 
 @asynccontextmanager
 async def connection():
-    print('opening', DATABASE_PATH)
     async with aiosqlite.connect(DATABASE_PATH) as db:
         db.row_factory = aiosqlite.Row
         yield db
