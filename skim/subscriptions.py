@@ -1,18 +1,15 @@
-import aiosqlite
-
-DATABASE_PATH = '/feeds/skim.db'
+from skim import database
 
 
 async def all():
-    async with aiosqlite.connect(DATABASE_PATH) as db:
-        db.row_factory = aiosqlite.Row
+    async with database.connection() as db:
         async with db.execute('SELECT * FROM subscriptions') as cursor:
             async for row in cursor:
                 yield row
 
 
 async def add(feed):
-    async with aiosqlite.connect(DATABASE_PATH) as db:
+    async with database.connection() as db:
         query = """
         INSERT OR IGNORE INTO subscriptions (feed) VALUES (?)
         """
@@ -22,8 +19,7 @@ async def add(feed):
 
 
 async def get(feed):
-    async with aiosqlite.connect(DATABASE_PATH) as db:
-        db.row_factory = aiosqlite.Row
+    async with database.connection() as db:
         query = 'SELECT * FROM subscriptions WHERE feed = ?'
         parameters = [feed]
         async with db.execute(query, parameters) as cursor:
@@ -31,7 +27,7 @@ async def get(feed):
 
 
 async def update(feed, title=None, site=None, icon=None):
-    async with aiosqlite.connect(DATABASE_PATH) as db:
+    async with database.connection() as db:
         query = """
         UPDATE subscriptions
         SET    title = ?,
@@ -50,7 +46,7 @@ async def update(feed, title=None, site=None, icon=None):
 
 
 async def remove(feed):
-    async with aiosqlite.connect(DATABASE_PATH) as db:
+    async with database.connection() as db:
         query = """
         DELETE FROM subscriptions WHERE feed = ?
         """

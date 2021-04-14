@@ -1,9 +1,8 @@
 import os
 
-import aiosqlite
 import pytest
 
-from skim import migrations
+from skim import database, migrations
 
 
 @pytest.fixture(autouse=True)
@@ -18,17 +17,17 @@ def example_migrations():
 
 @pytest.fixture(autouse=True)
 def example_database():
-    original = migrations.DATABASE_PATH
-    migrations.DATABASE_PATH = '/tmp/example.db'
+    original = database.DATABASE_PATH
+    database.DATABASE_PATH = '/tmp/example.db'
     try:
-        os.remove(migrations.DATABASE_PATH)
+        os.remove(database.DATABASE_PATH)
     except FileNotFoundError:
         pass
 
     try:
-        yield migrations.DATABASE_PATH
+        yield database.DATABASE_PATH
     finally:
-        migrations.DATABASE_PATH = original
+        database.DATABASE_PATH = original
 
 
 async def test_listing_migrations():
@@ -48,7 +47,7 @@ async def test_listing_migrations():
 async def test_applying_migrations_increments_user_version(example_database):
     await migrations.migrate()
 
-    async with aiosqlite.connect(example_database) as db:
+    async with database.connection() as db:
         async with db.execute('PRAGMA user_version;') as cursor:
             current_version = await cursor.fetchone()
             current_version = current_version[0]
@@ -59,18 +58,18 @@ async def test_applying_migrations_increments_user_version(example_database):
 async def test_applying_migrations_executes_scripts(example_database):
     await migrations.migrate()
 
-    async with aiosqlite.connect(example_database) as db:
+    async with database.connection() as db:
         # will raise if migration 0001.foo.sql hasn't run
         await db.execute('SELECT * FROM testing;')
 
 
 async def test_skips_applied_migrations(example_database):
-    async with aiosqlite.connect(example_database) as db:
+    async with database.connection() as db:
         await db.execute('PRAGMA user_version = 3;')
 
     await migrations.migrate()
 
-    async with aiosqlite.connect(example_database) as db:
+    async with database.connection() as db:
         table_query = '''
         SELECT  COUNT(*)
         FROM    sqlite_master

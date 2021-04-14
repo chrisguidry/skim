@@ -1,14 +1,14 @@
 import os
 
 import aiofiles
-import aiosqlite
+
+from skim import database
 
 MIGRATIONS_BASE = os.path.dirname(__file__)
-DATABASE_PATH = '/feeds/skim.db'
 
 
 async def migrate():
-    async with aiosqlite.connect(DATABASE_PATH) as db:
+    async with database.connection() as db:
         async with db.execute('PRAGMA user_version;') as cursor:
             current_version = await cursor.fetchone()
             current_version = current_version[0]

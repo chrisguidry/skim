@@ -1,31 +1,4 @@
-import os
-
-import pytest
-
-from skim import migrations, subscriptions
-
-
-@pytest.fixture(autouse=True)
-async def test_db():
-    TEST_PATH = '/tmp/test.db'
-
-    original = subscriptions.DATABASE_PATH
-
-    migrations.DATABASE_PATH = TEST_PATH
-    subscriptions.DATABASE_PATH = TEST_PATH
-
-    try:
-        os.remove(TEST_PATH)
-    except FileNotFoundError:
-        pass
-
-    await migrations.migrate()
-
-    try:
-        yield TEST_PATH
-    finally:
-        migrations.DATABASE_PATH = original
-        subscriptions.DATABASE_PATH = original
+from skim import subscriptions
 
 
 async def test_subscriptions_management():

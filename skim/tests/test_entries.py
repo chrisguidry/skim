@@ -1,32 +1,6 @@
-import os
 from datetime import datetime
 
-import pytest
-
-from skim import entries, migrations
-
-
-@pytest.fixture(autouse=True)
-async def test_db():
-    TEST_PATH = '/tmp/test.db'
-
-    original = entries.DATABASE_PATH
-
-    migrations.DATABASE_PATH = TEST_PATH
-    entries.DATABASE_PATH = TEST_PATH
-
-    try:
-        os.remove(TEST_PATH)
-    except FileNotFoundError:
-        pass
-
-    await migrations.migrate()
-
-    try:
-        yield TEST_PATH
-    finally:
-        migrations.DATABASE_PATH = original
-        entries.DATABASE_PATH = original
+from skim import entries
 
 
 async def test_entries_adding():
