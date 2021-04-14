@@ -2,7 +2,6 @@ from aiohttp import web
 
 from . import routes
 
-
 app = web.Application()
 app.add_routes(routes)
 

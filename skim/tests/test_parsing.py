@@ -7,7 +7,6 @@ import pytest
 
 from skim import parse
 
-
 EXAMPLES_PATH = '/skim/skim/tests/examples/'
 
 

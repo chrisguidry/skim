@@ -1,6 +1,5 @@
 import aiosqlite
 
-
 DATABASE_PATH = '/feeds/skim.db'
 
 

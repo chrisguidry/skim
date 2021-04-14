@@ -1,6 +1,4 @@
-import asyncio
 from xml.etree import ElementTree
-
 
 XML_FEEDS = {
     'application/atom+xml',

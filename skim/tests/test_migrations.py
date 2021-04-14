@@ -1,7 +1,6 @@
 import os
 
 import aiosqlite
-from unittest import mock
 import pytest
 
 from skim import migrations
@@ -79,6 +78,7 @@ async def test_skips_applied_migrations(example_database):
                 name = 'testing';
         '''
         async with db.execute(table_query) as cursor:
-            # since we "faked" migration 3, we should not have a "testing" table
+            # since we "faked" migration 3,
+            # we should not have a "testing" table
             count = await cursor.fetchone()
             assert count[0] == 0
