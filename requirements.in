@@ -2,10 +2,17 @@ aioconsole
 aiofiles
 aiohttp[speedups]
 aiosqlite
-pip-tools
+python-dateutil
+
+# testing and quality
+flake8
+flake8-isort
 pytest
 pytest-asyncio
 pytest-aiohttp
 pytest-cov
-python-dateutil
+pytest-flake8
+
+# development
+pip-tools
 watchgod

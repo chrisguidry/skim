@@ -2,11 +2,11 @@ import os
 
 import pytest
 
-from skim import database, migrations
+from skim import database
 
 
-@pytest.fixture(autouse=True)
-async def test_db():
+@pytest.fixture
+async def skim_db():
     TEST_PATH = '/tmp/test.db'
 
     original = database.DATABASE_PATH
@@ -18,7 +18,7 @@ async def test_db():
     except FileNotFoundError:
         pass
 
-    await migrations.migrate()
+    await database.migrate()
 
     try:
         yield TEST_PATH

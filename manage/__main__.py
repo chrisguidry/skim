@@ -23,7 +23,7 @@ def update_requirements():
 
 def migrate():
     """Applies migrations to the database"""
-    from skim.migrations import migrate
+    from skim.database import migrate
     loop.run_until_complete(migrate())
 
 

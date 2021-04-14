@@ -3,7 +3,7 @@ from datetime import datetime
 from skim import entries
 
 
-async def test_entries_adding():
+async def test_entries_adding(skim_db):
     before = [e['id'] async for e in entries.all()]
     assert 'test-id' not in before
 

@@ -30,6 +30,7 @@ services:
     - ./:/skim/
     entrypoint:
     - pytest
+    - --flake8
     - --cov=/skim/
     - --cov-branch
     - --cov-report=term-missing

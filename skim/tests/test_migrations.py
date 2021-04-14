@@ -2,17 +2,17 @@ import os
 
 import pytest
 
-from skim import database, migrations
+from skim import database
 
 
 @pytest.fixture(autouse=True)
 def example_migrations():
-    original = migrations.MIGRATIONS_BASE
-    migrations.MIGRATIONS_BASE = '/skim/skim/tests/migrations/'
+    original = database.MIGRATIONS_BASE
+    database.MIGRATIONS_BASE = '/skim/skim/tests/migrations/'
     try:
         yield
     finally:
-        migrations.MIGRATIONS_BASE = original
+        database.MIGRATIONS_BASE = original
 
 
 @pytest.fixture(autouse=True)
@@ -31,7 +31,7 @@ def example_database():
 
 
 async def test_listing_migrations():
-    found = [m async for m in migrations.migrations()]
+    found = [m async for m in database.migrations()]
 
     assert len(found) == 2
 
@@ -45,7 +45,7 @@ async def test_listing_migrations():
 
 
 async def test_applying_migrations_increments_user_version(example_database):
-    await migrations.migrate()
+    await database.migrate()
 
     async with database.connection() as db:
         async with db.execute('PRAGMA user_version;') as cursor:
@@ -56,7 +56,7 @@ async def test_applying_migrations_increments_user_version(example_database):
 
 
 async def test_applying_migrations_executes_scripts(example_database):
-    await migrations.migrate()
+    await database.migrate()
 
     async with database.connection() as db:
         # will raise if migration 0001.foo.sql hasn't run
@@ -67,7 +67,7 @@ async def test_skips_applied_migrations(example_database):
     async with database.connection() as db:
         await db.execute('PRAGMA user_version = 3;')
 
-    await migrations.migrate()
+    await database.migrate()
 
     async with database.connection() as db:
         table_query = '''

@@ -1,7 +1,7 @@
 from skim import subscriptions
 
 
-async def test_subscriptions_management():
+async def test_subscriptions_management(skim_db):
     before = await subscriptions.get('https://example.com')
     assert not before
 
@@ -25,7 +25,7 @@ async def test_subscriptions_management():
     assert 'https://example.com' not in after
 
 
-async def test_subscriptions_updating_data():
+async def test_subscriptions_updating_data(skim_db):
     await subscriptions.add('https://example.com')
     await subscriptions.update(
         'https://example.com',
