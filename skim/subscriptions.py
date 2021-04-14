@@ -22,6 +22,15 @@ async def add(feed):
         await db.commit()
 
 
+async def get(feed):
+    async with aiosqlite.connect(DATABASE_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        query = 'SELECT * FROM subscriptions WHERE feed = ?'
+        parameters = [feed]
+        async with db.execute(query, parameters) as cursor:
+            return await cursor.fetchone()
+
+
 async def update(feed, title=None, site=None, icon=None):
     async with aiosqlite.connect(DATABASE_PATH) as db:
         query = """
