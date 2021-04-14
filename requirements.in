@@ -1,3 +1,4 @@
+aioconsole
 aiofiles
 aiohttp[speedups]
 aiosqlite

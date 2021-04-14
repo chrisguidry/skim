@@ -25,11 +25,13 @@ def migrate():
     from skim.migrations import migrate
     loop.run_until_complete(migrate())
 
+def shell():
+    """Opens a Python shell"""
+    os.system('apython')
+
 def dbshell():
     """Opens a SQLite3 shell to the database"""
-    os.system(
-        'sqlite3 /feeds/skim.db'
-    )
+    os.system('sqlite3 /feeds/skim.db')
 
 def feeds():
     """Lists the current feeds"""
