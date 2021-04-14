@@ -15,9 +15,28 @@ async def all():
 async def add(feed):
     async with aiosqlite.connect(DATABASE_PATH) as db:
         query = """
-        INSERT INTO subscriptions (feed) VALUES (?)
+        INSERT OR IGNORE INTO subscriptions (feed) VALUES (?)
         """
         parameters = [feed]
+        await db.execute(query, parameters)
+        await db.commit()
+
+
+async def update(feed, title=None, site=None, icon=None):
+    async with aiosqlite.connect(DATABASE_PATH) as db:
+        query = """
+        UPDATE subscriptions
+        SET    title = ?,
+               site = ?,
+               icon = ?
+        WHERE  feed = ?
+        """
+        parameters = [
+            title,
+            site,
+            icon,
+            feed
+        ]
         await db.execute(query, parameters)
         await db.commit()
 

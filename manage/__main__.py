@@ -49,13 +49,14 @@ def remove_feed():
     from skim import subscriptions
     loop.run_until_complete(subscriptions.remove(sys.argv[2]))
 
+def fetch():
+    from skim import crawl
+    loop.run_until_complete(crawl.fetch(sys.argv[2]))
+
 def crawl():
     """Runs one full crawl"""
     from skim import crawl
-    if len(sys.argv) == 3:
-        loop.run_until_complete(crawl.fetch(sys.argv[2]))
-    else:
-        loop.run_until_complete(crawl.crawl())
+    loop.run_until_complete(crawl.crawl())
 
 
 available_commands = {

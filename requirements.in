@@ -6,4 +6,5 @@ pytest
 pytest-asyncio
 pytest-aiohttp
 pytest-cov
+python-dateutil
 watchgod
