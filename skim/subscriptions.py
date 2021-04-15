@@ -5,7 +5,7 @@ async def all():
     async with database.connection() as db:
         async with db.execute('SELECT * FROM subscriptions') as cursor:
             async for row in cursor:
-                yield row
+                yield dict(row)
 
 
 async def add(feed):
@@ -23,7 +23,8 @@ async def get(feed):
         query = 'SELECT * FROM subscriptions WHERE feed = ?'
         parameters = [feed]
         async with db.execute(query, parameters) as cursor:
-            return await cursor.fetchone()
+            feed = await cursor.fetchone()
+            return dict(feed) if feed else None
 
 
 async def update(feed, title=None, site=None, icon=None):

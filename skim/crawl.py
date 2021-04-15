@@ -1,10 +1,8 @@
 import asyncio
-from datetime import datetime
 
 from aiohttp import ClientSession
-from dateutil.parser import parse as parse_date
 
-from skim import entries, parse, subscriptions
+from skim import entries, normalize, parse, subscriptions
 
 
 async def crawl():
@@ -18,53 +16,14 @@ async def crawl():
         if not feed:
             continue
 
-        feed = normalize_feed(feed)
+        feed = normalize.feed(feed)
         await subscriptions.update(feed_url, **feed)
 
         entry_saves = [
-            entries.add(feed_url, **normalize_entry(entry))
+            entries.add(feed_url, **normalize.entry(entry))
             for entry in feed_entries
         ]
         await asyncio.gather(*entry_saves)
-
-
-def normalize_feed(feed):
-    return {
-        'title': feed.get('title'),
-        'site': (
-            feed.get('link') or
-            feed.get('link:alternate')
-        ),
-        'icon': feed.get('logo')
-    }
-
-
-def normalize_entry(entry):
-    return {
-        'id': (
-            entry.get('id') or
-            entry.get('guid') or
-            entry.get('uuid') or
-            entry.get('link') or
-            entry.get('link:alternate')
-        ),
-        'title': entry.get('title'),
-        'link': (
-            entry.get('link') or
-            entry.get('link:alternate')
-        ),
-        'timestamp': parse_date(
-            entry.get('updated') or
-            entry.get('pubDate') or
-            entry.get('published') or
-            datetime.utcnow().isoformat()
-        ),
-        'body': (
-            entry.get('summary') or
-            entry.get('description') or
-            entry.get('content')
-        )
-    }
 
 
 async def fetch(feed_url):
