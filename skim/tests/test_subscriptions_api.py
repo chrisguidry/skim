@@ -3,7 +3,7 @@ import aiofiles.os
 import pytest
 from aiohttp import web
 
-from skim import routes
+from skim.api import routes
 
 
 @pytest.fixture
