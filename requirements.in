@@ -1,6 +1,7 @@
 aioconsole
 aiofiles
 aiohttp[speedups]
+aioresponses
 aiosqlite
 python-dateutil
 
@@ -12,6 +13,7 @@ pytest-asyncio
 pytest-aiohttp
 pytest-cov
 pytest-flake8
+time-machine
 
 # development
 pip-tools

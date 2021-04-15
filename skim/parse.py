@@ -115,4 +115,7 @@ async def parse_xml_feed(content_type, charset, stream):
 
     entries = feed.pop(xml_format['entries_key'])
 
+    if not isinstance(entries, list):
+        entries = [entries]
+
     return feed, entries

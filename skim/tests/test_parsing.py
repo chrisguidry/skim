@@ -99,3 +99,39 @@ async def test_handles_empty_xml_document():
 
         assert not feed
         assert not entries
+
+
+async def test_handles_single_item_feed():
+    with tempfile.NamedTemporaryFile('w') as single_entry:
+        single_entry.write("""<?xml version="1.0"?>
+        <rss version="2.0">
+            <channel>
+                <title>Example!</title>
+                <link>http://www.example.com</link>
+                <item>
+                    <description>Great stuff!</description>
+                    <guid>abcdefg</guid>
+                </item>
+            </channel>
+        </rss>
+        """)
+        single_entry.flush()
+
+        async with aiofiles.open(single_entry.name, 'r') as stream:
+            feed, entries = await parse.parse(
+                'application/rss+xml',
+                'utf-8',
+                stream
+            )
+
+        assert feed == {
+            'title': 'Example!',
+            'link': 'http://www.example.com'
+        }
+        assert isinstance(entries, list)
+        assert entries == [
+            {
+                'description': 'Great stuff!',
+                'guid': 'abcdefg'
+            }
+        ]

@@ -13,7 +13,10 @@ aiofiles==0.6.0
 aiohttp[speedups]==3.7.4.post0
     # via
     #   -r requirements.in
+    #   aioresponses
     #   pytest-aiohttp
+aioresponses==0.7.2
+    # via -r requirements.in
 aiosqlite==0.17.0
     # via -r requirements.in
 async-timeout==3.0.1
@@ -91,11 +94,15 @@ pytest==6.2.3
     #   pytest-cov
     #   pytest-flake8
 python-dateutil==2.8.1
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   time-machine
 six==1.15.0
     # via python-dateutil
 testfixtures==6.17.1
     # via flake8-isort
+time-machine==2.1.0
+    # via -r requirements.in
 toml==0.10.2
     # via
     #   pep517
