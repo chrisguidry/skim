@@ -49,7 +49,8 @@ async def parse_xml_feed(content_type, charset, stream):
 
     xml_format = XML_FORMATS.get(content_type)
 
-    async for event, element in xml_elements_from_stream(stream):
+    element_stream = xml_elements_from_stream(stream)
+    async for event, element in element_stream:  # pragma no branch, bug?
         tag = element.tag.replace(ATOM_NS, '')
 
         # since we couldn't determine the feed format from the Content-Type,
