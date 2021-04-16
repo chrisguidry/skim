@@ -27,7 +27,7 @@ async def test_parsing_standard_examples(example, content_type):
     async with aiofiles.open(expected_filename, 'r') as file:
         expected = json.loads(await file.read())
 
-    async with aiofiles.open(example_filename, 'r') as file:
+    async with aiofiles.open(example_filename, 'rb') as file:
         feed, entries = await parse.parse(content_type, 'utf-8', file)
 
     assert feed == expected['feed']
@@ -51,7 +51,7 @@ async def test_parsing_standard_examples_generic_xml_type(example):
     async with aiofiles.open(expected_filename, 'r') as file:
         expected = json.loads(await file.read())
 
-    async with aiofiles.open(example_filename, 'r') as file:
+    async with aiofiles.open(example_filename, 'rb') as file:
         feed, entries = await parse.parse('text/xml', 'utf-8', file)
 
     assert feed == expected['feed']
@@ -84,7 +84,7 @@ async def test_raises_for_unrecognized_xml_document():
         weird_file.write('<wat></wat>')
         weird_file.flush()
 
-        async with aiofiles.open(weird_file.name, 'r') as stream:
+        async with aiofiles.open(weird_file.name, 'rb') as stream:
             with pytest.raises(NotImplementedError):
                 await parse.parse('text/xml', 'utf-8', stream)
 
@@ -117,7 +117,7 @@ async def test_handles_single_item_feed():
         """)
         single_entry.flush()
 
-        async with aiofiles.open(single_entry.name, 'r') as stream:
+        async with aiofiles.open(single_entry.name, 'rb') as stream:
             feed, entries = await parse.parse(
                 'application/rss+xml',
                 'utf-8',

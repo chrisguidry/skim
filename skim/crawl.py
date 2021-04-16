@@ -35,6 +35,7 @@ async def fetch(feed_url):
             if response.status != 200:
                 print(
                     'TODO: Error status codes',
+                    feed_url,
                     response.status,
                     response.headers
                 )
@@ -49,9 +50,11 @@ async def fetch(feed_url):
             print(f'--- {feed_url} ({response.content_type}) ---')
             import pprint
             pprint.pprint(feed)
+            pprint.pprint(normalize.feed(feed))
             print(f'--- {len(entries)} entries ---')
-            # for entry in entries:
-            #     pprint.pprint(entry)
+            for entry in entries:
+                pprint.pprint(entry)
+                pprint.pprint(normalize.entry(entry))
             print()
 
             return feed_url, feed, entries
