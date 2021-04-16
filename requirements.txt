@@ -10,9 +10,12 @@ aiodns==2.0.0
     # via aiohttp
 aiofiles==0.6.0
     # via -r requirements.in
+aiohttp-jinja2==1.4.2
+    # via -r requirements.in
 aiohttp[speedups]==3.7.4.post0
     # via
     #   -r requirements.in
+    #   aiohttp-jinja2
     #   aioresponses
     #   pytest-aiohttp
 aioresponses==0.7.2
@@ -41,7 +44,7 @@ coverage==5.5
     # via pytest-cov
 flake8-isort==4.0.0
     # via -r requirements.in
-flake8==3.9.0
+flake8==3.9.1
     # via
     #   -r requirements.in
     #   flake8-isort
@@ -52,6 +55,10 @@ iniconfig==1.1.1
     # via pytest
 isort==5.8.0
     # via flake8-isort
+jinja2==2.11.3
+    # via aiohttp-jinja2
+markupsafe==1.1.1
+    # via jinja2
 mccabe==0.6.1
     # via flake8
 multidict==5.1.0
@@ -110,6 +117,7 @@ toml==0.10.2
 typing-extensions==3.7.4.3
     # via
     #   aiohttp
+    #   aiohttp-jinja2
     #   aiosqlite
 watchgod==0.7
     # via -r requirements.in

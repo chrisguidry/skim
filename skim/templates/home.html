@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+  {% for entry in entries %}
+  <article>
+    <h1>
+      {% if entry.link %}<a href="{{entry.link}}" target="_blank">{% endif %}
+      {{entry.title}}
+      {% if entry.link %}</a>{% endif %}
+    </h1>
+    <h2>from {{entry.feed}} at {{entry.timestamp}}</h2>
+    <div>
+      {{entry.body|safe}}
+    </div>
+  </article>
+  {% endfor %}
+{% endblock %}

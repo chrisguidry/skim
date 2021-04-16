@@ -3,7 +3,12 @@ from skim import database
 
 async def all():
     async with database.connection() as db:
-        async with db.execute('SELECT * FROM entries') as cursor:
+        query = """
+        SELECT  *
+        FROM    entries
+        ORDER BY timestamp DESC
+        """
+        async with db.execute(query) as cursor:
             async for row in cursor:
                 yield dict(row)
 

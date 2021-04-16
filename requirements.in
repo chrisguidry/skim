@@ -1,6 +1,7 @@
 aioconsole
 aiofiles
 aiohttp[speedups]
+aiohttp_jinja2
 aioresponses
 aiosqlite
 python-dateutil

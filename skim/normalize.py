@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from dateutil.parser import parse as parse_date
+import dateutil.parser
+from dateutil.tz import gettz
 
 
 def feed(feed):
@@ -40,3 +41,11 @@ def entry(entry):
             entry.get('content')
         )
     }
+
+
+def parse_date(datestring):
+    tzinfos = {
+        'EDT': gettz('America/New_York'),
+        'EST': gettz('America/New_York')
+    }
+    return dateutil.parser.parse(datestring, tzinfos=tzinfos)
