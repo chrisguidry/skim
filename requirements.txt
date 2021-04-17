@@ -49,6 +49,8 @@ flake8==3.9.1
     #   -r requirements.in
     #   flake8-isort
     #   pytest-flake8
+humanize==3.4.1
+    # via -r requirements.in
 idna==3.1
     # via yarl
 iniconfig==1.1.1
@@ -126,3 +128,4 @@ yarl==1.6.3
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
+# setuptools

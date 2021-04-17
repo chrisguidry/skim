@@ -12,6 +12,12 @@ aiohttp_jinja2.setup(
     enable_async=True
 )
 
+env = aiohttp_jinja2.get_env(app)
+env.filters.update(
+    friendly_date=frontend.friendly_date,
+    time_ago=frontend.time_ago
+)
+
 app.add_routes(frontend.routes)
 
 

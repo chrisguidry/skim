@@ -1,13 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
   {% for entry in entries %}
+  {% set subscription = subscriptions[entry.feed] %}
   <article>
     <h1>
-      {% if entry.link %}<a href="{{entry.link}}" target="_blank">{% endif %}
-      {{entry.title}}
-      {% if entry.link %}</a>{% endif %}
+      {%- if entry.link %}
+      <a href="{{entry.link}}" target="_blank">
+      {%- endif -%}
+        {{entry.title}}
+      {%- if entry.link -%}
+      </a>
+      {%- endif %}
     </h1>
-    <h2>from {{entry.feed}} at {{entry.timestamp}}</h2>
+    <h2>
+      from
+      {%- if subscription.site %}
+      <a href="{{subscription.site}}" target="_blank">
+      {%- endif -%}
+        {{subscription.title}}
+      {%- if subscription.site -%}
+      </a>
+      {%- endif %}
+      <time datetime="{{entry.timestamp.isoformat()}}" title="{{entry.timestamp|friendly_date}}">
+      {{ entry.timestamp|time_ago }} ago
+      </time>
+    </h2>
     <div>
       {{entry.body|safe}}
     </div>

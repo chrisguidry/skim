@@ -4,6 +4,7 @@ aiohttp[speedups]
 aiohttp_jinja2
 aioresponses
 aiosqlite
+humanize
 python-dateutil
 
 # testing and quality
