@@ -7,7 +7,12 @@
         "atom:link[alternate]": "http://example.org/",
         "atom:link[self]": "http://example.org/feed.atom",
         "atom:rights": "Copyright (c) 2003, Mark Pilgrim",
-        "atom:generator": "Example Toolkit"
+        "atom:generator": "Example Toolkit",
+        "skim:namespaces": {
+            "http://purl.org/dc/elements/1.1/": "dc",
+            "http://www.w3.org/2005/Atom": "atom",
+            "http://www.w3.org/1999/xhtml": ""
+        }
     },
     "entries": [
         {

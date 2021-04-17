@@ -14,7 +14,12 @@
         "category": "1765",
         "managingEditor": "dave@userland.com",
         "webMaster": "dave@userland.com",
-        "ttl": "40"
+        "ttl": "40",
+        "skim:namespaces": {
+            "http://www.w3.org/2005/Atom": "atom",
+            "http://purl.org/dc/elements/1.1/": "dc",
+            "http://backend.userland.com/blogChannelModule": "blogChannel"
+        }
     },
     "entries": [
         {

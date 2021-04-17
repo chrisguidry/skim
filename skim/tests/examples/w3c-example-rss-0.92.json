@@ -7,7 +7,11 @@
         "docs": "http://backend.userland.com/rss092",
         "managingEditor": "dave@userland.com (Dave Winer)",
         "webMaster": "dave@userland.com (Dave Winer)",
-        "cloud": ""
+        "cloud": "",
+        "skim:namespaces": {
+            "http://purl.org/dc/elements/1.1/": "dc",
+            "http://www.w3.org/2005/Atom": "atom"
+        }
     },
     "entries": [
         {

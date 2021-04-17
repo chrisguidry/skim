@@ -2,6 +2,7 @@ from unittest import mock
 
 import pytest
 from aioresponses import aioresponses
+from yarl import URL
 
 from skim import crawl, subscriptions
 
@@ -26,8 +27,8 @@ async def test_crawl(two_subscriptions):
         await crawl.crawl()
 
         fetch.assert_has_calls([
-            mock.call('https://example.com/1'),
-            mock.call('https://example.com/2')
+            mock.call('https://example.com/1', caching=None),
+            mock.call('https://example.com/2', caching=None)
         ])
 
         by_feed = {s['feed']: s async for s in subscriptions.all()}
@@ -38,12 +39,14 @@ async def test_crawl(two_subscriptions):
                 'title': 'One',
                 'site': None,
                 'icon': None,
+                'caching': None
             },
             'https://example.com/2': {
                 'feed': 'https://example.com/2',
                 'title': 'Two',
                 'site': None,
                 'icon': None,
+                'caching': None
             }
         }
 
@@ -54,7 +57,7 @@ async def test_crawl_fetch_errors(one_subscription):
 
         await crawl.crawl()
 
-        fetch.assert_called_once_with('https://example.com/1')
+        fetch.assert_called_once_with('https://example.com/1', caching=None)
 
 
 async def test_fetch():
@@ -81,7 +84,12 @@ async def test_fetch():
         assert feed_url == 'https://example.com/1'
         assert feed == {
             'title': 'Example!',
-            'link': 'http://www.example.com'
+            'link': 'http://www.example.com',
+            'skim:caching': {},
+            'skim:namespaces': {
+                'http://www.w3.org/2005/Atom': 'atom',
+                'http://purl.org/dc/elements/1.1/': 'dc'
+            }
         }
         assert entries == [
             {
@@ -89,6 +97,52 @@ async def test_fetch():
                 'guid': 'abcdefg'
             }
         ]
+
+
+async def test_fetch_sends_user_agent():
+    with aioresponses() as m:
+        m.get('https://example.com/1', status=304)
+
+        await crawl.fetch('https://example.com/1')
+
+        request = m.requests[('GET', URL('https://example.com/1'))][0]
+        sent_headers = request.kwargs['headers']
+
+        assert sent_headers['User-Agent'] == 'skim/0'
+
+
+async def test_fetch_sends_caching_headers():
+    with aioresponses() as m:
+        m.get('https://example.com/1', status=304)
+
+        await crawl.fetch(
+            'https://example.com/1',
+            caching={'Etag': 'the-etag', 'Last-Modified': 'yesterday?'}
+        )
+
+        request = m.requests[('GET', URL('https://example.com/1'))][0]
+        sent_headers = request.kwargs['headers']
+
+        assert sent_headers['If-None-Match'] == 'the-etag'
+        assert sent_headers['If-Modified-Since'] == 'yesterday?'
+
+
+async def test_fetch_handles_304_responses():
+    with aioresponses() as m:
+        m.get(
+            'https://example.com/1',
+            status=304,
+            headers={'Content-Type': 'application/rss+xml'},
+        )
+
+        feed_url, feed, entries = await crawl.fetch(
+            'https://example.com/1',
+            caching={'Etag': 'the-etag', 'Last-Modified': 'yesterday?'}
+        )
+
+        assert feed_url == 'https://example.com/1'
+        assert feed is None
+        assert entries is None
 
 
 async def test_fetch_error_status():

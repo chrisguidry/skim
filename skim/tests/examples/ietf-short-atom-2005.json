@@ -6,7 +6,11 @@
         "atom:author": {
             "atom:name": "John Doe"
         },
-        "atom:id": "urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6"
+        "atom:id": "urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6",
+        "skim:namespaces": {
+            "http://purl.org/dc/elements/1.1/": "dc",
+            "http://www.w3.org/2005/Atom": "atom"
+        }
     },
     "entries": [
         {

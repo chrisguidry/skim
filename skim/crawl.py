@@ -7,7 +7,7 @@ from skim import entries, normalize, parse, subscriptions
 
 async def crawl():
     fetches = [
-        fetch(subscription['feed'])
+        fetch(subscription['feed'], caching=subscription['caching'])
         async for subscription
         in subscriptions.all()
     ]
@@ -26,13 +26,19 @@ async def crawl():
         await asyncio.gather(*entry_saves)
 
 
-async def fetch(feed_url):
-    headers = {
-        'User-Agent': 'skim/0'
-    }
-    async with ClientSession(headers=headers) as session:
-        async with session.get(feed_url) as response:
-            if response.status != 200:
+async def fetch(feed_url, caching=None):
+    headers = only_set({
+        'User-Agent': 'skim/0',
+        'If-None-Match': caching and caching.get('Etag'),
+        'If-Modified-Since': caching and caching.get('Last-Modified')
+    })
+    async with ClientSession() as session:
+        async with session.get(feed_url, headers=headers) as response:
+            print(f'--- {feed_url} ({response.status}) ---')
+
+            if response.status == 304:
+                return feed_url, None, None
+            elif response.status != 200:
                 print(
                     'TODO: Error status codes',
                     feed_url,
@@ -41,20 +47,30 @@ async def fetch(feed_url):
                 )
                 return feed_url, None, None
 
+            print(f'Content: {response.content_type} {response.charset}')
+
             feed, entries = await parse.parse(
                 response.content_type,
                 response.charset,
                 response.content
             )
 
-            print(f'--- {feed_url} ({response.content_type}) ---')
+            feed['skim:caching'] = only_set({
+                'Etag': response.headers.get('Etag'),
+                'Last-Modified': response.headers.get('Last-Modified')
+            })
+
             import pprint
             pprint.pprint(feed)
             pprint.pprint(normalize.feed(feed))
             print(f'--- {len(entries)} entries ---')
-            for entry in entries:
-                pprint.pprint(entry)
-                pprint.pprint(normalize.entry(entry))
-            print()
+            # for entry in entries:
+            #     pprint.pprint(entry)
+            #     pprint.pprint(normalize.entry(entry))
 
             return feed_url, feed, entries
+
+
+def only_set(d):
+    """Filters a dict to only the keys that have truthy values"""
+    return {k: v for k, v in d.items() if v}

@@ -14,6 +14,10 @@
             "width": "88",
             "height": "31",
             "description": "News for web users that write back"
+        },
+        "skim:namespaces": {
+            "http://purl.org/dc/elements/1.1/": "dc",
+            "http://www.w3.org/2005/Atom": "atom"
         }
     },
     "entries": [

@@ -19,7 +19,8 @@ def feed(feed):
             feed.get('logo') or
             feed.get('atom:icon') or
             feed.get('image')
-        )
+        ),
+        'caching': feed.get('skim:caching')
     }
 
 

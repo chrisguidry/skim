@@ -137,6 +137,8 @@ async def parse_xml_feed(content_type, charset, stream):
     for step in xml_format['feed_path']:
         feed = feed[step]
 
+    feed['skim:namespaces'] = namespace_aliases
+
     entries = feed.pop(xml_format['entries_key'])
 
     if not isinstance(entries, list):

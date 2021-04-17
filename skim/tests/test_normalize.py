@@ -12,7 +12,8 @@ def test_feed_empty():
     assert normalized == {
         'title': None,
         'site': None,
-        'icon': None
+        'icon': None,
+        'caching': None,
     }
 
 
@@ -25,7 +26,8 @@ def test_feed_basics():
     assert normalized == {
         'title': 'The Title',
         'site': 'https://example.com/1',
-        'icon': 'https://example.com/logo.png'
+        'icon': 'https://example.com/logo.png',
+        'caching': None
     }
 
 
@@ -40,7 +42,8 @@ def test_feed_detailed_icon():
     assert normalized == {
         'title': 'The Title',
         'site': 'https://example.com/1',
-        'icon': 'https://example.com/logo.png'
+        'icon': 'https://example.com/logo.png',
+        'caching': None
     }
 
 
@@ -55,7 +58,8 @@ def test_feed_detailed_icon_not_a_string_or_dict():
     assert normalized == {
         'title': 'The Title',
         'site': 'https://example.com/1',
-        'icon': None
+        'icon': None,
+        'caching': None
     }
 
 

@@ -126,7 +126,11 @@ async def test_handles_single_item_feed():
 
         assert feed == {
             'title': 'Example!',
-            'link': 'http://www.example.com'
+            'link': 'http://www.example.com',
+            'skim:namespaces': {
+                'http://purl.org/dc/elements/1.1/': 'dc',
+                'http://www.w3.org/2005/Atom': 'atom'
+            }
         }
         assert isinstance(entries, list)
         assert entries == [

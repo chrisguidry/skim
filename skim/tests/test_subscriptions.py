@@ -33,3 +33,13 @@ async def test_subscriptions_updating_data(skim_db):
     )
     after = await subscriptions.get('https://example.com')
     assert after['title'] == 'Example!'
+
+
+async def test_subscriptions_updating_caching(skim_db):
+    await subscriptions.add('https://example.com')
+    await subscriptions.update(
+        'https://example.com',
+        caching={'Etag': 'foo', 'Last-Modified': 'bar'}
+    )
+    after = await subscriptions.get('https://example.com')
+    assert after['caching'] == {'Etag': 'foo', 'Last-Modified': 'bar'}
