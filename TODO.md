@@ -21,3 +21,5 @@
 ## Fetching favicons
 
 ## Fetching full articles?
+
+## Collecting subscription-level statistics, crawl audits, and errors

@@ -31,3 +31,11 @@ async def home(request):
         'entries': entries.all(),
         'subscriptions': {s['feed']: s async for s in subscriptions.all()}
     }
+
+
+@routes.get('/subscriptions')
+@template('subscriptions.html')
+async def subscriptions_list(request):
+    return {
+        'subscriptions': subscriptions.all()
+    }

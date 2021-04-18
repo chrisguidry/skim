@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+  <table>
+    <tr>
+      <th>Icon</th>
+      <th>Title</th>
+      <th>Feed</th>
+    </tr>
+    {%- for subscription in subscriptions %}
+    <tr>
+      <td>
+        {%- if subscription.icon %}
+        <img src="{{subscription.icon}}" />
+        {%- endif %}
+      </td>
+      <td>
+        {%- if subscription.site %}
+        <a href="{{subscription.site}}" target="_blank">
+        {%- endif -%}
+          {{subscription.title}}
+        {%- if subscription.site -%}
+        </a>
+        {%- endif %}
+      </td>
+      <td>
+        <a href="{{subscription.feed}}" target="_blank">
+        {{subscription.feed}}
+        </a>
+      </td>
+    </tr>
+    {%- endfor %}
+  </table>
+{% endblock %}

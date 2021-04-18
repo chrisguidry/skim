@@ -7,7 +7,8 @@ from skim import entries, server, subscriptions
 
 @pytest.fixture
 def client(loop, aiohttp_client):
-    return loop.run_until_complete(aiohttp_client(server.app))
+    app = server.create_application()
+    return loop.run_until_complete(aiohttp_client(app))
 
 
 @pytest.fixture
@@ -31,4 +32,14 @@ async def test_get_home(client, a_subscription, some_entries):
     assert response.status == 200
     assert response.headers['Content-Type'] == 'text/html; charset=utf-8'
 
+    assert 'Entry 2' in await response.text()
+    # TODO: more tests
+
+
+async def test_get_subscriptions_list(client, a_subscription):
+    response = await client.get('/subscriptions')
+    assert response.status == 200
+    assert response.headers['Content-Type'] == 'text/html; charset=utf-8'
+
+    assert 'https://example.com/feed' in await response.text()
     # TODO: more tests
