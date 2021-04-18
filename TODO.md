@@ -17,3 +17,7 @@
 ## Frontend time-based paging
 
 ## Crawling support for feed-level crawling hints (TTL, etc)
+
+## Fetching favicons
+
+## Fetching full articles?
