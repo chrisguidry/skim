@@ -17,6 +17,9 @@
       {%- if subscription.site %}
       <a href="{{subscription.site}}" target="_blank">
       {%- endif -%}
+        {% if subscription.icon %}
+        <img src="{{subscription.icon}}" />
+        {% endif %}
         {{subscription.title}}
       {%- if subscription.site -%}
       </a>

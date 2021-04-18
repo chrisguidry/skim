@@ -60,15 +60,15 @@ async def fetch(feed_url, caching=None):
                 'Last-Modified': response.headers.get('Last-Modified')
             })
 
-            import pprint
-            pprint.pprint(feed)
-            pprint.pprint(normalize.feed(feed))
-            print(f'--- {len(entries)} entries ---')
-            # for entry in entries:
-            #     pprint.pprint(entry)
-            #     pprint.pprint(normalize.entry(entry))
+        import pprint
+        pprint.pprint(feed)
+        pprint.pprint(normalize.feed(feed))
+        print(f'--- {len(entries)} entries ---')
+        for entry in entries:
+            pprint.pprint(entry)
+            pprint.pprint(normalize.entry(entry))
 
-            return feed_url, feed, entries
+    return feed_url, feed, entries
 
 
 def only_set(d):
