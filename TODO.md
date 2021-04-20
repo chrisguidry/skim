@@ -4,8 +4,6 @@
 
 ## More tests for normalize
 
-## Tests for the frontend
-
 ## Uniformly localized dates/times on the frontend
 
 ## Normalize and store authors/contributors
