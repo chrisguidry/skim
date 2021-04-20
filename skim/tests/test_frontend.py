@@ -6,9 +6,9 @@ from skim import entries, server, subscriptions
 
 
 @pytest.fixture
-def client(loop, aiohttp_client):
+async def client(aiohttp_client):
     app = server.create_application()
-    return loop.run_until_complete(aiohttp_client(app))
+    return await aiohttp_client(app)
 
 
 @pytest.fixture

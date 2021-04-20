@@ -5,6 +5,12 @@ import pytest
 from skim import database
 
 
+@pytest.fixture(autouse=True)
+def event_loop(loop):
+    # uses the aiohttp loop as the pytest-asyncio loop for all tests
+    return loop
+
+
 @pytest.fixture
 async def skim_db():
     TEST_PATH = '/tmp/test.db'
