@@ -4,6 +4,7 @@ aiohttp[speedups]
 aiohttp_jinja2
 aioresponses
 aiosqlite
+beautifulsoup4
 humanize
 python-dateutil
 
@@ -11,7 +12,7 @@ python-dateutil
 flake8
 flake8-isort
 pytest
-pytest-asyncio
+pytest-asyncio<0.15.0
 pytest-aiohttp
 pytest-cov
 pytest-flake8

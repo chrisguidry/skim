@@ -1,6 +1,8 @@
 from datetime import datetime
+from urllib.parse import urljoin, urlparse
 
 import dateutil.parser
+from bs4 import BeautifulSoup
 from dateutil.tz import gettz
 
 
@@ -25,12 +27,18 @@ def feed(feed):
 
 
 def entry(entry):
+    link = (
+        entry.get('link') or
+        entry.get('atom:link[alternate]') or
+        urllike(entry.get('id')) or
+        urllike(entry.get('atom:id')) or
+        urllike(entry.get('guid'))
+    )
     return {
         'id': (
             entry.get('id') or
             entry.get('atom:id') or
             entry.get('guid') or
-            entry.get('uuid') or
             entry.get('link') or
             entry.get('atom:link[alternate]')
         ),
@@ -38,23 +46,21 @@ def entry(entry):
             entry.get('title') or
             entry.get('atom:title')
         ),
-        'link': (
-            entry.get('link') or
-            entry.get('atom:link[alternate]')
-        ),
-        'timestamp': parse_date(
+        'link': link,
+        'timestamp': date(
             entry.get('pubDate') or
             entry.get('atom:updated') or
             entry.get('atom:published') or
             datetime.utcnow().isoformat()
         ),
-        'body': (
+        'body': markup(
             entry.get('atom:content') or
             entry.get('content:encoded') or
             entry.get('content') or
             entry.get('atom:summary') or
             entry.get('summary') or
-            entry.get('description')
+            entry.get('description'),
+            base_url=link
         )
     }
 
@@ -70,9 +76,36 @@ def feed_icon(icon):
         return icon.get('url')
 
 
-def parse_date(datestring):
+def date(datestring):
     tzinfos = {
         'EDT': gettz('America/New_York'),
         'EST': gettz('America/New_York')
     }
     return dateutil.parser.parse(datestring, tzinfos=tzinfos)
+
+
+def urllike(string):
+    if not string:
+        return None
+
+    parsed = urlparse(string)
+    if parsed.scheme and parsed.netloc:
+        return string
+
+    return None
+
+
+def markup(content, base_url):
+    if not content:
+        return content
+
+    soup = BeautifulSoup(content, features='html.parser')
+
+    # translate relative URLs to absolute URLs
+    for attribute in ['href', 'src']:
+        for element in soup.select(f'[{attribute}]'):
+            parsed = urlparse(element[attribute])
+            if not parsed.scheme:
+                element[attribute] = urljoin(base_url, element[attribute])
+
+    return soup.prettify()

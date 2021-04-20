@@ -1,7 +1,5 @@
 # TODO
 
-## Rewrite relative URLs in the body of an entry to absolute ones
-
 ## Handle custom error pages
 
 ## More tests for normalize
@@ -18,7 +16,7 @@
 
 ## Crawling support for feed-level crawling hints (TTL, etc)
 
-## Fetching favicons
+## Fetching favicons for sites that don't include them in the feeds
 
 ## Fetching full articles?
 

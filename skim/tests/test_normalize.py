@@ -73,3 +73,28 @@ def test_entry_empty():
         'timestamp': FROZEN_NOW,
         'body': None
     }
+
+
+def test_normalizing_links_with_urllike_id():
+    normalized = normalize.entry({
+        'id': 'https://example.com/1'
+    })
+    assert normalized['link'] == 'https://example.com/1'
+
+
+def test_normalizing_markup_relative_links():
+    normalized = normalize.entry({
+        'link': 'https://example.com/1',
+        'content': (
+            '<a href="/1/2/3/">'
+            '<img src="4/5/6"/>'
+            '<img src="https://leaveit" />'
+            '</a>'
+        )
+    })
+    assert normalized['body'] == (
+        '<a href="https://example.com/1/2/3/">\n'
+        ' <img src="https://example.com/4/5/6"/>\n'
+        ' <img src="https://leaveit"/>\n'
+        '</a>'
+    )

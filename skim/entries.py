@@ -20,7 +20,7 @@ async def all():
 async def add(feed, id, timestamp=None, title=None, link=None, body=None):
     async with database.connection() as db:
         query = """
-        INSERT OR IGNORE INTO entries (feed, id, timestamp, title, link, body)
+        INSERT OR REPLACE INTO entries (feed, id, timestamp, title, link, body)
         VALUES (?, ?, ?, ?, ?, ?)
         """
         parameters = [feed, id, timestamp.isoformat(), title, link, body]

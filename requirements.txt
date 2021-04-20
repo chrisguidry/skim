@@ -28,6 +28,8 @@ attrs==20.3.0
     # via
     #   aiohttp
     #   pytest
+beautifulsoup4==4.9.3
+    # via -r requirements.in
 brotlipy==0.7.0
     # via aiohttp
 cchardet==2.1.7
@@ -108,6 +110,8 @@ python-dateutil==2.8.1
     #   time-machine
 six==1.15.0
     # via python-dateutil
+soupsieve==2.2.1
+    # via beautifulsoup4
 testfixtures==6.17.1
     # via flake8-isort
 time-machine==2.1.0

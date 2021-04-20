@@ -20,8 +20,25 @@ async def two_subscriptions(one_subscription):
 async def test_crawl(two_subscriptions):
     with mock.patch('skim.crawl.fetch') as fetch:
         fetch.side_effect = [
-            ('https://example.com/1', {'title': 'One'}, [{'the': 'entry'}]),
-            ('https://example.com/2', {'title': 'Two'}, [{'the': 'entry'}])
+            (
+                'https://example.com/1',
+                {'title': 'One'},
+                [
+                    {
+                        'id': 'entry-one',
+                        'title': 'Entry One'
+                    }
+                ]
+            ),
+            (
+                'https://example.com/2',
+                {'title': 'Two'},
+                [
+                    {
+                        'id': 'entry-two',
+                        'title': 'Entry Two'
+                    }
+                ])
         ]
 
         await crawl.crawl()
