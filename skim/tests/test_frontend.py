@@ -43,6 +43,25 @@ async def test_get_home(client, a_subscription, some_entries):
     ]
 
 
+async def test_get_home_second_page(client, a_subscription, some_entries):
+    response = await client.get('/?older-than=2021-01-02T05:00:00Z')
+    assert response.status == 200
+    assert response.headers['Content-Type'] == 'text/html; charset=utf-8'
+
+    soup = BeautifulSoup(await response.text())
+    entry_links = [a['href'] for a in soup.select('article h1 a')]
+    assert entry_links == [
+        'https://example.com/1',
+        'https://example.com/0'
+    ]
+
+
+async def test_redirect_on_bad_date(client, a_subscription, some_entries):
+    response = await client.get('/?older-than=junk', allow_redirects=False)
+    assert response.status == 302
+    assert response.headers['Location'] == '/'
+
+
 async def test_get_subscriptions_list(client, a_subscription):
     response = await client.get('/subscriptions')
     assert response.status == 200

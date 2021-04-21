@@ -10,8 +10,6 @@
 
 ## Normalize and store enclosures on entries
 
-## Frontend time-based paging
-
 ## Crawling support for feed-level crawling hints (TTL, etc)
 
 ## Fetching favicons for sites that don't include them in the feeds

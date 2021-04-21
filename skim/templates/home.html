@@ -32,5 +32,8 @@
       {{entry.body|safe}}
     </div>
   </article>
+  {% if loop.last %}
+  <a href="?older-than={{entry.timestamp.isoformat()|urlencode}}">Older</a>
+  {% endif %}
   {% endfor %}
 {% endblock %}

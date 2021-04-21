@@ -25,14 +25,3 @@ async def test_entries_adding(skim_db):
         'link': 'https://example.com/1',
         'body': 'Hiiiii'
     }
-
-
-def test_from_iso():
-    assert (
-        entries.from_iso('2021-02-03T04:05:06Z') ==
-        datetime(2021, 2, 3, 4, 5, 6, tzinfo=timezone.utc)
-    )
-    assert (
-        entries.from_iso('2021-02-03T04:05:06.123456Z') ==
-        datetime(2021, 2, 3, 4, 5, 6, 123456, tzinfo=timezone.utc)
-    )

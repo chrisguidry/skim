@@ -4,9 +4,11 @@ import humanize
 from aiohttp import web
 from aiohttp_jinja2 import template
 
-from skim import entries, subscriptions
+from skim import dates, entries, subscriptions
 
 routes = web.RouteTableDef()
+
+END_OF_TIME = datetime.max.replace(tzinfo=timezone.utc)
 
 STATIC_ROOT = '/skim/skim/static'
 
@@ -27,8 +29,15 @@ def friendly_date(date):
 @routes.get('/')
 @template('home.html')
 async def home(request):
+    try:
+        older_than = dates.from_iso(request.query['older-than'])
+    except KeyError:
+        older_than = END_OF_TIME
+    except ValueError:
+        return web.Response(status=302, headers={'Location': '/'})
+
     return {
-        'entries': entries.all(),
+        'entries': entries.older_than(older_than, limit=10),
         'subscriptions': {s['feed']: s async for s in subscriptions.all()}
     }
 
