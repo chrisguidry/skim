@@ -82,6 +82,16 @@ def test_normalizing_links_with_urllike_id():
     assert normalized['link'] == 'https://example.com/1'
 
 
+def test_normalizing_youtube_feeds():
+    normalized = normalize.entry({
+        'atom:id': 'yt:video:abcdefg'
+    })
+    assert normalized['body'] == (
+        '<iframe allowfullscreen="" class="youtube video" src="https://www.youtube.com/embed/abcdefg">\n'
+        '</iframe>\n'
+    )
+
+
 def test_normalizing_markup_relative_links():
     normalized = normalize.entry({
         'link': 'https://example.com/1',
@@ -97,4 +107,27 @@ def test_normalizing_markup_relative_links():
         ' <img src="https://example.com/4/5/6"/>\n'
         ' <img src="https://leaveit"/>\n'
         '</a>'
+    )
+
+
+def test_normalizing_scrubbing_google_analytics_images():
+    normalized = normalize.entry({
+        'link': 'https://example.com/1',
+        'content': (
+            '<p>'
+            '<em>hello</em>'
+            '<img src="https://www.google-analytics.com/booooooo"/>'
+            '<em>world</em>'
+            '</p>'
+        )
+    })
+    assert normalized['body'] == (
+        '<p>\n'
+        ' <em>\n'
+        '  hello\n'
+        ' </em>\n'
+        ' <em>\n'
+        '  world\n'
+        ' </em>\n'
+        '</p>'
     )

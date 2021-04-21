@@ -1,1 +1,34 @@
-skim.css
+body {
+}
+
+img.icon {
+    display: inline-block;
+    max-width: 1em;
+    max-height: 1em;
+}
+
+a.older {
+    display: block;
+    width: 100%;
+    height: 5em;
+    line-height: 5em;
+    text-align: center;
+    background-color: #CCCCCC;
+    text-decoration: none;
+}
+
+article {
+    font-size: 20px;
+}
+article>h2 {
+    font-size: 20px;
+}
+
+article img {
+    max-width: 100%;
+}
+
+article iframe.video {
+    width: 640px;
+    height: 480px;
+}

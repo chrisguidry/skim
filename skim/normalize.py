@@ -59,7 +59,8 @@ def entry(entry):
             entry.get('content') or
             entry.get('atom:summary') or
             entry.get('summary') or
-            entry.get('description'),
+            entry.get('description') or
+            youtube_embed(entry),
             base_url=link
         )
     }
@@ -95,6 +96,21 @@ def urllike(string):
     return None
 
 
+def youtube_embed(entry):
+    entry_id = entry.get('atom:id')
+    if not entry_id or not entry_id.startswith('yt:video:'):
+        return None
+
+    video_id = entry_id.split(':')[-1]
+
+    return f'''
+    <iframe src="https://www.youtube.com/embed/{video_id}"
+            class="youtube video"
+            allowfullscreen>
+    </iframe>
+    '''
+
+
 def markup(content, base_url):
     if not content:
         return content
@@ -107,5 +123,11 @@ def markup(content, base_url):
             parsed = urlparse(element[attribute])
             if not parsed.scheme:
                 element[attribute] = urljoin(base_url, element[attribute])
+
+    # scrub any <img src="...google analytics..." /> trackers
+    for element in soup.select('img[src]'):
+        parsed = urlparse(element['src'])
+        if parsed.netloc == 'www.google-analytics.com':
+            element.decompose()
 
     return soup.prettify()
