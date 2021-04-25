@@ -1,6 +1,6 @@
 import json
 
-from skim import database
+from skim import database, dates
 
 
 async def all():
@@ -66,3 +66,26 @@ def subscription_from_row(row):
     if subscription['caching']:
         subscription['caching'] = json.loads(subscription['caching'])
     return subscription
+
+
+async def log_crawl(feed, status=None, content_type=None, new_entries=None):
+    async with database.connection() as db:
+        query = """
+        INSERT INTO crawl_log (
+            feed,
+            crawled,
+            status,
+            content_type,
+            new_entries
+        )
+        VALUES (?, ?, ?, ? ,?)
+        """
+        parameters = [
+            feed,
+            dates.utcnow().isoformat(),
+            status,
+            content_type,
+            new_entries
+        ]
+        await db.execute(query, parameters)
+        await db.commit()

@@ -2,8 +2,6 @@ import asyncio
 import os
 import sys
 
-loop = asyncio.get_event_loop()
-
 
 def help():
     """Prints available commands"""
@@ -24,7 +22,7 @@ def update_requirements():
 def migrate():
     """Applies migrations to the database"""
     from skim.database import migrate
-    loop.run_until_complete(migrate())
+    asyncio.run(migrate())
 
 
 def shell():
@@ -45,30 +43,30 @@ def feeds():
         async for subscription in subscriptions.all():
             print(subscription['feed'])
 
-    loop.run_until_complete(print_feeds())
+    asyncio.run(print_feeds())
 
 
 def add_feed():
     """Subscribes to a new feed"""
     from skim import subscriptions
-    loop.run_until_complete(subscriptions.add(sys.argv[2]))
+    asyncio.run(subscriptions.add(sys.argv[2]))
 
 
 def remove_feed():
     """Unsubscribes from a feed"""
     from skim import subscriptions
-    loop.run_until_complete(subscriptions.remove(sys.argv[2]))
+    asyncio.run(subscriptions.remove(sys.argv[2]))
 
 
 def fetch():
     from skim import crawl
-    loop.run_until_complete(crawl.fetch(sys.argv[2]))
+    asyncio.run(crawl.fetch(sys.argv[2]))
 
 
 def crawl():
     """Runs one full crawl"""
     from skim import crawl
-    loop.run_until_complete(crawl.crawl())
+    asyncio.run(crawl.crawl())
 
 
 available_commands = {

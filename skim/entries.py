@@ -31,9 +31,11 @@ async def _query_results(query, parameters=None):
 async def add(feed, id, timestamp=None, title=None, link=None, body=None):
     async with database.connection() as db:
         query = """
-        INSERT OR REPLACE INTO entries (feed, id, timestamp, title, link, body)
+        INSERT OR IGNORE INTO entries (feed, id, timestamp, title, link, body)
         VALUES (?, ?, ?, ?, ?, ?)
         """
         parameters = [feed, id, timestamp.isoformat(), title, link, body]
         await db.execute(query, parameters)
+        was_new = db.total_changes > 0
         await db.commit()
+        return was_new

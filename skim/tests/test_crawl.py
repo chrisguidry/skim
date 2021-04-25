@@ -22,6 +22,7 @@ async def test_crawl(two_subscriptions):
         fetch.side_effect = [
             (
                 'https://example.com/1',
+                mock.Mock(status=200, content_type='application/rss+xml'),
                 {'title': 'One'},
                 [
                     {
@@ -32,6 +33,7 @@ async def test_crawl(two_subscriptions):
             ),
             (
                 'https://example.com/2',
+                mock.Mock(status=200, content_type='application/rss+xml'),
                 {'title': 'Two'},
                 [
                     {
@@ -70,7 +72,12 @@ async def test_crawl(two_subscriptions):
 
 async def test_crawl_fetch_errors(one_subscription):
     with mock.patch('skim.crawl.fetch') as fetch:
-        fetch.return_value = ('https://example.com/1', None, None)
+        fetch.return_value = (
+            'https://example.com/1',
+            mock.Mock(status=500, content_type='application/rss+xml'),
+            None,
+            None
+        )
 
         await crawl.crawl()
 
@@ -96,9 +103,12 @@ async def test_fetch():
             '''
         )
 
-        feed_url, feed, entries = await crawl.fetch('https://example.com/1')
+        feed_url, response, feed, entries = await crawl.fetch(
+            'https://example.com/1'
+        )
 
         assert feed_url == 'https://example.com/1'
+        assert response.status == 200
         assert feed == {
             'title': 'Example!',
             'link': 'http://www.example.com',
@@ -152,12 +162,13 @@ async def test_fetch_handles_304_responses():
             headers={'Content-Type': 'application/rss+xml'},
         )
 
-        feed_url, feed, entries = await crawl.fetch(
+        feed_url, response, feed, entries = await crawl.fetch(
             'https://example.com/1',
             caching={'Etag': 'the-etag', 'Last-Modified': 'yesterday?'}
         )
 
         assert feed_url == 'https://example.com/1'
+        assert response.status == 304
         assert feed is None
         assert entries is None
 
@@ -171,8 +182,11 @@ async def test_fetch_error_status():
             body='any old thing'
         )
 
-        feed_url, feed, entries = await crawl.fetch('https://example.com/1')
+        feed_url, response, feed, entries = await crawl.fetch(
+            'https://example.com/1'
+        )
 
         assert feed_url == 'https://example.com/1'
+        assert response.status == 500
         assert feed is None
         assert entries is None

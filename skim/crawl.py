@@ -6,24 +6,36 @@ from skim import entries, normalize, parse, subscriptions
 
 
 async def crawl():
-    fetches = [
-        fetch(subscription['feed'], caching=subscription['caching'])
+    await asyncio.gather(*[
+        fetch_and_save(subscription)
         async for subscription
         in subscriptions.all()
-    ]
-    for future_feed in asyncio.as_completed(fetches):
-        feed_url, feed, feed_entries = await future_feed
-        if not feed:
-            continue
+    ])
 
-        feed = normalize.feed(feed)
-        await subscriptions.update(feed_url, **feed)
 
-        entry_saves = [
-            entries.add(feed_url, **normalize.entry(entry))
-            for entry in feed_entries
-        ]
-        await asyncio.gather(*entry_saves)
+async def fetch_and_save(subscription):
+    feed_url, response, feed, feed_entries = await fetch(
+        subscription['feed'],
+        caching=subscription['caching']
+    )
+    if not feed:
+        await subscriptions.log_crawl(feed_url, status=response.status)
+        return
+
+    feed = normalize.feed(feed)
+    await subscriptions.update(feed_url, **feed)
+
+    new_entries = 0
+    for entry in feed_entries:
+        new = await entries.add(feed_url, **normalize.entry(entry))
+        new_entries += 1 if new else 0
+
+    await subscriptions.log_crawl(
+        feed_url,
+        status=response.status,
+        content_type=response.content_type,
+        new_entries=new_entries
+    )
 
 
 async def fetch(feed_url, caching=None):
@@ -37,7 +49,7 @@ async def fetch(feed_url, caching=None):
             print(f'--- {feed_url} ({response.status}) ---')
 
             if response.status == 304:
-                return feed_url, None, None
+                return feed_url, response, None, None
             elif response.status != 200:
                 print(
                     'TODO: Error status codes',
@@ -45,7 +57,7 @@ async def fetch(feed_url, caching=None):
                     response.status,
                     response.headers
                 )
-                return feed_url, None, None
+                return feed_url, response, None, None
 
             print(f'Content: {response.content_type} {response.charset}')
 
@@ -62,9 +74,9 @@ async def fetch(feed_url, caching=None):
 
         # simpler
         print(normalize.feed(feed)['title'])
-        for entry in entries:
-            entry = normalize.entry(entry)
-            print(entry['timestamp'], entry['title'])
+        # for entry in entries:
+        #     entry = normalize.entry(entry)
+        #     print(entry['timestamp'], entry['title'])
 
         # # verbose
         # import pprint
@@ -75,7 +87,7 @@ async def fetch(feed_url, caching=None):
         #     pprint.pprint(entry)
         #     pprint.pprint(normalize.entry(entry))
 
-    return feed_url, feed, entries
+    return feed_url, response, feed, entries
 
 
 def only_set(d):

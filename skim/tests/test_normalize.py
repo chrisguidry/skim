@@ -87,7 +87,9 @@ def test_normalizing_youtube_feeds():
         'atom:id': 'yt:video:abcdefg'
     })
     assert normalized['body'] == (
-        '<iframe allowfullscreen="" class="youtube video" src="https://www.youtube.com/embed/abcdefg">\n'
+        '<iframe allowfullscreen="" '
+        'class="youtube video" '
+        'src="https://www.youtube.com/embed/abcdefg">\n'
         '</iframe>\n'
     )
 
