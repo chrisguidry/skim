@@ -31,10 +31,10 @@ article>header {
     align-self: flex-start;
 }
 article>header h1 {
-    font-size: 32px;
+    font-size: 24px;
 }
 article>header h2 {
-    font-size: 20px;
+    font-size: 18px;
 }
 
 article>.article-body {
