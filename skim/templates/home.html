@@ -13,22 +13,19 @@
         </a>
         {%- endif %}
       </h1>
-      <h2>
-        from
-        {%- if subscription.site %}
-        <a href="{{subscription.site}}" target="_blank">
-        {%- endif -%}
-          {% if subscription.icon %}
-          <img src="{{subscription.icon}}" class="icon"/>
-          {% endif %}
-          {{subscription.title}}
-        {%- if subscription.site -%}
-        </a>
-        {%- endif %}
-        <time datetime="{{entry.timestamp.isoformat()}}" title="{{entry.timestamp|friendly_date}}">
-        {{ entry.timestamp|time_ago }} ago
-        </time>
-      </h2>
+      {%- if subscription.site %}
+      <a href="{{subscription.site}}" target="_blank">
+      {%- endif -%}
+        {% if subscription.icon %}
+        <img src="{{subscription.icon}}" class="icon"/>
+        {% endif %}
+        {{subscription.title}}
+      {%- if subscription.site -%}
+      </a>
+      {%- endif %}
+      <time datetime="{{entry.timestamp.isoformat()}}" title="{{entry.timestamp|friendly_date}}">
+      {{ entry.timestamp|time_ago }} ago
+      </time>
     </header>
     <div class='article-body'>
       {{entry.body|safe}}

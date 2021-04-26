@@ -1,4 +1,11 @@
+:root {
+    --dark-text: #111111;
+    --light-background: #f8f8f8;
+}
+
 body {
+    color: var(--dark-text);
+    background-color: var(--light-background);
 }
 
 img.icon {
@@ -13,19 +20,24 @@ a.older {
     height: 5em;
     line-height: 5em;
     text-align: center;
-    background-color: #CCCCCC;
+    background-color: #cccccc;
     text-decoration: none;
 }
 
 article {
+    margin: 1em;
+    border-bottom: 1px dashed #dddddd;
+    padding: 1em 0 1em 0;
     display: flex;
-    border-bottom: 1px dashed #DDDDDD;
-    font-size: 20px;
+    font-size: 22px;
+}
+article:first-child {
+    margin-top: 0;
 }
 
 article>header {
     flex: 1;
-    order: 2;
+    order: 1;
     position: sticky;
     top: 0px;
     align-self: flex-start;
@@ -33,14 +45,22 @@ article>header {
 article>header h1 {
     font-size: 24px;
 }
-article>header h2 {
-    font-size: 18px;
+article>header a {
+    color: var(--dark-text);
+    text-decoration: none;
 }
+article>header .site-link {
+    display: block;
+}
+article>header time {
+    display: block;
+}
+
 
 article>.article-body {
     flex: 3;
-    order: 1;
-    margin: 1em;
+    order: 2;
+    margin: 0em 1em 0em 1em;
 }
 
 .article-body img {
