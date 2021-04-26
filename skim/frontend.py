@@ -37,7 +37,7 @@ async def home(request):
         return web.Response(status=302, headers={'Location': '/'})
 
     return {
-        'entries': entries.older_than(older_than, limit=10),
+        'entries': entries.older_than(older_than, limit=20),
         'subscriptions': {s['feed']: s async for s in subscriptions.all()}
     }
 

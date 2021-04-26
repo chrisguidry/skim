@@ -18,17 +18,40 @@ a.older {
 }
 
 article {
-    font-size: 20px;
-}
-article>h2 {
+    display: flex;
+    border-bottom: 1px dashed #DDDDDD;
     font-size: 20px;
 }
 
-article img {
+article>header {
+    flex: 1;
+    order: 2;
+    position: sticky;
+    top: 0px;
+    align-self: flex-start;
+}
+article>header h1 {
+    font-size: 32px;
+}
+article>header h2 {
+    font-size: 20px;
+}
+
+article>.article-body {
+    flex: 3;
+    order: 1;
+    margin: 1em;
+}
+
+.article-body img {
     max-width: 100%;
 }
 
-article iframe.video {
+.article-body blockquote {
+    font-style: italic;
+}
+
+.article-body iframe.video {
     width: 640px;
     height: 480px;
 }
