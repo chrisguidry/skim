@@ -41,7 +41,7 @@ def feeds():
 
     async def print_feeds():
         async for subscription in subscriptions.all():
-            print(subscription['feed'])
+            print(f"{subscription['title']}: {subscription['feed']}")
 
     asyncio.run(print_feeds())
 

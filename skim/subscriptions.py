@@ -5,7 +5,12 @@ from skim import database, dates
 
 async def all():
     async with database.connection() as db:
-        async with db.execute('SELECT * FROM subscriptions') as cursor:
+        query = """
+        SELECT  *
+        FROM    subscriptions
+        ORDER BY title
+        """
+        async with db.execute(query) as cursor:
             async for row in cursor:
                 yield subscription_from_row(row)
 

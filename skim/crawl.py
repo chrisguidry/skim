@@ -4,13 +4,18 @@ from aiohttp import ClientSession
 
 from skim import entries, normalize, parse, subscriptions
 
+MAX_CONCURRENT = 10
+
 
 async def crawl():
-    await asyncio.gather(*[
+    fetches = [
         fetch_and_save(subscription)
         async for subscription
         in subscriptions.all()
-    ])
+    ]
+    while fetches:
+        batch, fetches = fetches[:MAX_CONCURRENT], fetches[MAX_CONCURRENT:]
+        await asyncio.gather(*batch)
 
 
 async def fetch_and_save(subscription):
