@@ -1,6 +1,6 @@
 import asyncio
 
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientTimeout
 
 from skim import entries, normalize, parse, subscriptions
 
@@ -19,12 +19,20 @@ async def crawl():
 
 
 async def fetch_and_save(subscription):
-    feed_url, response, feed, feed_entries = await fetch(
-        subscription['feed'],
-        caching=subscription['caching']
-    )
+    feed_url = subscription['feed']
+    try:
+        feed_url, response, feed, feed_entries = await fetch(
+            feed_url,
+            caching=subscription['caching']
+        )
+        status = response.status
+    except asyncio.TimeoutError:
+        feed = None
+        status = -1
+
     if not feed:
-        await subscriptions.log_crawl(feed_url, status=response.status)
+        print(f"Status {status} for {feed_url}")
+        await subscriptions.log_crawl(feed_url, status=status)
         return
 
     feed = normalize.feed(feed)
@@ -49,7 +57,8 @@ async def fetch(feed_url, caching=None):
         'If-None-Match': caching and caching.get('Etag'),
         'If-Modified-Since': caching and caching.get('Last-Modified')
     })
-    async with ClientSession() as session:
+    timeout = ClientTimeout(total=5)
+    async with ClientSession(timeout=timeout) as session:
         async with session.get(feed_url, headers=headers) as response:
             print(f'--- {feed_url} ({response.status}) ---')
 
