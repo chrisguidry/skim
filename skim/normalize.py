@@ -53,6 +53,13 @@ def entry(entry):
             entry.get('atom:published') or
             datetime.utcnow().isoformat()
         ),
+        'creators': list_or_none(
+            entry.get('dc:creator') or
+            entry.get('atom:author', {}).get('atom:name')
+        ),
+        'categories': list_or_none(
+            entry.get('category')
+        ),
         'body': markup(
             entry.get('atom:content') or
             entry.get('content:encoded') or
@@ -94,6 +101,14 @@ def urllike(string):
         return string
 
     return None
+
+
+def list_or_none(value):
+    if not value:
+        return None
+    if not isinstance(value, list):
+        return [value]
+    return value
 
 
 def youtube_embed(entry):

@@ -17,6 +17,7 @@ def create_application():
     env = aiohttp_jinja2.get_env(app)
     env.filters.update(
         friendly_date=frontend.friendly_date,
+        query_string=frontend.query_string,
         time_ago=frontend.time_ago
     )
 

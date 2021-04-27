@@ -5,34 +5,48 @@
   <article>
     <header>
       <h1>
-        {%- if entry.link %}
+        {% if entry.link %}
         <a href="{{entry.link}}" target="_blank">
-        {%- endif -%}
-          {{entry.title}}
-        {%- if entry.link -%}
-        </a>
-        {%- endif %}
-      </h1>
-      {%- if subscription.site %}
-      <a href="{{subscription.site}}" target="_blank">
-      {%- endif -%}
-        {% if subscription.icon %}
-        <img src="{{subscription.icon}}" class="icon"/>
         {% endif %}
-        {{subscription.title}}
-      {%- if subscription.site -%}
-      </a>
-      {%- endif %}
+          {{entry.title}}
+        {% if entry.link %}
+        </a>
+        {% endif %}
+      </h1>
+
+      {% for creator in entry.creators %}
+      {% if loop.first %}
+      <ol class='creators'>
+      {% endif %}
+        <li><a href="?creator={{creator|urlencode}}">{{creator}}</a></li>
+      {% if loop.last %}
+      </ol>
+      {% endif %}
+      {% endfor %}
+
       <time datetime="{{entry.timestamp.isoformat()}}" title="{{entry.timestamp|friendly_date}}">
       {{ entry.timestamp|time_ago }} ago
       </time>
+      <a href="?feed={{subscription.feed|urlencode}}">
+        {{subscription.title}}
+      </a>
+
+      {% for category in entry.categories %}
+      {% if loop.first %}
+      <ol class='categories'>
+      {% endif %}
+        <li><a href="?category={{category|urlencode}}">{{category}}</a></li>
+      {% if loop.last %}
+      </ol>
+      {% endif %}
+      {% endfor %}
     </header>
     <div class='article-body'>
       {{entry.body|safe}}
     </div>
   </article>
   {% if loop.last %}
-  <a class='older' href="?older-than={{entry.timestamp.isoformat()|urlencode}}">
+  <a class='older' href="?older-than={{entry.timestamp.isoformat()|urlencode}}&{{filters|query_string}}">
   older articles
   </a>
   {% endif %}

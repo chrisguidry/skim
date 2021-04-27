@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from urllib.parse import urlencode
 
 import humanize
 from aiohttp import web
@@ -26,6 +27,10 @@ def friendly_date(date):
     return date.strftime('%A, %B %d, %Y at %I:%M %p (%Z)')
 
 
+def query_string(query):
+    return urlencode({k: v for k, v in query.items() if v})
+
+
 @routes.get('/')
 @template('home.html')
 async def home(request):
@@ -36,8 +41,15 @@ async def home(request):
     except ValueError:
         return web.Response(status=302, headers={'Location': '/'})
 
+    filters = {
+        'feed': request.query.get('feed'),
+        'creator': request.query.get('creator'),
+        'category': request.query.get('category')
+    }
+
     return {
-        'entries': entries.older_than(older_than, limit=20),
+        'filters': filters,
+        'entries': entries.older_than(older_than, filters, limit=20),
         'subscriptions': {s['feed']: s async for s in subscriptions.all()}
     }
 

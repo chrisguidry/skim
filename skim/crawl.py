@@ -4,7 +4,7 @@ from aiohttp import ClientSession
 
 from skim import entries, normalize, parse, subscriptions
 
-MAX_CONCURRENT = 10
+MAX_CONCURRENT = 4
 
 
 async def crawl():
@@ -79,9 +79,9 @@ async def fetch(feed_url, caching=None):
 
         # simpler
         print(normalize.feed(feed)['title'])
-        # for entry in entries:
-        #     entry = normalize.entry(entry)
-        #     print(entry['timestamp'], entry['title'])
+        for entry in entries:
+            entry = normalize.entry(entry)
+            print(entry['timestamp'], entry['title'], 'by:', entry['creators'])
 
         # # verbose
         # import pprint

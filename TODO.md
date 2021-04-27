@@ -6,8 +6,6 @@
 
 ## Uniformly localized dates/times on the frontend
 
-## Normalize and store authors/contributors
-
 ## Normalize and store enclosures on entries
 
 ## Crawling support for feed-level crawling hints (TTL, etc)

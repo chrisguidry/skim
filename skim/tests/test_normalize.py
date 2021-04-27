@@ -13,7 +13,7 @@ def test_feed_empty():
         'title': None,
         'site': None,
         'icon': None,
-        'caching': None,
+        'caching': None
     }
 
 
@@ -71,8 +71,24 @@ def test_entry_empty():
         'title': None,
         'link': None,
         'timestamp': FROZEN_NOW,
-        'body': None
+        'body': None,
+        'creators': None,
+        'categories': None
     }
+
+
+def test_normalizing_lists():
+    normalized = normalize.entry({})
+    assert normalized['creators'] is None
+
+    normalized = normalize.entry({'dc:creator': None})
+    assert normalized['creators'] is None
+
+    normalized = normalize.entry({'dc:creator': 'Jane'})
+    assert normalized['creators'] == ['Jane']
+
+    normalized = normalize.entry({'dc:creator': ['Jane', 'John']})
+    assert normalized['creators'] == ['Jane', 'John']
 
 
 def test_normalizing_links_with_urllike_id():
