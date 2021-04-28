@@ -50,9 +50,7 @@ article>header a {
     color: var(--dark-text);
     text-decoration: none;
 }
-article>header .site-link {
-    display: block;
-}
+article>header .site-link,
 article>header time {
     display: block;
 }
@@ -66,6 +64,31 @@ article>header .categories li {
     list-style-type: none;
 }
 
+@media only screen and (max-width: 800px) {
+    article {
+        display: block;
+        margin: 0em;
+        border-bottom: none;
+    }
+    article>header {
+        padding: 0.5em;
+        background-color: var(--light-background);
+        font-size: 12px;
+        text-align: center;
+        filter: drop-shadow(0px 4px 4px #bbbbbb);
+    }
+    article>header h1 {
+        font-size: 14px;
+    }
+    article>header .site-link,
+    article>header time {
+        display: inline-block;
+    }
+    article>header .creators,
+    article>header .categories {
+        display: none;
+    }
+}
 
 article>.article-body {
     flex: 3;
