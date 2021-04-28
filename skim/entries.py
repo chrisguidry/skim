@@ -91,10 +91,20 @@ async def _query_results(query, parameters=None):
                 yield entry
 
 
+async def add_all(feed, entries):
+    async with database.connection() as db:
+        new_entries = 0
+        for entry in entries:
+            new = await add(feed, **entry, db=db)
+            new_entries += 1 if new else 0
+        return new_entries
+
+
 async def add(
     feed, id,
     timestamp=None, title=None, link=None, body=None,
-    creators=None, categories=None
+    creators=None, categories=None,
+    db=None
 ):
     async with database.connection() as db:
         query = """

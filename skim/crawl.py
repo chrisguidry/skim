@@ -4,7 +4,7 @@ from aiohttp import ClientSession, ClientTimeout
 
 from skim import entries, normalize, parse, subscriptions
 
-MAX_CONCURRENT = 4
+MAX_CONCURRENT = 8
 
 
 async def crawl():
@@ -38,10 +38,10 @@ async def fetch_and_save(subscription):
     feed = normalize.feed(feed)
     await subscriptions.update(feed_url, **feed)
 
-    new_entries = 0
-    for entry in feed_entries:
-        new = await entries.add(feed_url, **normalize.entry(entry))
-        new_entries += 1 if new else 0
+    new_entries = await entries.add_all(
+        feed_url,
+        map(normalize.entry, feed_entries)
+    )
 
     await subscriptions.log_crawl(
         feed_url,

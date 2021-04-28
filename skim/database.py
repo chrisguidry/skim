@@ -8,11 +8,21 @@ DATABASE_PATH = '/feeds/skim.db'
 MIGRATIONS_BASE = '/skim/skim/migrations/'
 
 
+_depth = 0
+
+
 @asynccontextmanager
 async def connection():
+    global _depth
     async with aiosqlite.connect(DATABASE_PATH) as db:
         db.row_factory = aiosqlite.Row
-        yield db
+        try:
+            _depth += 1
+            # print('opened at depth', _depth)
+            yield db
+        finally:
+            # print('closed at depth', _depth)
+            _depth -= 1
 
 
 async def migrate():
