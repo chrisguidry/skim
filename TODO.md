@@ -4,6 +4,8 @@
 
 ## Dark Mode
 
+See https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme for details
+
 ## Handle custom error pages
 
 ## More tests for normalize
@@ -17,3 +19,4 @@
 ## Fetching favicons for sites that don't include them in the feeds
 
 ## Fetching full articles?
+
