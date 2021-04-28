@@ -68,7 +68,7 @@ async def _query_results(query, parameters=None):
     async with database.connection() as db:
         async with db.execute(query, parameters or []) as cursor:
             entry = {'feed': None, 'id': None}
-            async for row in cursor:
+            async for row in cursor:  # pragma no branch, bug?
                 if (row['feed'], row['id']) == (entry['feed'], entry['id']):
                     entry['creators'].add(row['creator'])
                     entry['categories'].add(row['category'])
