@@ -1,5 +1,9 @@
 # TODO
 
+## Have GOT to get a handle on "database is locked" errors
+
+## Dark Mode
+
 ## Handle custom error pages
 
 ## More tests for normalize

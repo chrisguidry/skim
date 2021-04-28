@@ -1,3 +1,4 @@
+import asyncio
 from unittest import mock
 
 import pytest
@@ -71,10 +72,12 @@ async def test_crawl(two_subscriptions):
 
 
 async def test_crawl_fetch_errors(one_subscription):
-    with mock.patch('skim.crawl.fetch') as fetch:
+    with mock.patch('skim.crawl.fetch') as fetch, \
+         mock.patch('skim.crawl.subscriptions.log_crawl') as log_crawl:
+
         fetch.return_value = (
             'https://example.com/1',
-            mock.Mock(status=500, content_type='application/rss+xml'),
+            mock.Mock(status=543, content_type='application/rss+xml'),
             None,
             None
         )
@@ -82,6 +85,21 @@ async def test_crawl_fetch_errors(one_subscription):
         await crawl.crawl()
 
         fetch.assert_called_once_with('https://example.com/1', caching=None)
+
+        log_crawl.assert_called_once_with('https://example.com/1', status=543)
+
+
+async def test_crawl_timeout(one_subscription):
+    with mock.patch('skim.crawl.fetch') as fetch, \
+         mock.patch('skim.crawl.subscriptions.log_crawl') as log_crawl:
+
+        fetch.side_effect = asyncio.TimeoutError()
+
+        await crawl.crawl()
+
+        fetch.assert_called_once_with('https://example.com/1', caching=None)
+
+        log_crawl.assert_called_once_with('https://example.com/1', status=-1)
 
 
 async def test_fetch():
