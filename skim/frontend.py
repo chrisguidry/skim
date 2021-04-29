@@ -19,7 +19,7 @@ routes.static('/static', f'{STATIC_ROOT}', show_index=True)
 
 def time_ago(date):
     return humanize.naturaldelta(
-        datetime.utcnow().replace(tzinfo=timezone.utc) - date
+        dates.utcnow() - date
     )
 
 

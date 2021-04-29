@@ -21,14 +21,7 @@ appears to be sitting too high in the feed.
 
 ## Fetching full articles?
 
-## Low-resolution dates on some feeds
-
-For feeds that only present dates rather than times, if we're crawling it
-today, use the crawl timestamp in lieu of just saying 00:00:00.
-
-## Date parsing error when displaying entries
-
-ValueError: time data '2021-04-25T00:00:00' does not match format '%Y-%m-%dT%H:%M:%S%z'
+## Caching images?
 
 # Deployment
 
@@ -42,3 +35,5 @@ but iSCSI can't be mounted in multiple pods at a time.  If I do try iSCSI, I'll
 need to make crawling something that happens _within_ the same process as the
 web server.  They should be able to share the same event loop, but contention
 may be a bit of an issue.
+
+## Automated backups

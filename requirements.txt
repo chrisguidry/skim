@@ -91,7 +91,7 @@ pyparsing==2.4.7
     # via packaging
 pytest-aiohttp==0.3.0
     # via -r requirements.in
-pytest-asyncio==0.15.0
+pytest-asyncio==0.15.1
     # via -r requirements.in
 pytest-cov==2.11.1
     # via -r requirements.in
@@ -105,17 +105,13 @@ pytest==6.2.3
     #   pytest-cov
     #   pytest-flake8
 python-dateutil==2.8.1
-    # via
-    #   -r requirements.in
-    #   time-machine
+    # via -r requirements.in
 six==1.15.0
     # via python-dateutil
 soupsieve==2.2.1
     # via beautifulsoup4
 testfixtures==6.17.1
     # via flake8-isort
-time-machine==2.1.0
-    # via -r requirements.in
 toml==0.10.2
     # via
     #   pep517

@@ -1,10 +1,11 @@
 from datetime import datetime
+from unittest import mock
 
-import time_machine
+from dateutil.tz import gettz
 
-from skim import normalize
+from skim import dates, normalize
 
-FROZEN_NOW = datetime.utcnow()
+FROZEN_NOW = dates.utcnow()
 
 
 def test_feed_empty():
@@ -63,8 +64,8 @@ def test_feed_detailed_icon_not_a_string_or_dict():
     }
 
 
-@time_machine.travel(FROZEN_NOW)
-def test_entry_empty():
+@mock.patch('skim.dates.utcnow', return_value=FROZEN_NOW)
+def test_entry_empty(utcnow):
     normalized = normalize.entry({})
     assert normalized == {
         'id': None,
@@ -96,6 +97,22 @@ def test_normalizing_links_with_urllike_id():
         'id': 'https://example.com/1'
     })
     assert normalized['link'] == 'https://example.com/1'
+
+
+def test_normalizing_date_only_on_an_earlier_day():
+    normalized = normalize.entry({
+        'pubDate': 'April 1st, 2021'
+    })
+    eastern = gettz('America/New_York')
+    assert normalized['timestamp'] == datetime(2021, 4, 1, tzinfo=eastern)
+
+
+@mock.patch('skim.dates.utcnow', return_value=FROZEN_NOW)
+def test_normalizing_date_only_today(utcnow):
+    normalized = normalize.entry({
+        'pubDate': FROZEN_NOW.strftime('%B %d, %Y')
+    })
+    assert normalized['timestamp'] == FROZEN_NOW
 
 
 def test_normalizing_youtube_feeds():

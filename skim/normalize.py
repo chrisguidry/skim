@@ -1,16 +1,18 @@
-from datetime import datetime
 from urllib.parse import urljoin, urlparse
 
 import dateutil.parser
 from bs4 import BeautifulSoup
 from dateutil.tz import gettz
 
+from skim import dates
+
 
 def feed(feed):
     return {
         'title': (
             feed.get('title') or
-            feed.get('atom:title')
+            feed.get('atom:title') or
+            feed.get('description')
         ),
         'site': (
             feed.get('link') or
@@ -47,11 +49,11 @@ def entry(entry):
             entry.get('atom:title')
         ),
         'link': link,
-        'timestamp': date(
+        'timestamp': entry_date(
             entry.get('pubDate') or
             entry.get('atom:updated') or
             entry.get('atom:published') or
-            datetime.utcnow().isoformat()
+            dates.utcnow().isoformat()
         ),
         'creators': list_or_none(
             entry.get('dc:creator') or
@@ -84,12 +86,24 @@ def feed_icon(icon):
         return icon.get('url')
 
 
-def date(datestring):
+def entry_date(datestring):
     tzinfos = {
         'EDT': gettz('America/New_York'),
         'EST': gettz('America/New_York')
     }
-    return dateutil.parser.parse(datestring, tzinfos=tzinfos)
+    parsed = dateutil.parser.parse(datestring, tzinfos=tzinfos)
+
+    # if the feed doesn't have a timezone, assume Eastern
+    if not parsed.tzinfo:
+        parsed = parsed.replace(tzinfo=tzinfos['EST'])
+
+    # if the feed seems to only be giving dates, use the crawl time as the
+    # timestamp if we're crawling it on the same day the article is first seen
+    now = dates.utcnow()
+    if parsed.date() == now.date() and (parsed.hour, parsed.minute) == (0, 0):
+        parsed = now
+
+    return parsed
 
 
 def urllike(string):
