@@ -2,10 +2,6 @@
 
 ## Have GOT to get a handle on "database is locked" errors
 
-## Dark Mode
-
-See https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme for details
-
 ## Handle custom error pages
 
 ## More tests for normalize

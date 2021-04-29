@@ -1,12 +1,45 @@
 :root {
-    --dark-text: #111111;
-    --light-background: #f8f8f8;
+    --text-color: #222222;
+    --background-color: #eeeeee;
+    --elevated-background-color: #eeeeee;
+    --elevation-shadow: #bbbbbb;
+    --link-color: #0000ee;
+    --visited-link-color: #551A8B;
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --text-color: #222222;
+        --background-color: #eeeeee;
+        --elevated-background-color: #eeeeee;
+        --elevation-shadow: #bbbbbb;
+        --link-color: #0000ee;
+        --visited-link-color: #551A8B;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-color: #eeeeee;
+        --background-color: #222222;
+        --elevated-background-color: #282828;
+        --elevation-shadow: #181818;
+        --link-color: #8888ee;
+        --visited-link-color: #773CAD;
+    }
 }
 
 body {
-    color: var(--dark-text);
-    background-color: var(--light-background);
+    color: var(--text-color);
+    background-color: var(--background-color);
     font-size: 22px;
+}
+
+a {
+    color: var(--link-color);
+}
+a:visited {
+    color: var(--visited-link-color);
 }
 
 img.icon {
@@ -21,7 +54,7 @@ a.older {
     height: 5em;
     line-height: 5em;
     text-align: center;
-    background-color: #cccccc;
+    background-color: var(--elevated-background-color);
     text-decoration: none;
 }
 
@@ -47,7 +80,7 @@ article>header h1 {
     font-size: 24px;
 }
 article>header a {
-    color: var(--dark-text);
+    color: var(--text-color);
     text-decoration: none;
 }
 article>header .site-link,
@@ -65,6 +98,9 @@ article>header .categories li {
 }
 
 @media only screen and (max-width: 800px) {
+    body {
+        font-size: 20px;
+    }
     article {
         display: block;
         margin: 0em;
@@ -72,10 +108,10 @@ article>header .categories li {
     }
     article>header {
         padding: 0.5em;
-        background-color: var(--light-background);
+        background-color: var(--elevated-background-color);
         font-size: 12px;
         text-align: center;
-        filter: drop-shadow(0px 4px 4px #bbbbbb);
+        filter: drop-shadow(0px 4px 4px var(--elevation-shadow));
     }
     article>header h1 {
         font-size: 14px;
@@ -94,6 +130,8 @@ article>.article-body {
     flex: 3;
     order: 2;
     margin: 0em 1em 0em 1em;
+
+    line-height: 1.33em;
 }
 
 .article-body img {
