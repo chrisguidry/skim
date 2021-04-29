@@ -3,6 +3,7 @@
     --background-color: #eeeeee;
     --elevated-background-color: #eeeeee;
     --elevation-shadow: #bbbbbb;
+    --divider-color: #dddddd;
     --link-color: #0000ee;
     --visited-link-color: #551A8B;
 }
@@ -13,6 +14,7 @@
         --background-color: #eeeeee;
         --elevated-background-color: #eeeeee;
         --elevation-shadow: #bbbbbb;
+        --divider-color: #dddddd;
         --link-color: #0000ee;
         --visited-link-color: #551A8B;
     }
@@ -24,6 +26,7 @@
         --background-color: #222222;
         --elevated-background-color: #282828;
         --elevation-shadow: #181818;
+        --divider-color: #444444;
         --link-color: #8888ee;
         --visited-link-color: #773CAD;
     }
@@ -60,7 +63,7 @@ a.older {
 
 article {
     margin: 1em;
-    border-bottom: 1px dashed #dddddd;
+    border-bottom: 1px dashed var(--divider-color);
     padding: 1em 0 1em 0;
     display: flex;
 }
@@ -103,8 +106,10 @@ article>header .categories li {
     }
     article {
         display: block;
-        margin: 0em;
+        margin: 0;
         border-bottom: none;
+        padding-top: 0;
+        padding-bottom: 0;
     }
     article>header {
         padding: 0.5em;
@@ -134,8 +139,10 @@ article>.article-body {
     line-height: 1.33em;
 }
 
-.article-body img {
-    max-width: 100%;
+.article-body img,
+.article-body iframe {
+    max-width: 100% !important;
+    height: auto !important;
 }
 
 .article-body blockquote {

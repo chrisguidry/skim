@@ -14,7 +14,21 @@
 
 ## Fetching favicons for sites that don't include them in the feeds
 
+## Wrap plain text articles in markup
+
+Plain text articles don't pick up the `<p>` top and bottom margins, so they
+appears to be sitting too high in the feed.
+
 ## Fetching full articles?
+
+## Low-resolution dates on some feeds
+
+For feeds that only present dates rather than times, if we're crawling it
+today, use the crawl timestamp in lieu of just saying 00:00:00.
+
+## Date parsing error when displaying entries
+
+ValueError: time data '2021-04-25T00:00:00' does not match format '%Y-%m-%dT%H:%M:%S%z'
 
 # Deployment
 
