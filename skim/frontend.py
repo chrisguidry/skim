@@ -11,16 +11,17 @@ routes = web.RouteTableDef()
 
 END_OF_TIME = datetime.max.replace(tzinfo=timezone.utc)
 
-STATIC_ROOT = '/skim/skim/static'
 
-
-routes.static('/static', f'{STATIC_ROOT}', show_index=True)
+routes.static(
+    '/static',
+    '/skim/skim/static',
+    name='static',
+    append_version=True
+)
 
 
 def time_ago(date):
-    return humanize.naturaldelta(
-        dates.utcnow() - date
-    )
+    return humanize.naturaldelta(dates.utcnow() - date)
 
 
 def friendly_date(date):
@@ -29,6 +30,10 @@ def friendly_date(date):
 
 def query_string(query):
     return urlencode({k: v for k, v in query.items() if v})
+
+
+def static_file(app, filename):
+    return app.router['static'].url_for(filename=filename)
 
 
 @routes.get('/')

@@ -25,7 +25,7 @@
         --text-color: #eeeeee;
         --background-color: #222222;
         --elevated-background-color: #282828;
-        --elevation-shadow: #181818;
+        --elevation-shadow: #1C1C1C;
         --divider-color: #444444;
         --link-color: #8888ee;
         --visited-link-color: #773CAD;
@@ -51,14 +51,23 @@ img.icon {
     max-height: 1em;
 }
 
-a.older {
-    display: block;
-    width: 100%;
-    height: 5em;
-    line-height: 5em;
-    text-align: center;
+nav {
+    display: flex;
     background-color: var(--elevated-background-color);
+    width: 100%;
+    height: 3em;
+    line-height: 3em;
+}
+nav a {
+    flex: 1;
+    display: block;
+    text-align: center;
     text-decoration: none;
+    font-style: italic;
+    color: var(--text-color);
+}
+nav a:visited {
+    color: var(--text-color);
 }
 
 article {
@@ -103,6 +112,11 @@ article>header .categories li {
 @media only screen and (max-width: 800px) {
     body {
         font-size: 20px;
+    }
+    nav {
+        filter: drop-shadow(0px -4px 4px var(--elevation-shadow));
+        height: 2.5em;
+        line-height: 2.5em;
     }
     article {
         display: block;

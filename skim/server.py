@@ -1,3 +1,5 @@
+from functools import partial
+
 import aiohttp_jinja2
 import jinja2
 from aiohttp import web
@@ -18,7 +20,8 @@ def create_application():
     env.filters.update(
         friendly_date=frontend.friendly_date,
         query_string=frontend.query_string,
-        time_ago=frontend.time_ago
+        time_ago=frontend.time_ago,
+        static_file=partial(frontend.static_file, app)
     )
 
     app.add_routes(frontend.routes)

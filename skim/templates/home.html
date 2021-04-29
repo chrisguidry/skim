@@ -46,9 +46,14 @@
     </div>
   </article>
   {% if loop.last %}
-  <a class='older' href="?older-than={{entry.timestamp.isoformat()|urlencode}}&{{filters|query_string}}">
-  older articles
-  </a>
+  <nav>
+    <a href="/">
+    start over
+    </a>
+    <a href="?older-than={{entry.timestamp.isoformat()|urlencode}}&{{filters|query_string}}">
+    keep going
+    </a>
+  </nav>
   {% endif %}
   {% endfor %}
 {% endblock %}

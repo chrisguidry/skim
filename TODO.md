@@ -4,8 +4,6 @@
 
 ## Handle custom error pages
 
-## More tests for normalize
-
 ## Uniformly localized dates/times on the frontend
 
 ## Normalize and store enclosures on entries
@@ -22,6 +20,11 @@ appears to be sitting too high in the feed.
 ## Fetching full articles?
 
 ## Caching images?
+
+## A quick way to jump to the next article?
+
+First, does this violate the spirit of skim?  If not, then it would be nice
+to pop ahead to the next article instead of scrolling a potentially long one.
 
 # Deployment
 
