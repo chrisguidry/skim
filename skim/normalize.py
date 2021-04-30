@@ -9,7 +9,7 @@ from skim import dates
 
 def feed(feed):
     return {
-        'title': (
+        'title': title(
             feed.get('title') or
             feed.get('atom:title') or
             feed.get('description')
@@ -44,7 +44,7 @@ def entry(entry):
             entry.get('link') or
             entry.get('atom:link[alternate]')
         ),
-        'title': (
+        'title': title(
             entry.get('title') or
             entry.get('atom:title')
         ),
@@ -141,7 +141,14 @@ def youtube_embed(entry):
     '''
 
 
-def markup(content, base_url):
+def title(content):
+    if not content:
+        return content
+
+    return markup(content).strip()
+
+
+def markup(content, base_url=''):
     if not content:
         return content
 
