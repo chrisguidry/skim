@@ -100,7 +100,8 @@ def entry_date(datestring):
     # if the feed seems to only be giving dates, use the crawl time as the
     # timestamp if we're crawling it on the same day the article is first seen
     now = dates.utcnow()
-    if parsed.date() == now.date() and (parsed.hour, parsed.minute) == (0, 0):
+    age = now - parsed
+    if age.total_seconds() < 86400 and (parsed.hour, parsed.minute) == (0, 0):
         parsed = now
 
     return parsed
