@@ -5,6 +5,7 @@
   <article>
     <header>
       <h1>
+        <a name="article{{loop.index}}" />
         {% if entry.link %}
         <a href="{{entry.link}}" target="_blank">
         {% endif %}
@@ -44,6 +45,11 @@
     <div class='article-body'>
       {{entry.body|safe}}
     </div>
+    {% if not loop.last %}
+    <footer>
+      <a href="#article{{loop.index+1}}">next</a>
+    </footer>
+    {% endif %}
   </article>
   {% if loop.last %}
   <nav>

@@ -109,14 +109,18 @@ article>header .categories li {
     list-style-type: none;
 }
 
+article>footer {
+    display: none;
+}
+
 @media only screen and (max-width: 800px) {
     body {
         font-size: 20px;
     }
     nav {
-        filter: drop-shadow(0px -4px 4px var(--elevation-shadow));
         height: 2.5em;
         line-height: 2.5em;
+        filter: drop-shadow(0px -4px 4px var(--elevation-shadow));
     }
     article {
         display: block;
@@ -143,6 +147,32 @@ article>header .categories li {
     article>header .categories {
         display: none;
     }
+
+    article>footer {
+        display: block;
+        position: sticky;
+        bottom: 0px;
+        height: 2em;
+        line-height: 2em;
+        z-index: -1;
+    }
+    article>footer a {
+        position: absolute;
+        right: 0px;
+        padding: 0 1em;
+
+        font-style: italic;
+        text-decoration: none;
+        color: var(--text-color);
+
+        opacity: .8;
+        background-color: var(--elevated-background-color);
+        filter: drop-shadow(0px -4px 4px var(--elevation-shadow));
+        text-align: right;
+    }
+    article>footer a:visited {
+        color: var(--text-color);
+    }
 }
 
 article>.article-body {
@@ -164,6 +194,8 @@ article>.article-body {
 
 .article-body blockquote {
     font-style: italic;
+    margin-left: 1.5em;
+    margin-right: 1.5em;
 }
 
 .article-body iframe.video {
