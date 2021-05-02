@@ -153,9 +153,12 @@ article>.article-body {
     line-height: 1.33em;
 }
 
+.article-body * {
+    max-width: 100% !important;
+}
+
 .article-body img,
 .article-body iframe {
-    max-width: 100% !important;
     height: auto !important;
 }
 
