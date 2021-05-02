@@ -4,7 +4,7 @@ from aiohttp import ClientSession, ClientTimeout
 
 from skim import entries, normalize, parse, subscriptions
 
-MAX_CONCURRENT = 2
+MAX_CONCURRENT = 4
 
 
 async def crawl():
