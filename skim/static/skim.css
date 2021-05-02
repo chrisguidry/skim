@@ -198,6 +198,10 @@ article>.article-body {
     margin-right: 1.5em;
 }
 
+.article-body table {
+    width: auto;
+}
+
 .article-body iframe.video {
     width: 640px;
     height: 480px;
