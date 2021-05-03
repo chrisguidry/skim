@@ -87,6 +87,7 @@ article>header {
     position: sticky;
     top: 0px;
     align-self: flex-start;
+    z-index: 1;
 }
 article>header h1 {
     font-size: 24px;
@@ -154,7 +155,6 @@ article>footer {
         bottom: 0px;
         height: 2em;
         line-height: 2em;
-        z-index: -1;
     }
     article>footer a {
         position: absolute;

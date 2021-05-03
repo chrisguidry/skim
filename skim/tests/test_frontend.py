@@ -35,7 +35,7 @@ async def test_get_home(client, a_subscription, some_entries):
     assert response.headers['Content-Type'] == 'text/html; charset=utf-8'
 
     soup = BeautifulSoup(await response.text())
-    entry_links = [a['href'] for a in soup.select('article h1 a')]
+    entry_links = [a['href'] for a in soup.select('article h1 a[href]')]
     assert entry_links == [
         'https://example.com/2',
         'https://example.com/1',
@@ -49,7 +49,7 @@ async def test_get_home_second_page(client, a_subscription, some_entries):
     assert response.headers['Content-Type'] == 'text/html; charset=utf-8'
 
     soup = BeautifulSoup(await response.text())
-    entry_links = [a['href'] for a in soup.select('article h1 a')]
+    entry_links = [a['href'] for a in soup.select('article h1 a[href]')]
     assert entry_links == [
         'https://example.com/1',
         'https://example.com/0'
@@ -68,7 +68,7 @@ async def test_get_subscriptions_list(client, a_subscription):
     assert response.headers['Content-Type'] == 'text/html; charset=utf-8'
 
     soup = BeautifulSoup(await response.text())
-    feed_links = [a['href'] for a in soup.select('table td a')]
+    feed_links = [a['href'] for a in soup.select('table td a[href]')]
     assert feed_links == [
         'https://example.com/feed'
     ]
