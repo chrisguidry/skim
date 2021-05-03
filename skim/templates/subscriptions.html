@@ -5,6 +5,7 @@
       <th>Icon</th>
       <th>Title</th>
       <th>Feed</th>
+      <th>Entries</th>
     </tr>
     {%- for subscription in subscriptions %}
     <tr>
@@ -25,6 +26,11 @@
       <td>
         <a href="{{subscription.feed}}" target="_blank">
         {{subscription.feed}}
+        </a>
+      </td>
+      <td>
+        <a href="/?feed={{subscription.feed}}">
+        entries
         </a>
       </td>
     </tr>

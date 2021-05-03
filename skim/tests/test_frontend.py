@@ -70,5 +70,6 @@ async def test_get_subscriptions_list(client, a_subscription):
     soup = BeautifulSoup(await response.text())
     feed_links = [a['href'] for a in soup.select('table td a[href]')]
     assert feed_links == [
-        'https://example.com/feed'
+        'https://example.com/feed',
+        '/?feed=https://example.com/feed'
     ]
