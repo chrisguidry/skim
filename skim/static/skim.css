@@ -206,3 +206,8 @@ article>.article-body {
     width: 640px;
     height: 480px;
 }
+
+
+table th {
+    text-align: left;
+}
