@@ -186,6 +186,9 @@ article>.article-body {
 .article-body * {
     max-width: 100% !important;
 }
+.article-body img {
+    height: auto !important;
+}
 
 .article-body .video {
     position: relative;
