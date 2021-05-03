@@ -173,6 +173,10 @@ article>footer {
     article>footer a:visited {
         color: var(--text-color);
     }
+
+    article>.article-body {
+        line-height: 1.4em;
+    }
 }
 
 article>.article-body {
@@ -181,6 +185,8 @@ article>.article-body {
     margin: 0em 1em 0em 1em;
 
     line-height: 1.33em;
+
+    overflow-x: hidden;
 }
 
 .article-body * {
