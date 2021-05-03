@@ -1,6 +1,7 @@
 from datetime import datetime
 from unittest import mock
 
+from bs4 import BeautifulSoup
 from dateutil.tz import gettz
 
 from skim import dates, normalize
@@ -119,12 +120,12 @@ def test_normalizing_youtube_feeds():
     normalized = normalize.entry({
         'atom:id': 'yt:video:abcdefg'
     })
-    assert normalized['body'] == (
-        '<iframe allowfullscreen="" '
-        'class="youtube video" '
-        'src="https://www.youtube.com/embed/abcdefg">\n'
-        '</iframe>\n'
-    )
+    assert normalized['body'] == BeautifulSoup('''
+    <div class="youtube video">
+        <iframe allowfullscreen src="https://www.youtube.com/embed/abcdefg">
+        </iframe>
+    </div>
+    ''', features='html.parser').prettify()
 
 
 def test_normalizing_markup_relative_links():

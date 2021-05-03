@@ -134,10 +134,10 @@ def youtube_embed(entry):
     video_id = entry_id.split(':')[-1]
 
     return f'''
-    <iframe src="https://www.youtube.com/embed/{video_id}"
-            class="youtube video"
-            allowfullscreen>
-    </iframe>
+    <div class="youtube video">
+      <iframe src="https://www.youtube.com/embed/{video_id}" allowfullscreen>
+      </iframe>
+    </div>
     '''
 
 
