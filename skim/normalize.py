@@ -1,3 +1,4 @@
+import html
 from urllib.parse import urljoin, urlparse
 
 import dateutil.parser
@@ -145,7 +146,7 @@ def title(content):
     if not content:
         return content
 
-    return markup(content).strip()
+    return html.unescape(markup(content).strip())
 
 
 def markup(content, base_url=''):

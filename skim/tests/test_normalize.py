@@ -79,6 +79,16 @@ def test_entry_empty(utcnow):
     }
 
 
+def test_normalizing_titles():
+    assert normalize.title('hello &amp; world') == 'hello & world'
+    assert normalize.title('hello & world') == 'hello & world'
+    assert normalize.title('hello &lt; world') == 'hello < world'
+    assert normalize.title('hello < world') == 'hello < world'
+    assert normalize.title('hello &gt; world') == 'hello > world'
+    assert normalize.title('hello > world') == 'hello > world'
+    assert normalize.title('<em>hello</em>') == '<em>\n hello\n</em>'
+
+
 def test_normalizing_lists():
     normalized = normalize.entry({})
     assert normalized['creators'] is None
