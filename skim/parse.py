@@ -1,5 +1,7 @@
 from xml.etree import ElementTree
 
+ParseError = ElementTree.ParseError
+
 XML_FEEDS = {
     'application/atom+xml',
     'application/rss+xml',

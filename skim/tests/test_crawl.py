@@ -5,7 +5,7 @@ import pytest
 from aioresponses import aioresponses
 from yarl import URL
 
-from skim import crawl, subscriptions
+from skim import crawl, parse, subscriptions
 
 
 @pytest.fixture
@@ -94,6 +94,19 @@ async def test_crawl_timeout(one_subscription):
          mock.patch('skim.crawl.subscriptions.log_crawl') as log_crawl:
 
         fetch.side_effect = asyncio.TimeoutError()
+
+        await crawl.crawl()
+
+        fetch.assert_called_once_with('https://example.com/1', caching=None)
+
+        log_crawl.assert_called_once_with('https://example.com/1', status=-1)
+
+
+async def test_crawl_parseerror(one_subscription):
+    with mock.patch('skim.crawl.fetch') as fetch, \
+         mock.patch('skim.crawl.subscriptions.log_crawl') as log_crawl:
+
+        fetch.side_effect = parse.ParseError()
 
         await crawl.crawl()
 

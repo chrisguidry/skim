@@ -2,6 +2,8 @@
 
 ## Have GOT to get a handle on "database is locked" errors
 
+## The query for entries still under-pulls when there are categories/creators
+
 ## Handle custom error pages
 
 ## Uniformly localized dates/times on the frontend

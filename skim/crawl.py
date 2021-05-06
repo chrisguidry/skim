@@ -1,6 +1,6 @@
 import asyncio
 
-from aiohttp import ClientSession, ClientTimeout
+from aiohttp import ClientConnectionError, ClientSession, ClientTimeout
 
 from skim import entries, normalize, parse, subscriptions
 
@@ -26,7 +26,10 @@ async def fetch_and_save(subscription):
             caching=subscription['caching']
         )
         status = response.status
-    except asyncio.TimeoutError:
+    except (asyncio.TimeoutError, ClientConnectionError):
+        feed = None
+        status = -1
+    except parse.ParseError:
         feed = None
         status = -1
 
