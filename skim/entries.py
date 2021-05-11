@@ -49,6 +49,12 @@ def older_than(timestamp, filters, limit=100):
                         ON entry_categories.feed = entries.feed AND
                            entry_categories.id = entries.id
         WHERE   {where}
+        GROUP BY entries.feed,
+                 entries.id,
+                 entries.timestamp,
+                 entries.title,
+                 entries.link,
+                 entries.body
         ORDER BY entries.timestamp DESC
         LIMIT ?
     )

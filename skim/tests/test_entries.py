@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -117,7 +117,7 @@ async def filterable_entries(skim_db):
     await entries.add(
         'https://example.com/feed/A',
         id='another-one',
-        timestamp=old,
+        timestamp=old - timedelta(seconds=1),
         title='Test Entry',
         link='https://example.com/1',
         body='Hiiiii #1',
