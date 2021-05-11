@@ -1,4 +1,5 @@
 import html
+from datetime import timezone
 from urllib.parse import urljoin, urlparse
 
 import dateutil.parser
@@ -105,7 +106,7 @@ def entry_date(datestring):
     if age.total_seconds() < 86400 and (parsed.hour, parsed.minute) == (0, 0):
         parsed = now
 
-    return parsed
+    return parsed.astimezone(timezone.utc)
 
 
 def urllike(string):
@@ -146,12 +147,20 @@ def title(content):
     if not content:
         return content
 
-    return html.unescape(markup(content).strip())
+    soup = BeautifulSoup(content, features='html.parser')
+    return html.unescape(soup.prettify().strip())
 
 
 def markup(content, base_url=''):
     if not content:
         return content
+
+    content = content.strip()
+
+    # when the result seems like just plain text, wrap it in paragraphs
+    if '<' not in content and '>' not in content:
+        content = content.replace('\n\n', '\n')
+        content = '<p>' + '</p><p>'.join(content.split('\n')) + '</p>'
 
     soup = BeautifulSoup(content, features='html.parser')
 

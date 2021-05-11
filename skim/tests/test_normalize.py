@@ -134,8 +134,7 @@ def test_normalizing_youtube_feeds():
     <div class="youtube video">
         <iframe allowfullscreen src="https://www.youtube.com/embed/abcdefg">
         </iframe>
-    </div>
-    ''', features='html.parser').prettify()
+    </div>''', features='html.parser').prettify()
 
 
 def test_normalizing_markup_relative_links():
@@ -176,4 +175,25 @@ def test_normalizing_scrubbing_google_analytics_images():
         '  world\n'
         ' </em>\n'
         '</p>'
+    )
+
+
+def test_normalizing_markup_plain_text_wrapped_in_a_paragraph():
+    normalized = normalize.entry({
+        'content': 'Hello, world!'
+    })
+    assert normalized['body'] == (
+        '<p>\n Hello, world!\n</p>'
+    )
+
+    normalized = normalize.entry({
+        'content': """
+            Hello, world!
+
+            This is awesome!
+        """
+    })
+    assert normalized['body'] == (
+        '<p>\n Hello, world!\n</p>\n'
+        '<p>\n This is awesome!\n</p>'
     )

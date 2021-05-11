@@ -221,6 +221,14 @@ article>.article-body {
     margin-right: 1.5em;
 }
 
+/*
+for paragraphs that have some kind of embedded style, force them to at least
+be left justified
+*/
+.article-body p[style] {
+    text-align: left !important;
+}
+
 .article-body table {
     width: auto;
 }
@@ -229,7 +237,6 @@ article>.article-body {
     width: 640px;
     height: 480px;
 }
-
 
 table th {
     text-align: left;

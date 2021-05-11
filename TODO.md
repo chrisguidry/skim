@@ -2,8 +2,6 @@
 
 ## Have GOT to get a handle on "database is locked" errors
 
-## The query for entries still under-pulls when there are categories/creators
-
 ## Handle custom error pages
 
 ## Uniformly localized dates/times on the frontend
@@ -13,11 +11,6 @@
 ## Crawling support for feed-level crawling hints (TTL, etc)
 
 ## Fetching favicons for sites that don't include them in the feeds
-
-## Wrap plain text articles in markup
-
-Plain text articles don't pick up the `<p>` top and bottom margins, so they
-appears to be sitting too high in the feed.
 
 ## Fetching full articles?
 

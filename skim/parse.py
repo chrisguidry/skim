@@ -6,7 +6,8 @@ XML_FEEDS = {
     'application/atom+xml',
     'application/rss+xml',
     'application/xml',
-    'text/xml'
+    'text/xml',
+    'text/html'
 }
 
 
