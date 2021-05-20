@@ -63,6 +63,13 @@ async def remove(feed):
         """
         parameters = [feed]
         await db.execute(query, parameters)
+
+        query = """
+        DELETE FROM entries WHERE feed = ?
+        """
+        parameters = [feed]
+        await db.execute(query, parameters)
+
         await db.commit()
 
 

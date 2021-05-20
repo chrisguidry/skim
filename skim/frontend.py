@@ -65,3 +65,15 @@ async def subscriptions_list(request):
     return {
         'subscriptions': subscriptions.all()
     }
+
+
+@routes.post('/subscriptions')
+@template('subscriptions.html')
+async def modify_subscriptions(request):
+    data = await request.post()
+    if data['feed']:
+        if data['action'] == 'delete':
+            await subscriptions.remove(data['feed'])
+        else:  # data['action'] == 'add':
+            await subscriptions.add(data['feed'])
+    return await subscriptions_list(request)

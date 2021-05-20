@@ -70,6 +70,48 @@ async def test_get_subscriptions_list(client, a_subscription):
     soup = BeautifulSoup(await response.text())
     feed_links = [a['href'] for a in soup.select('table td a[href]')]
     assert feed_links == [
-        'https://example.com/feed',
-        '/?feed=https://example.com/feed'
+        '/?feed=https://example.com/feed',
+        'https://example.com/feed'
     ]
+
+
+async def test_add_subscription(skim_db, client):
+    response = await client.post(
+        '/subscriptions',
+        data={'feed': 'https://example.com/feed', 'action': 'add'}
+    )
+    assert response.status == 200
+    assert response.headers['Content-Type'] == 'text/html; charset=utf-8'
+
+    soup = BeautifulSoup(await response.text())
+    feed_links = [a['href'] for a in soup.select('table td a[href]')]
+    assert feed_links == [
+        '/?feed=https://example.com/feed',
+        'https://example.com/feed'
+    ]
+
+
+async def test_add_subscription_empty(skim_db, client):
+    response = await client.post(
+        '/subscriptions',
+        data={'feed': '', 'action': 'add'}
+    )
+    assert response.status == 200
+    assert response.headers['Content-Type'] == 'text/html; charset=utf-8'
+
+    soup = BeautifulSoup(await response.text())
+    feed_links = [a['href'] for a in soup.select('table td a[href]')]
+    assert feed_links == []
+
+
+async def test_delete_subscription(client, a_subscription):
+    response = await client.post(
+        '/subscriptions',
+        data={'feed': 'https://example.com/feed', 'action': 'delete'}
+    )
+    assert response.status == 200
+    assert response.headers['Content-Type'] == 'text/html; charset=utf-8'
+
+    soup = BeautifulSoup(await response.text())
+    feed_links = [a['href'] for a in soup.select('table td a[href]')]
+    assert feed_links == []

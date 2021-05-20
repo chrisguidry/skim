@@ -1,11 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
-  <table>
+  <table class="subscriptions">
     <tr>
       <th>Icon</th>
       <th>Title</th>
       <th>Feed</th>
-      <th>Entries</th>
+      <th>Delete</th>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td>
+        <form method="POST">
+          <input type="text" name="feed" placeholder="add a new feed" />
+          <input type="submit" name="action" value="add" />
+        </form>
+      </td>
+      <td></td>
     </tr>
     {%- for subscription in subscriptions %}
     <tr>
@@ -15,13 +26,15 @@
         {%- endif %}
       </td>
       <td>
-        {%- if subscription.site %}
-        <a href="{{subscription.site}}" target="_blank">
-        {%- endif -%}
-          {{subscription.title}}
-        {%- if subscription.site -%}
+        <a href="/?feed={{subscription.feed}}">
+        {% if subscription.title %}
+        {{subscription.title}}
+        {% elif subscription.site %}
+        {{subscription.site}}
+        {% else %}
+        {{subscription.feed}}
+        {% endif %}
         </a>
-        {%- endif %}
       </td>
       <td>
         <a href="{{subscription.feed}}" target="_blank">
@@ -29,9 +42,10 @@
         </a>
       </td>
       <td>
-        <a href="/?feed={{subscription.feed}}">
-        entries
-        </a>
+        <form method="POST">
+          <input type="hidden" name="feed" value="{{subscription.feed}}" />
+          <input type="submit" name="action" value="delete" />
+        </form>
       </td>
     </tr>
     {%- endfor %}
