@@ -2,9 +2,78 @@ kind: pipeline
 type: kubernetes
 name: default
 
+node_selector:
+  pi-model: 4
+
+volumes:
+- name: docker-socket
+  host:
+    path: /var/run/
+- name: docker-config
+  host:
+    path: /home/chris/.docker/
+
+docker: &docker
+  image: docker:dind
+  volumes:
+  - name: docker-socket
+    path: /var/run/
+  - name: docker-config
+    path: /root/.docker/
+
+environment:
+  REGISTRY: registry.home.theguidrys.us
+  IMAGE_NAME: 44stonypoint/skim
+  IMAGE_TAG: "${DRONE_COMMIT_BRANCH}-${DRONE_BUILD_NUMBER}"
+
 steps:
-- name: greeting
-  image: alpine
+
+- name: prime
+  <<: *docker
+  failure: ignore
   commands:
-  - echo hello
-  - echo world
+  - docker pull $REGISTRY/$IMAGE_NAME:latest
+
+- name: build
+  <<: *docker
+  commands:
+  - docker build --pull -t $IMAGE_NAME:$IMAGE_TAG .
+
+- name: test
+  <<: *docker
+  commands:
+  - echo "Skipping tests to work out deployments"
+  - docker run --rm $IMAGE_NAME:$IMAGE_TAG pytest
+
+- name: publish
+  <<: *docker
+  commands:
+  - docker tag $IMAGE_NAME:$IMAGE_TAG $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+  - docker tag $IMAGE_NAME:$IMAGE_TAG $REGISTRY/$IMAGE_NAME:latest
+  - docker push $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+  - docker push $REGISTRY/$IMAGE_NAME:latest
+  - docker rmi $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+  # we'll leave the :latest so we have better layer cache re-use
+  when:
+    branch:
+    - main
+
+- name: deploy
+  image: raspbernetes/kubectl:1.18.2
+  commands:
+  - sed -i "s/{{IMAGE_TAG}}/$IMAGE_TAG/g" kubernetes.yaml
+  - cat kubernetes.yaml
+  - kubectl --namespace=skim delete job migrate
+  - kubectl --namespace=skim apply -f kubernetes.yaml
+  when:
+    branch:
+    - main
+
+- name: cleanup
+  <<: *docker
+  when:
+    status:
+    - success
+    - failure
+  commands:
+  - docker rmi $IMAGE_NAME:$IMAGE_TAG

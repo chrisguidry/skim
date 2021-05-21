@@ -1,5 +1,6 @@
 docker-compose.yml
 .dockerignore
 Dockerfile
+.drone.yml
 .git
 __pycache__
