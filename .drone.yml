@@ -42,7 +42,6 @@ steps:
 - name: test
   <<: *docker
   commands:
-  - echo "Skipping tests to work out deployments"
   - docker run --rm $IMAGE_NAME:$IMAGE_TAG pytest
 
 - name: publish
