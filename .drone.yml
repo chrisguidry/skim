@@ -81,7 +81,6 @@ steps:
   image: registry.home.theguidrys.us/44stonypoint/drone-pushover:main-10
   when:
     status:
-    - success
     - failure
   environment:
     # compensating for weird behavior, it was always sending success
