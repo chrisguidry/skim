@@ -76,3 +76,18 @@ steps:
     - failure
   commands:
   - docker rmi $IMAGE_NAME:$IMAGE_TAG
+
+- name: notify
+  image: registry.home.theguidrys.us/44stonypoint/drone-pushover
+  when:
+    status:
+    - success
+    - failure
+  environment:
+    # compensating for weird behavior, it was always sending success
+    DRONE_BUILD_STATUS: failure
+  settings:
+    pushover_token:
+      from_secret: pushover_token
+    pushover_user:
+      from_secret: pushover_user
