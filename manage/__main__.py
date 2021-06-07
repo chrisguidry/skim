@@ -2,6 +2,8 @@ import asyncio
 import os
 import sys
 
+from aiohttp import ClientSession, ClientTimeout
+
 
 def help():
     """Prints available commands"""
@@ -67,6 +69,21 @@ def crawl():
     """Runs one full crawl"""
     from skim import crawl
     asyncio.run(crawl.crawl())
+    asyncio.run(post_crawl_webhook())
+
+
+async def post_crawl_webhook():
+    webhook = os.environ.get('SKIM_POST_CRAWL_WEBHOOK')
+    if not webhook:
+        return
+
+    print('Pinging webhook...')
+    async with ClientSession(timeout=ClientTimeout(total=30)) as session:
+        async with session.get(webhook) as response:
+            print(
+                response.status,
+                await response.content.read()
+            )
 
 
 available_commands = {

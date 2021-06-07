@@ -147,6 +147,9 @@ spec:
           - name: skim
             image: registry.home.theguidrys.us/44stonypoint/skim:{{IMAGE_TAG}}
             command: ['/usr/local/bin/python', '-m', 'manage', 'crawl']
+            env:
+            - name: SKIM_POST_CRAWL_WEBHOOK
+              value: https://healthchecks.home.theguidrys.us/ping/5868e2c8-e8ab-4190-afcd-2bcaaf96c885
             volumeMounts:
             - name: feeds-volume
               mountPath: /feeds/
