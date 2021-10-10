@@ -7,7 +7,7 @@ XML_FEEDS = {
     'application/rss+xml',
     'application/xml',
     'text/xml',
-    'text/html'
+    'text/html',
 }
 
 
@@ -19,8 +19,7 @@ async def parse(content_type, charset, stream):
 
     else:
         raise NotImplementedError(
-            f'Parsing feeds of type "{content_type}" is not '
-            'implemented'
+            f'Parsing feeds of type "{content_type}" is not ' 'implemented'
         )
 
 
@@ -37,17 +36,17 @@ async def xml_from_stream(stream, events):
 XML_FORMATS = {
     'application/rss+xml': {
         'feed_path': ['rss', 'channel'],
-        'entries_key': 'item'
+        'entries_key': 'item',
     },
     'application/atom+xml': {
         'feed_path': ['atom:feed'],
-        'entries_key': 'atom:entry'
-    }
+        'entries_key': 'atom:entry',
+    },
 }
 
 NAMESPACE_ALIASES = {
     'http://www.w3.org/2005/Atom': 'atom',
-    'http://purl.org/dc/elements/1.1/': 'dc'
+    'http://purl.org/dc/elements/1.1/': 'dc',
 }
 
 

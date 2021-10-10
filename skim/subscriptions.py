@@ -49,8 +49,7 @@ async def update(feed, title=None, site=None, icon=None, caching=None):
             site,
             icon,
             json.dumps(caching) if caching else None,
-
-            feed
+            feed,
         ]
         await db.execute(query, parameters)
         await db.commit()
@@ -97,7 +96,7 @@ async def log_crawl(feed, status=None, content_type=None, new_entries=None):
             dates.utcnow().isoformat(),
             status,
             content_type,
-            new_entries
+            new_entries,
         ]
         await db.execute(query, parameters)
         await db.commit()

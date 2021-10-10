@@ -37,12 +37,16 @@ async def migrate():
                 continue
 
             print(f'Applying {version}')
-            await db.executescript('\n'.join([
-                'BEGIN;',
-                f'PRAGMA user_version = {version};',
-                migration,
-                'COMMIT;'
-            ]))
+            await db.executescript(
+                '\n'.join(
+                    [
+                        'BEGIN;',
+                        f'PRAGMA user_version = {version};',
+                        migration,
+                        'COMMIT;',
+                    ]
+                )
+            )
 
 
 async def migrations():

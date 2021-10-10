@@ -13,10 +13,7 @@ END_OF_TIME = datetime.max.replace(tzinfo=timezone.utc)
 
 
 routes.static(
-    '/static',
-    '/skim/skim/static',
-    name='static',
-    append_version=True
+    '/static', '/skim/skim/static', name='static', append_version=True
 )
 
 
@@ -49,22 +46,20 @@ async def home(request):
     filters = {
         'feed': request.query.get('feed'),
         'creator': request.query.get('creator'),
-        'category': request.query.get('category')
+        'category': request.query.get('category'),
     }
 
     return {
         'filters': filters,
         'entries': entries.older_than(older_than, filters, limit=20),
-        'subscriptions': {s['feed']: s async for s in subscriptions.all()}
+        'subscriptions': {s['feed']: s async for s in subscriptions.all()},
     }
 
 
 @routes.get('/subscriptions')
 @template('subscriptions.html')
 async def subscriptions_list(request):
-    return {
-        'subscriptions': subscriptions.all()
-    }
+    return {'subscriptions': subscriptions.all()}
 
 
 @routes.post('/subscriptions')

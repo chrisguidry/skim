@@ -4,3 +4,4 @@ Dockerfile
 .drone.yml
 .git
 __pycache__
+.python-version

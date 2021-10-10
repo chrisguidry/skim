@@ -25,7 +25,7 @@ async def some_entries(a_subscription, skim_db):
             id=f'uniquely-{i}',
             title=f'Entry {i}',
             link=f'https://example.com/{i}',
-            timestamp=datetime(2021, 1, 2, 3 + i, tzinfo=timezone.utc)
+            timestamp=datetime(2021, 1, 2, 3 + i, tzinfo=timezone.utc),
         )
 
 
@@ -39,7 +39,7 @@ async def test_get_home(client, a_subscription, some_entries):
     assert entry_links == [
         'https://example.com/2',
         'https://example.com/1',
-        'https://example.com/0'
+        'https://example.com/0',
     ]
 
 
@@ -50,10 +50,7 @@ async def test_get_home_second_page(client, a_subscription, some_entries):
 
     soup = BeautifulSoup(await response.text())
     entry_links = [a['href'] for a in soup.select('article h1 a[href]')]
-    assert entry_links == [
-        'https://example.com/1',
-        'https://example.com/0'
-    ]
+    assert entry_links == ['https://example.com/1', 'https://example.com/0']
 
 
 async def test_redirect_on_bad_date(client, a_subscription, some_entries):
@@ -71,14 +68,14 @@ async def test_get_subscriptions_list(client, a_subscription):
     feed_links = [a['href'] for a in soup.select('table td a[href]')]
     assert feed_links == [
         '/?feed=https://example.com/feed',
-        'https://example.com/feed'
+        'https://example.com/feed',
     ]
 
 
 async def test_add_subscription(skim_db, client):
     response = await client.post(
         '/subscriptions',
-        data={'feed': 'https://example.com/feed', 'action': 'add'}
+        data={'feed': 'https://example.com/feed', 'action': 'add'},
     )
     assert response.status == 200
     assert response.headers['Content-Type'] == 'text/html; charset=utf-8'
@@ -87,14 +84,13 @@ async def test_add_subscription(skim_db, client):
     feed_links = [a['href'] for a in soup.select('table td a[href]')]
     assert feed_links == [
         '/?feed=https://example.com/feed',
-        'https://example.com/feed'
+        'https://example.com/feed',
     ]
 
 
 async def test_add_subscription_empty(skim_db, client):
     response = await client.post(
-        '/subscriptions',
-        data={'feed': '', 'action': 'add'}
+        '/subscriptions', data={'feed': '', 'action': 'add'}
     )
     assert response.status == 200
     assert response.headers['Content-Type'] == 'text/html; charset=utf-8'
@@ -107,7 +103,7 @@ async def test_add_subscription_empty(skim_db, client):
 async def test_delete_subscription(client, a_subscription):
     response = await client.post(
         '/subscriptions',
-        data={'feed': 'https://example.com/feed', 'action': 'delete'}
+        data={'feed': 'https://example.com/feed', 'action': 'delete'},
     )
     assert response.status == 200
     assert response.headers['Content-Type'] == 'text/html; charset=utf-8'

@@ -13,7 +13,7 @@ def create_application():
     aiohttp_jinja2.setup(
         app,
         loader=jinja2.FileSystemLoader('/skim/skim/templates'),
-        enable_async=True
+        enable_async=True,
     )
 
     env = aiohttp_jinja2.get_env(app)
@@ -21,7 +21,7 @@ def create_application():
         friendly_date=frontend.friendly_date,
         query_string=frontend.query_string,
         time_ago=frontend.time_ago,
-        static_file=partial(frontend.static_file, app)
+        static_file=partial(frontend.static_file, app),
     )
 
     app.add_routes(frontend.routes)

@@ -18,7 +18,7 @@ EXAMPLES_PATH = '/skim/skim/tests/examples/'
         ('w3c-example-rss-2.0', 'application/rss+xml'),
         ('ietf-short-atom-2005', 'application/atom+xml'),
         ('ietf-longer-atom-2005', 'application/atom+xml'),
-    ]
+    ],
 )
 async def test_parsing_standard_examples(example, content_type):
     example_filename = os.path.join(EXAMPLES_PATH, example + '.xml')
@@ -42,7 +42,7 @@ async def test_parsing_standard_examples(example, content_type):
         'w3c-example-rss-2.0',
         'ietf-short-atom-2005',
         'ietf-longer-atom-2005',
-    ]
+    ],
 )
 async def test_parsing_standard_examples_generic_xml_type(example):
     example_filename = os.path.join(EXAMPLES_PATH, example + '.xml')
@@ -70,9 +70,7 @@ async def test_handles_empty_feed_document():
 
         async with aiofiles.open(weird_file.name, 'r') as stream:
             feed, entries = await parse.parse(
-                'application/rss+xml',
-                'utf-8',
-                stream
+                'application/rss+xml', 'utf-8', stream
             )
 
         assert not feed
@@ -103,7 +101,8 @@ async def test_handles_empty_xml_document():
 
 async def test_handles_single_item_feed():
     with tempfile.NamedTemporaryFile('w') as single_entry:
-        single_entry.write("""<?xml version="1.0"?>
+        single_entry.write(
+            """<?xml version="1.0"?>
         <rss version="2.0">
             <channel>
                 <title>Example!</title>
@@ -114,14 +113,13 @@ async def test_handles_single_item_feed():
                 </item>
             </channel>
         </rss>
-        """)
+        """
+        )
         single_entry.flush()
 
         async with aiofiles.open(single_entry.name, 'rb') as stream:
             feed, entries = await parse.parse(
-                'application/rss+xml',
-                'utf-8',
-                stream
+                'application/rss+xml', 'utf-8', stream
             )
 
         assert feed == {
@@ -129,13 +127,8 @@ async def test_handles_single_item_feed():
             'link': 'http://www.example.com',
             'skim:namespaces': {
                 'http://purl.org/dc/elements/1.1/': 'dc',
-                'http://www.w3.org/2005/Atom': 'atom'
-            }
+                'http://www.w3.org/2005/Atom': 'atom',
+            },
         }
         assert isinstance(entries, list)
-        assert entries == [
-            {
-                'description': 'Great stuff!',
-                'guid': 'abcdefg'
-            }
-        ]
+        assert entries == [{'description': 'Great stuff!', 'guid': 'abcdefg'}]

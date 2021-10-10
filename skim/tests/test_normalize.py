@@ -15,53 +15,55 @@ def test_feed_empty():
         'title': None,
         'site': None,
         'icon': None,
-        'caching': None
+        'caching': None,
     }
 
 
 def test_feed_basics():
-    normalized = normalize.feed({
-        'title': 'The Title',
-        'link': 'https://example.com/1',
-        'logo': 'https://example.com/logo.png'
-    })
+    normalized = normalize.feed(
+        {
+            'title': 'The Title',
+            'link': 'https://example.com/1',
+            'logo': 'https://example.com/logo.png',
+        }
+    )
     assert normalized == {
         'title': 'The Title',
         'site': 'https://example.com/1',
         'icon': 'https://example.com/logo.png',
-        'caching': None
+        'caching': None,
     }
 
 
 def test_feed_detailed_icon():
-    normalized = normalize.feed({
-        'title': 'The Title',
-        'link': 'https://example.com/1',
-        'image': {
-            'url': 'https://example.com/logo.png'
+    normalized = normalize.feed(
+        {
+            'title': 'The Title',
+            'link': 'https://example.com/1',
+            'image': {'url': 'https://example.com/logo.png'},
         }
-    })
+    )
     assert normalized == {
         'title': 'The Title',
         'site': 'https://example.com/1',
         'icon': 'https://example.com/logo.png',
-        'caching': None
+        'caching': None,
     }
 
 
 def test_feed_detailed_icon_not_a_string_or_dict():
-    normalized = normalize.feed({
-        'title': 'The Title',
-        'link': 'https://example.com/1',
-        'image': [
-            'nope', 'https://example.com/logo.png'
-        ]
-    })
+    normalized = normalize.feed(
+        {
+            'title': 'The Title',
+            'link': 'https://example.com/1',
+            'image': ['nope', 'https://example.com/logo.png'],
+        }
+    )
     assert normalized == {
         'title': 'The Title',
         'site': 'https://example.com/1',
         'icon': None,
-        'caching': None
+        'caching': None,
     }
 
 
@@ -75,7 +77,7 @@ def test_entry_empty(utcnow):
         'timestamp': FROZEN_NOW,
         'body': None,
         'creators': None,
-        'categories': None
+        'categories': None,
     }
 
 
@@ -104,49 +106,49 @@ def test_normalizing_lists():
 
 
 def test_normalizing_links_with_urllike_id():
-    normalized = normalize.entry({
-        'id': 'https://example.com/1'
-    })
+    normalized = normalize.entry({'id': 'https://example.com/1'})
     assert normalized['link'] == 'https://example.com/1'
 
 
 def test_normalizing_date_only_on_an_earlier_day():
-    normalized = normalize.entry({
-        'pubDate': 'April 1st, 2021'
-    })
+    normalized = normalize.entry({'pubDate': 'April 1st, 2021'})
     eastern = gettz('America/New_York')
     assert normalized['timestamp'] == datetime(2021, 4, 1, tzinfo=eastern)
 
 
 @mock.patch('skim.dates.utcnow', return_value=FROZEN_NOW)
 def test_normalizing_date_only_today(utcnow):
-    normalized = normalize.entry({
-        'pubDate': FROZEN_NOW.strftime('%B %d, %Y')
-    })
+    normalized = normalize.entry({'pubDate': FROZEN_NOW.strftime('%B %d, %Y')})
     assert normalized['timestamp'] == FROZEN_NOW
 
 
 def test_normalizing_youtube_feeds():
-    normalized = normalize.entry({
-        'atom:id': 'yt:video:abcdefg'
-    })
-    assert normalized['body'] == BeautifulSoup('''
+    normalized = normalize.entry({'atom:id': 'yt:video:abcdefg'})
+    assert (
+        normalized['body']
+        == BeautifulSoup(
+            '''
     <div class="youtube video">
         <iframe allowfullscreen src="https://www.youtube.com/embed/abcdefg">
         </iframe>
-    </div>''', features='html.parser').prettify()
+    </div>''',
+            features='html.parser',
+        ).prettify()
+    )
 
 
 def test_normalizing_markup_relative_links():
-    normalized = normalize.entry({
-        'link': 'https://example.com/1',
-        'content': (
-            '<a href="/1/2/3/">'
-            '<img src="4/5/6"/>'
-            '<img src="https://leaveit" />'
-            '</a>'
-        )
-    })
+    normalized = normalize.entry(
+        {
+            'link': 'https://example.com/1',
+            'content': (
+                '<a href="/1/2/3/">'
+                '<img src="4/5/6"/>'
+                '<img src="https://leaveit" />'
+                '</a>'
+            ),
+        }
+    )
     assert normalized['body'] == (
         '<a href="https://example.com/1/2/3/">\n'
         ' <img src="https://example.com/4/5/6"/>\n'
@@ -156,16 +158,18 @@ def test_normalizing_markup_relative_links():
 
 
 def test_normalizing_scrubbing_google_analytics_images():
-    normalized = normalize.entry({
-        'link': 'https://example.com/1',
-        'content': (
-            '<p>'
-            '<em>hello</em>'
-            '<img src="https://www.google-analytics.com/booooooo"/>'
-            '<em>world</em>'
-            '</p>'
-        )
-    })
+    normalized = normalize.entry(
+        {
+            'link': 'https://example.com/1',
+            'content': (
+                '<p>'
+                '<em>hello</em>'
+                '<img src="https://www.google-analytics.com/booooooo"/>'
+                '<em>world</em>'
+                '</p>'
+            ),
+        }
+    )
     assert normalized['body'] == (
         '<p>\n'
         ' <em>\n'
@@ -179,21 +183,18 @@ def test_normalizing_scrubbing_google_analytics_images():
 
 
 def test_normalizing_markup_plain_text_wrapped_in_a_paragraph():
-    normalized = normalize.entry({
-        'content': 'Hello, world!'
-    })
-    assert normalized['body'] == (
-        '<p>\n Hello, world!\n</p>'
-    )
+    normalized = normalize.entry({'content': 'Hello, world!'})
+    assert normalized['body'] == ('<p>\n Hello, world!\n</p>')
 
-    normalized = normalize.entry({
-        'content': """
+    normalized = normalize.entry(
+        {
+            'content': """
             Hello, world!
 
             This is awesome!
         """
-    })
+        }
+    )
     assert normalized['body'] == (
-        '<p>\n Hello, world!\n</p>\n'
-        '<p>\n This is awesome!\n</p>'
+        '<p>\n Hello, world!\n</p>\n' '<p>\n This is awesome!\n</p>'
     )

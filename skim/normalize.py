@@ -12,68 +12,61 @@ from skim import dates
 def feed(feed):
     return {
         'title': title(
-            feed.get('title') or
-            feed.get('atom:title') or
-            feed.get('description')
+            feed.get('title')
+            or feed.get('atom:title')
+            or feed.get('description')
         ),
         'site': (
-            feed.get('link') or
-            feed.get('atom:link') or
-            feed.get('atom:link[alternate]')
+            feed.get('link')
+            or feed.get('atom:link')
+            or feed.get('atom:link[alternate]')
         ),
         'icon': feed_icon(
-            feed.get('logo') or
-            feed.get('atom:icon') or
-            feed.get('image')
+            feed.get('logo') or feed.get('atom:icon') or feed.get('image')
         ),
-        'caching': feed.get('skim:caching')
+        'caching': feed.get('skim:caching'),
     }
 
 
 def entry(entry):
     link = (
-        entry.get('link') or
-        entry.get('atom:link[alternate]') or
-        urllike(entry.get('id')) or
-        urllike(entry.get('atom:id')) or
-        urllike(entry.get('guid'))
+        entry.get('link')
+        or entry.get('atom:link[alternate]')
+        or urllike(entry.get('id'))
+        or urllike(entry.get('atom:id'))
+        or urllike(entry.get('guid'))
     )
     return {
         'id': (
-            entry.get('id') or
-            entry.get('atom:id') or
-            entry.get('guid') or
-            entry.get('link') or
-            entry.get('atom:link[alternate]')
+            entry.get('id')
+            or entry.get('atom:id')
+            or entry.get('guid')
+            or entry.get('link')
+            or entry.get('atom:link[alternate]')
         ),
-        'title': title(
-            entry.get('title') or
-            entry.get('atom:title')
-        ),
+        'title': title(entry.get('title') or entry.get('atom:title')),
         'link': link,
         'timestamp': entry_date(
-            entry.get('pubDate') or
-            entry.get('atom:updated') or
-            entry.get('atom:published') or
-            dates.utcnow().isoformat()
+            entry.get('pubDate')
+            or entry.get('atom:updated')
+            or entry.get('atom:published')
+            or dates.utcnow().isoformat()
         ),
         'creators': list_or_none(
-            entry.get('dc:creator') or
-            entry.get('atom:author', {}).get('atom:name')
+            entry.get('dc:creator')
+            or entry.get('atom:author', {}).get('atom:name')
         ),
-        'categories': list_or_none(
-            entry.get('category')
-        ),
+        'categories': list_or_none(entry.get('category')),
         'body': markup(
-            entry.get('atom:content') or
-            entry.get('content:encoded') or
-            entry.get('content') or
-            entry.get('atom:summary') or
-            entry.get('summary') or
-            entry.get('description') or
-            youtube_embed(entry),
-            base_url=link
-        )
+            entry.get('atom:content')
+            or entry.get('content:encoded')
+            or entry.get('content')
+            or entry.get('atom:summary')
+            or entry.get('summary')
+            or entry.get('description')
+            or youtube_embed(entry),
+            base_url=link,
+        ),
     }
 
 
@@ -91,7 +84,7 @@ def feed_icon(icon):
 def entry_date(datestring):
     tzinfos = {
         'EDT': gettz('America/New_York'),
-        'EST': gettz('America/New_York')
+        'EST': gettz('America/New_York'),
     }
     parsed = dateutil.parser.parse(datestring, tzinfos=tzinfos)
 

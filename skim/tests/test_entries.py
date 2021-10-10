@@ -18,7 +18,7 @@ async def test_entries_single_creator(skim_db):
         link='https://example.com/1',
         body='Hiiiii',
         creators=['Jane'],
-        categories=None
+        categories=None,
     )
 
     after = [e async for e in entries.all() if e['id'] == 'test-id'][0]
@@ -30,7 +30,7 @@ async def test_entries_single_creator(skim_db):
         'link': 'https://example.com/1',
         'body': 'Hiiiii',
         'creators': {'Jane'},
-        'categories': set()
+        'categories': set(),
     }
 
 
@@ -43,7 +43,7 @@ async def test_entries_single_category(skim_db):
         link='https://example.com/1',
         body='Hiiiii',
         creators=None,
-        categories=['Cool']
+        categories=['Cool'],
     )
 
     after = [e async for e in entries.all() if e['id'] == 'test-id'][0]
@@ -55,7 +55,7 @@ async def test_entries_single_category(skim_db):
         'link': 'https://example.com/1',
         'body': 'Hiiiii',
         'creators': set(),
-        'categories': {'Cool'}
+        'categories': {'Cool'},
     }
 
 
@@ -71,7 +71,7 @@ async def test_entries_adding(skim_db):
         link='https://example.com/1',
         body='Hiiiii',
         creators=['Jane', 'John'],
-        categories=['Cool', 'Stuff']
+        categories=['Cool', 'Stuff'],
     )
 
     after = [e async for e in entries.all() if e['id'] == 'test-id'][0]
@@ -83,7 +83,7 @@ async def test_entries_adding(skim_db):
         'link': 'https://example.com/1',
         'body': 'Hiiiii',
         'creators': {'Jane', 'John'},
-        'categories': {'Cool', 'Stuff'}
+        'categories': {'Cool', 'Stuff'},
     }
 
 
@@ -100,7 +100,7 @@ async def filterable_entries(skim_db):
         link='https://example.com/2',
         body='Hiiiii #2',
         creators=['Jane', 'John'],
-        categories=['Cool', 'Stuff']
+        categories=['Cool', 'Stuff'],
     )
 
     await entries.add(
@@ -111,7 +111,7 @@ async def filterable_entries(skim_db):
         link='https://example.com/1',
         body='Hiiiii #1',
         creators=['Jane'],
-        categories=['Neat', 'Stuff']
+        categories=['Neat', 'Stuff'],
     )
 
     await entries.add(
@@ -122,55 +122,45 @@ async def filterable_entries(skim_db):
         link='https://example.com/1',
         body='Hiiiii #1',
         creators=['John'],
-        categories=['Cool', 'Stuff']
+        categories=['Cool', 'Stuff'],
     )
 
 
 async def test_entries_older_than(filterable_entries):
     older = [
-        e['id'] async for e
-        in entries.older_than(datetime(2021, 2, 3), {})
+        e['id'] async for e in entries.older_than(datetime(2021, 2, 3), {})
     ]
     assert older == ['old-one', 'another-one']
 
 
 async def test_entries_older_than_ancient(filterable_entries):
-    older = [
-        e['id'] async for e
-        in entries.older_than(datetime(1, 2, 3), {})
-    ]
+    older = [e['id'] async for e in entries.older_than(datetime(1, 2, 3), {})]
     assert older == []
 
 
 async def test_entries_older_than_by_feed(filterable_entries):
-    filters = {
-        'feed': 'https://example.com/feed/B'
-    }
+    filters = {'feed': 'https://example.com/feed/B'}
     older = [
-        e['id'] async for e
-        in entries.older_than(datetime(2021, 2, 3), filters)
+        e['id']
+        async for e in entries.older_than(datetime(2021, 2, 3), filters)
     ]
     assert older == ['old-one']
 
 
 async def test_entries_older_than_by_category(filterable_entries):
-    filters = {
-        'category': 'Cool'
-    }
+    filters = {'category': 'Cool'}
     older = [
-        e['id'] async for e
-        in entries.older_than(datetime(2021, 2, 3), filters)
+        e['id']
+        async for e in entries.older_than(datetime(2021, 2, 3), filters)
     ]
     assert older == ['another-one']
 
 
 async def test_entries_older_than_by_creator(filterable_entries):
-    filters = {
-        'creator': 'Jane'
-    }
+    filters = {'creator': 'Jane'}
     older = [
-        e['id'] async for e
-        in entries.older_than(datetime(2021, 2, 3), filters)
+        e['id']
+        async for e in entries.older_than(datetime(2021, 2, 3), filters)
     ]
     assert older == ['old-one']
 
@@ -179,10 +169,10 @@ async def test_entries_older_than_by_multiple(filterable_entries):
     filters = {
         'feed': 'https://example.com/feed/B',
         'category': 'Neat',
-        'creator': 'Jane'
+        'creator': 'Jane',
     }
     older = [
-        e['id'] async for e
-        in entries.older_than(datetime(2021, 2, 3), filters)
+        e['id']
+        async for e in entries.older_than(datetime(2021, 2, 3), filters)
     ]
     assert older == ['old-one']

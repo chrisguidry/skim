@@ -10,8 +10,7 @@ MAX_CONCURRENT = 2
 async def crawl():
     fetches = [
         fetch_and_save(subscription)
-        async for subscription
-        in subscriptions.all()
+        async for subscription in subscriptions.all()
     ]
     while fetches:
         batch, fetches = fetches[:MAX_CONCURRENT], fetches[MAX_CONCURRENT:]
@@ -22,8 +21,7 @@ async def fetch_and_save(subscription):
     feed_url = subscription['feed']
     try:
         feed_url, response, feed, feed_entries = await fetch(
-            feed_url,
-            caching=subscription['caching']
+            feed_url, caching=subscription['caching']
         )
         status = response.status
     except (asyncio.TimeoutError, ClientConnectionError):
@@ -42,24 +40,25 @@ async def fetch_and_save(subscription):
     await subscriptions.update(feed_url, **feed)
 
     new_entries = await entries.add_all(
-        feed_url,
-        map(normalize.entry, feed_entries)
+        feed_url, map(normalize.entry, feed_entries)
     )
 
     await subscriptions.log_crawl(
         feed_url,
         status=response.status,
         content_type=response.content_type,
-        new_entries=new_entries
+        new_entries=new_entries,
     )
 
 
 async def fetch(feed_url, caching=None):
-    headers = only_set({
-        'User-Agent': 'skim/0',
-        'If-None-Match': caching and caching.get('Etag'),
-        'If-Modified-Since': caching and caching.get('Last-Modified')
-    })
+    headers = only_set(
+        {
+            'User-Agent': 'skim/0',
+            'If-None-Match': caching and caching.get('Etag'),
+            'If-Modified-Since': caching and caching.get('Last-Modified'),
+        }
+    )
     timeout = ClientTimeout(total=5)
     async with ClientSession(timeout=timeout) as session:
         async with session.get(feed_url, headers=headers) as response:
@@ -72,22 +71,22 @@ async def fetch(feed_url, caching=None):
                     'TODO: Error status codes',
                     feed_url,
                     response.status,
-                    response.headers
+                    response.headers,
                 )
                 return feed_url, response, None, None
 
             print(f'Content: {response.content_type} {response.charset}')
 
             feed, entries = await parse.parse(
-                response.content_type,
-                response.charset,
-                response.content
+                response.content_type, response.charset, response.content
             )
 
-            feed['skim:caching'] = only_set({
-                'Etag': response.headers.get('Etag'),
-                'Last-Modified': response.headers.get('Last-Modified')
-            })
+            feed['skim:caching'] = only_set(
+                {
+                    'Etag': response.headers.get('Etag'),
+                    'Last-Modified': response.headers.get('Last-Modified'),
+                }
+            )
 
         # simpler
         print(normalize.feed(feed)['title'])

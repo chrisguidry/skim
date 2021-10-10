@@ -2,7 +2,8 @@ from skim import database, dates
 
 
 def all():
-    return _query_results("""
+    return _query_results(
+        """
         SELECT  *
         FROM    entries
                 LEFT JOIN  entry_creators
@@ -12,7 +13,8 @@ def all():
                         ON entry_categories.feed = entries.feed AND
                            entry_categories.id = entries.id
         ORDER BY timestamp DESC
-    """)
+    """
+    )
 
 
 def older_than(timestamp, filters, limit=100):
@@ -80,7 +82,7 @@ async def _query_results(query, parameters=None):
                     entry['categories'].add(row['category'])
                     continue
 
-                if (entry['feed'] and entry['id']):
+                if entry['feed'] and entry['id']:
                     entry['creators'].discard(None)
                     entry['categories'].discard(None)
                     yield entry
@@ -91,7 +93,7 @@ async def _query_results(query, parameters=None):
                 entry['creators'] = {entry.pop('creator', None)}
                 entry['categories'] = {entry.pop('category', None)}
 
-            if (entry['feed'] and entry['id']):
+            if entry['feed'] and entry['id']:
                 entry['creators'].discard(None)
                 entry['categories'].discard(None)
                 yield entry
@@ -107,28 +109,26 @@ async def add_all(feed, entries):
 
 
 async def add(
-    feed, id,
-    timestamp=None, title=None, link=None, body=None,
-    creators=None, categories=None,
-    db=None
+    feed,
+    id,
+    timestamp=None,
+    title=None,
+    link=None,
+    body=None,
+    creators=None,
+    categories=None,
+    db=None,
 ):
     async with database.connection() as db:
         query = """
         INSERT OR IGNORE INTO entries (feed, id, timestamp, title, link, body)
         VALUES (?, ?, ?, ?, ?, ?)
         """
-        parameters = [
-            feed,
-            id,
-            timestamp.isoformat(),
-            title,
-            link,
-            body
-        ]
+        parameters = [feed, id, timestamp.isoformat(), title, link, body]
         await db.execute(query, parameters)
         was_new = db.total_changes > 0
 
-        for creator in (creators or []):
+        for creator in creators or []:
             query = """
             INSERT OR IGNORE INTO entry_creators (feed, id, creator)
             VALUES (?, ?, ?)
@@ -136,7 +136,7 @@ async def add(
             parameters = [feed, id, creator]
             await db.execute(query, parameters)
 
-        for category in (categories or []):
+        for category in categories or []:
             query = """
             INSERT OR IGNORE INTO entry_categories (feed, id, category)
             VALUES (?, ?, ?)
