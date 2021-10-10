@@ -2,7 +2,10 @@ FROM python:3.9
 LABEL maintainer="chris@theguidrys.us"
 
 RUN apt-get update && \
-    apt-get install -y sqlite3 && \
+    apt-get install -y \
+        rustc \
+        sqlite3 \
+    && \
     rm -rf /var/lib/apt/lists/*
 
 ADD https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py /tmp/install-poetry.py
