@@ -14,8 +14,11 @@ def help():
         print('  ', name, '-', function.__doc__)
 
 
-def poetry():
-    os.system(' '.join(sys.argv[1:]))
+def update_requirements():
+    """Updates all python requirements, saving them to requirements.txt"""
+    os.system(
+        'pip-compile --upgrade requirements.in --output-file requirements.txt'
+    )
 
 
 def migrate():

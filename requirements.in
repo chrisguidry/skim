@@ -1,0 +1,22 @@
+# production
+aioconsole
+aiofiles
+aiohttp-jinja2
+aiohttp[speedups]
+aioresponses
+aiosqlite
+beautifulsoup4
+humanize
+python-dateutil
+
+# development
+black
+isort
+pip-tools
+pylint
+pytest
+pytest-aiohttp
+pytest-asyncio
+pytest-black
+pytest-cov
+watchgod
