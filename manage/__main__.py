@@ -2,7 +2,7 @@ import asyncio
 import os
 import sys
 
-# from aiohttp import ClientSession, ClientTimeout
+from aiohttp import ClientSession, ClientTimeout
 
 
 def help():
