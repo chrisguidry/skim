@@ -40,8 +40,6 @@ spec:
         hostPath:
           path: /home/chris/feeds/
           type: Directory
-      nodeSelector:
-        kubernetes.io/hostname: pi6
 ---
 apiVersion: v1
 kind: Service
@@ -127,8 +125,6 @@ spec:
         hostPath:
           path: /home/chris/feeds/
           type: Directory
-      nodeSelector:
-        kubernetes.io/hostname: pi6
 ---
 apiVersion: batch/v1beta1
 kind: CronJob
@@ -158,5 +154,3 @@ spec:
             hostPath:
               path: /home/chris/feeds/
               type: Directory
-          nodeSelector:
-            kubernetes.io/hostname: pi6
