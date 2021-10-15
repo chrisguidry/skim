@@ -2,9 +2,6 @@ kind: pipeline
 type: kubernetes
 name: default
 
-node_selector:
-  pi-model: 4
-
 volumes:
 - name: docker-socket
   host:
