@@ -75,7 +75,7 @@ steps:
   - docker rmi $IMAGE_NAME:$IMAGE_TAG
 
 - name: notify
-  image: registry.home.theguidrys.us/44stonypoint/drone-pushover:main-10
+  image: registry.home.theguidrys.us/44stonypoint/drone-pushover:main-1
   when:
     status:
     - failure
