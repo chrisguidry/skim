@@ -54,17 +54,6 @@ steps:
     branch:
     - main
 
-- name: deploy
-  image: raspbernetes/kubectl:1.18.2
-  commands:
-  - sed -i "s/{{IMAGE_TAG}}/$IMAGE_TAG/g" kubernetes.yaml
-  - cat kubernetes.yaml
-  - kubectl --namespace=skim delete job migrate
-  - kubectl --namespace=skim apply -f kubernetes.yaml
-  when:
-    branch:
-    - main
-
 - name: cleanup
   <<: *docker
   when:
