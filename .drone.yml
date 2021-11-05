@@ -21,7 +21,7 @@ docker: &docker
 environment:
   REGISTRY: registry.home.theguidrys.us
   IMAGE_NAME: 44stonypoint/skim
-  IMAGE_TAG: "${DRONE_COMMIT_BRANCH}-${DRONE_BUILD_STARTED}"
+  UNIQUE_TAG: "${DRONE_COMMIT_BRANCH}-${DRONE_BUILD_NUMBER}"
 
 steps:
 
@@ -34,21 +34,22 @@ steps:
 - name: build
   <<: *docker
   commands:
-  - docker build --pull -t $IMAGE_NAME:$IMAGE_TAG .
+  - docker build --pull -t $IMAGE_NAME:$UNIQUE_TAG .
 
 - name: test
   <<: *docker
   commands:
-  - docker run --rm $IMAGE_NAME:$IMAGE_TAG pytest
+  - docker run --rm $IMAGE_NAME:$UNIQUE_TAG pytest
 
 - name: publish
   <<: *docker
   commands:
-  - docker tag $IMAGE_NAME:$IMAGE_TAG $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
-  - docker tag $IMAGE_NAME:$IMAGE_TAG $REGISTRY/$IMAGE_NAME:latest
-  - docker push $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+  - PUBLISHED_TAG=`date -u +'%Y%m%d-%H%M%S'`
+  - docker tag $IMAGE_NAME:$UNIQUE_TAG $REGISTRY/$IMAGE_NAME:$PUBLISHED_TAG
+  - docker tag $IMAGE_NAME:$UNIQUE_TAG $REGISTRY/$IMAGE_NAME:latest
+  - docker push $REGISTRY/$IMAGE_NAME:$PUBLISHED_TAG
   - docker push $REGISTRY/$IMAGE_NAME:latest
-  - docker rmi $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+  - docker rmi $REGISTRY/$IMAGE_NAME:$PUBLISHED_TAG
   # we'll leave the :latest so we have better layer cache re-use
   when:
     branch:
@@ -61,7 +62,7 @@ steps:
     - success
     - failure
   commands:
-  - docker rmi $IMAGE_NAME:$IMAGE_TAG
+  - docker rmi $IMAGE_NAME:$UNIQUE_TAG
 
 - name: notify
   image: registry.home.theguidrys.us/44stonypoint/drone-pushover:main-1
