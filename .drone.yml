@@ -21,7 +21,7 @@ docker: &docker
 environment:
   REGISTRY: registry.home.theguidrys.us
   IMAGE_NAME: 44stonypoint/skim
-  IMAGE_TAG: "${DRONE_COMMIT_BRANCH}-${DRONE_BUILD_NUMBER}"
+  IMAGE_TAG: "${DRONE_COMMIT_BRANCH}-${DRONE_BUILD_STARTED}"
 
 steps:
 
