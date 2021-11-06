@@ -1,13 +1,3 @@
-[tool.poetry]
-name = "skim"
-version = "0.1.0"
-description = ""
-authors = ["Chris Guidry <chris@theguidrys.us>"]
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = """
@@ -23,5 +13,8 @@ line-length = 79
 skip-string-normalization = true
 target-version = ['py39']
 
-[tool.pylint."MESSAGES CONTROL"]
-disable = "missing-module-docstring,missing-function-docstring"
+[tool.pylint.messages_control]
+disable = [
+    'missing-module-docstring',
+    'missing-function-docstring',
+]
