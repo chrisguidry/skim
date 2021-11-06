@@ -21,7 +21,7 @@ docker: &docker
 environment:
   REGISTRY: registry.home.theguidrys.us
   IMAGE_NAME: 44stonypoint/skim
-  UNIQUE_TAG: "${DRONE_COMMIT_BRANCH}-${DRONE_BUILD_NUMBER}"
+  IMAGE_TAG: "${DRONE_COMMIT_BRANCH}-${DRONE_BUILD_NUMBER}-${DRONE_COMMIT_SHA:0:8}"
 
 steps:
 
@@ -34,23 +34,31 @@ steps:
 - name: build
   <<: *docker
   commands:
-  - docker build --pull -t $IMAGE_NAME:$UNIQUE_TAG .
+  - docker build --pull -t $IMAGE_NAME:$IMAGE_TAG .
 
 - name: test
   <<: *docker
   commands:
-  - docker run --rm $IMAGE_NAME:$UNIQUE_TAG pytest
+  - docker run --rm $IMAGE_NAME:$IMAGE_TAG pytest
 
 - name: publish
   <<: *docker
   commands:
-  - PUBLISHED_TAG=`date -u +'%Y%m%d-%H%M%S'`
-  - docker tag $IMAGE_NAME:$UNIQUE_TAG $REGISTRY/$IMAGE_NAME:$PUBLISHED_TAG
-  - docker tag $IMAGE_NAME:$UNIQUE_TAG $REGISTRY/$IMAGE_NAME:latest
-  - docker push $REGISTRY/$IMAGE_NAME:$PUBLISHED_TAG
+  - docker tag $IMAGE_NAME:$IMAGE_TAG $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+  - docker tag $IMAGE_NAME:$IMAGE_TAG $REGISTRY/$IMAGE_NAME:latest
+  - docker push $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
   - docker push $REGISTRY/$IMAGE_NAME:latest
-  - docker rmi $REGISTRY/$IMAGE_NAME:$PUBLISHED_TAG
+  - docker rmi $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
   # we'll leave the :latest so we have better layer cache re-use
+  when:
+    branch:
+    - main
+
+- name: deploy
+  image: registry.home.theguidrys.us/44stonypoint/k8s-deploy
+  pull: always
+  commands:
+  - /44stonypoint/k8s/deploy skim $REGISTRY/$IMAGE_NAME:latest=$REGISTRY/$IMAGE_NAME:$IMAGE_TAG
   when:
     branch:
     - main
@@ -62,7 +70,7 @@ steps:
     - success
     - failure
   commands:
-  - docker rmi $IMAGE_NAME:$UNIQUE_TAG
+  - docker rmi $IMAGE_NAME:$IMAGE_TAG
 
 - name: notify
   image: registry.home.theguidrys.us/44stonypoint/drone-pushover:20211105-015941
