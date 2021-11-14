@@ -72,6 +72,19 @@ async def test_get_subscriptions_list(client, a_subscription):
     ]
 
 
+async def test_get_subscriptions_opml(client, a_subscription):
+    response = await client.get('/subscriptions.opml')
+    assert response.status == 200
+    assert response.headers['Content-Type'] == 'text/x-opml; charset=utf-8'
+
+    soup = BeautifulSoup(await response.text(), 'xml')
+    print(soup.select('opml body outline'))
+    feed_links = [o['xmlUrl'] for o in soup.select('opml body outline')]
+    assert feed_links == [
+        'https://example.com/feed',
+    ]
+
+
 async def test_add_subscription(skim_db, client):
     response = await client.post(
         '/subscriptions',

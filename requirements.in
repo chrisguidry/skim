@@ -7,6 +7,7 @@ aioresponses
 aiosqlite
 beautifulsoup4
 humanize
+lxml
 python-dateutil
 
 # development
@@ -19,4 +20,5 @@ pytest-aiohttp
 pytest-asyncio
 pytest-black
 pytest-cov
+pytest-isort
 watchgod

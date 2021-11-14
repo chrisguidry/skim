@@ -3,9 +3,9 @@ from urllib.parse import urlencode
 
 import humanize
 from aiohttp import web
-from aiohttp_jinja2 import template
+from aiohttp_jinja2 import render_template, template
 
-from skim import dates, entries, subscriptions
+from skim import dates, entries, opml, subscriptions
 
 routes = web.RouteTableDef()
 
@@ -13,7 +13,10 @@ END_OF_TIME = datetime.max.replace(tzinfo=timezone.utc)
 
 
 routes.static(
-    '/static', '/skim/skim/static', name='static', append_version=True
+    '/static',
+    '/skim/skim/static',
+    name='static',
+    append_version=True,
 )
 
 
@@ -72,3 +75,13 @@ async def modify_subscriptions(request):
         else:  # data['action'] == 'add':
             await subscriptions.add(data['feed'])
     return await subscriptions_list(request)
+
+
+@routes.get('/subscriptions.opml')
+async def subscriptions_opml(request):
+    response = web.Response(
+        status=200,
+        headers={'Content-Type': 'text/x-opml'},
+        text=await opml.from_subscriptions(subscriptions.all()),
+    )
+    return response

@@ -4,13 +4,13 @@
 #
 #    pip-compile --output-file=requirements.txt requirements.in
 #
-aioconsole==0.3.2
+aioconsole==0.3.3
     # via -r requirements.in
 aiodns==3.0.0
     # via aiohttp
 aiofiles==0.7.0
     # via -r requirements.in
-aiohttp[speedups]==3.7.4.post0
+aiohttp[speedups]==3.8.1
     # via
     #   -r requirements.in
     #   aiohttp-jinja2
@@ -20,11 +20,13 @@ aiohttp-jinja2==1.5
     # via -r requirements.in
 aioresponses==0.7.2
     # via -r requirements.in
+aiosignal==1.2.0
+    # via aiohttp
 aiosqlite==0.17.0
     # via -r requirements.in
-astroid==2.8.2
+astroid==2.8.5
     # via pylint
-async-timeout==3.0.1
+async-timeout==4.0.1
     # via aiohttp
 attrs==21.2.0
     # via
@@ -32,40 +34,45 @@ attrs==21.2.0
     #   pytest
 beautifulsoup4==4.10.0
     # via -r requirements.in
-black==21.9b0
+black==21.10b0
     # via
     #   -r requirements.in
     #   pytest-black
-brotlipy==0.7.0
+brotli==1.0.9
     # via aiohttp
 cchardet==2.1.7
     # via aiohttp
-cffi==1.14.6
-    # via
-    #   brotlipy
-    #   pycares
-chardet==4.0.0
+cffi==1.15.0
+    # via pycares
+charset-normalizer==2.0.7
     # via aiohttp
 click==8.0.3
     # via
     #   black
     #   pip-tools
-coverage[toml]==6.0.2
+coverage[toml]==6.1.2
     # via pytest-cov
+frozenlist==1.2.0
+    # via
+    #   aiohttp
+    #   aiosignal
 humanize==3.12.0
     # via -r requirements.in
-idna==3.2
+idna==3.3
     # via yarl
 iniconfig==1.1.1
     # via pytest
-isort==5.9.3
+isort==5.10.1
     # via
     #   -r requirements.in
     #   pylint
-jinja2==3.0.2
+    #   pytest-isort
+jinja2==3.0.3
     # via aiohttp-jinja2
 lazy-object-proxy==1.6.0
     # via astroid
+lxml==4.6.4
+    # via -r requirements.in
 markupsafe==2.0.1
     # via jinja2
 mccabe==0.6.1
@@ -76,13 +83,13 @@ multidict==5.2.0
     #   yarl
 mypy-extensions==0.4.3
     # via black
-packaging==21.0
+packaging==21.2
     # via pytest
 pathspec==0.9.0
     # via black
-pep517==0.11.0
+pep517==0.12.0
     # via pip-tools
-pip-tools==6.3.1
+pip-tools==6.4.0
     # via -r requirements.in
 platformdirs==2.4.0
     # via
@@ -90,11 +97,11 @@ platformdirs==2.4.0
     #   pylint
 pluggy==1.0.0
     # via pytest
-py==1.10.0
+py==1.11.0
     # via pytest
-pycares==4.0.0
+pycares==4.1.2
     # via aiodns
-pycparser==2.20
+pycparser==2.21
     # via cffi
 pylint==2.11.1
     # via -r requirements.in
@@ -109,44 +116,46 @@ pytest==6.2.5
     #   pytest-cov
 pytest-aiohttp==0.3.0
     # via -r requirements.in
-pytest-asyncio==0.15.1
+pytest-asyncio==0.16.0
     # via -r requirements.in
 pytest-black==0.3.12
     # via -r requirements.in
 pytest-cov==3.0.0
     # via -r requirements.in
+pytest-isort==2.0.0
+    # via -r requirements.in
 python-dateutil==2.8.2
     # via -r requirements.in
-regex==2021.10.8
+regex==2021.11.10
     # via black
 six==1.16.0
     # via python-dateutil
-soupsieve==2.2.1
+soupsieve==2.3.1
     # via beautifulsoup4
 toml==0.10.2
     # via
     #   pylint
     #   pytest
     #   pytest-black
-tomli==1.2.1
+tomli==1.2.2
     # via
     #   black
     #   coverage
     #   pep517
 typing-extensions==3.10.0.2
     # via
-    #   aiohttp
     #   aiosqlite
     #   astroid
+    #   async-timeout
     #   black
     #   pylint
 watchgod==0.7
     # via -r requirements.in
 wheel==0.37.0
     # via pip-tools
-wrapt==1.12.1
+wrapt==1.13.3
     # via astroid
-yarl==1.7.0
+yarl==1.7.2
     # via aiohttp
 
 # The following packages are considered to be unsafe in a requirements file:
