@@ -34,7 +34,13 @@ steps:
 - name: build
   <<: *docker
   commands:
-  - docker build --pull -t $IMAGE_NAME:$IMAGE_TAG .
+  - |
+    docker build \
+      --pull \
+      --build-arg BUILDKIT_INLINE_CACHE=1 \
+      --cache-from $REGISTRY/$IMAGE_NAME:latest \
+      -t $IMAGE_NAME:$IMAGE_TAG \
+      .
 
 - name: test
   <<: *docker
