@@ -27,6 +27,8 @@ steps:
 
 - name: build
   <<: *docker
+  environment:
+    DOCKER_BUILDKIT: "1"
   commands:
   - |
     docker build \
