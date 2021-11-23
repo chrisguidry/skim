@@ -21,4 +21,5 @@ pytest-asyncio
 pytest-black
 pytest-cov
 pytest-isort
+pytest-pylint
 watchgod

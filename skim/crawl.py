@@ -30,6 +30,9 @@ async def fetch_and_save(subscription):
     except parse.ParseError:
         feed = None
         status = -1
+    except Exception:
+        print(f'Unhandled exception while crawling {feed_url}')
+        raise
 
     if not feed:
         print(f"Status {status} for {feed_url}")

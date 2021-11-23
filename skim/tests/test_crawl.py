@@ -111,6 +111,17 @@ async def test_crawl_parseerror(one_subscription):
         log_crawl.assert_called_once_with('https://example.com/1', status=-1)
 
 
+async def test_crawl_unhandled(one_subscription):
+    with mock.patch('skim.crawl.fetch') as fetch:
+
+        fetch.side_effect = ValueError('This went poorly')
+
+        with pytest.raises(ValueError) as exc_info:
+            await crawl.crawl()
+
+        assert 'This went poorly' in str(exc_info)
+
+
 async def test_fetch():
     with aioresponses() as m:
         m.get(

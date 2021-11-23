@@ -24,7 +24,7 @@ aiosignal==1.2.0
     # via aiohttp
 aiosqlite==0.17.0
     # via -r requirements.in
-astroid==2.8.5
+astroid==2.8.6
     # via pylint
 async-timeout==4.0.1
     # via aiohttp
@@ -34,7 +34,7 @@ attrs==21.2.0
     #   pytest
 beautifulsoup4==4.10.0
     # via -r requirements.in
-black==21.10b0
+black==21.11b1
     # via
     #   -r requirements.in
     #   pytest-black
@@ -83,7 +83,7 @@ multidict==5.2.0
     #   yarl
 mypy-extensions==0.4.3
     # via black
-packaging==21.2
+packaging==21.3
     # via pytest
 pathspec==0.9.0
     # via black
@@ -104,8 +104,10 @@ pycares==4.1.2
 pycparser==2.21
     # via cffi
 pylint==2.11.1
-    # via -r requirements.in
-pyparsing==2.4.7
+    # via
+    #   -r requirements.in
+    #   pytest-pylint
+pyparsing==3.0.6
     # via packaging
 pytest==6.2.5
     # via
@@ -114,6 +116,7 @@ pytest==6.2.5
     #   pytest-asyncio
     #   pytest-black
     #   pytest-cov
+    #   pytest-pylint
 pytest-aiohttp==0.3.0
     # via -r requirements.in
 pytest-asyncio==0.16.0
@@ -123,6 +126,8 @@ pytest-black==0.3.12
 pytest-cov==3.0.0
     # via -r requirements.in
 pytest-isort==2.0.0
+    # via -r requirements.in
+pytest-pylint==0.18.0
     # via -r requirements.in
 python-dateutil==2.8.2
     # via -r requirements.in
@@ -137,12 +142,13 @@ toml==0.10.2
     #   pylint
     #   pytest
     #   pytest-black
+    #   pytest-pylint
 tomli==1.2.2
     # via
     #   black
     #   coverage
     #   pep517
-typing-extensions==3.10.0.2
+typing-extensions==4.0.0
     # via
     #   aiosqlite
     #   astroid
