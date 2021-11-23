@@ -25,12 +25,6 @@ environment:
 
 steps:
 
-- name: prime
-  <<: *docker
-  failure: ignore
-  commands:
-  - docker pull $REGISTRY/$IMAGE_NAME:latest
-
 - name: build
   <<: *docker
   commands:
