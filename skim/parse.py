@@ -19,7 +19,7 @@ async def parse(content_type, charset, stream):
 
     else:
         raise NotImplementedError(
-            f'Parsing feeds of type "{content_type}" is not ' 'implemented'
+            f'Parsing feeds of type "{content_type}" is not implemented'
         )
 
 
@@ -48,6 +48,10 @@ NAMESPACE_ALIASES = {
     'http://www.w3.org/2005/Atom': 'atom',
     'http://purl.org/dc/elements/1.1/': 'dc',
 }
+
+
+# Tags that are "safe" to embed unescaped in titles/descriptions
+EMBEDDABLE_HTML_TAGS = {'i', 'em'}
 
 
 async def parse_xml_feed(content_type, charset, stream):
@@ -102,20 +106,30 @@ async def parse_xml_feed(content_type, charset, stream):
 
             if 'rel' in attributes:
                 child_name = f'{tag}[{attributes["rel"]}]'
+            # if there are embedded unescaped HTML tags, just capture their
+            # text as in a special key called __html__ so they can be integrated
+            # back as a string
+            elif tag in EMBEDDABLE_HTML_TAGS:
+                child_name = '__html__'
             else:
                 child_name = tag
 
             if 'href' in attributes:
                 child['__value__'] = attributes['href']
             else:
-                child['__value__'] = (element.text or '').strip()
+                text = element.text or ''
+                if tag in EMBEDDABLE_HTML_TAGS:
+                    text = f'<{tag}>' + text + f'</{tag}>'
+                child['__value__'] = (text + (element.tail or '')).strip()
 
             # decide what happens with the __value__
 
             # if the only thing in this child is a `__value__` key, just use
-            # that as the child
+            # that as the child (possibly integration previously captured HTML)
             if set(child.keys()) == {'__value__'}:
                 child = child['__value__']
+            elif set(child.keys()) == {'__value__', '__html__'}:
+                child = child['__value__'] + ' ' + child['__html__']
             else:
                 child.pop('__value__')
 

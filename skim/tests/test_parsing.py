@@ -58,6 +58,26 @@ async def test_parsing_standard_examples_generic_xml_type(example):
     assert entries == expected['entries']
 
 
+@pytest.mark.parametrize(
+    'example,content_type',
+    [
+        ('gatesnotes-2021', 'text/xml'),
+    ],
+)
+async def test_parsing_examples_from_the_wild(example, content_type):
+    example_filename = os.path.join(EXAMPLES_PATH, example + '.xml')
+    expected_filename = os.path.join(EXAMPLES_PATH, example + '.json')
+
+    async with aiofiles.open(expected_filename, 'r') as file:
+        expected = json.loads(await file.read())
+
+    async with aiofiles.open(example_filename, 'rb') as file:
+        feed, entries = await parse.parse(content_type, 'utf-8', file)
+
+    assert feed == expected['feed']
+    assert entries == expected['entries']
+
+
 async def test_raises_for_unknown_content_type():
     with pytest.raises(NotImplementedError):
         await parse.parse('text/plain', 'utf-8', None)

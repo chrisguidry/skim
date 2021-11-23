@@ -1,0 +1,28 @@
+{
+    "feed": {
+        "title": "Gates Notes",
+        "link": "https://www.gatesnotes.com",
+        "description": "The most recently published articles on www.gatesnotes.com",
+        "language": "en",
+        "skim:namespaces": {
+            "http://www.w3.org/2005/Atom": "atom",
+            "http://purl.org/dc/elements/1.1/": "dc"
+        }
+    },
+    "entries": [
+        {
+            "guid": "9dda1ed5-f8e1-43db-87fa-e964143966dc",
+            "link": "https://www.gatesnotes.com/Books/The-Code-Breaker",
+            "title": "A thought-provoking look at the gene-editing revolution",
+            "description": "Walter Isaacson\u2019s latest book profiles Jennifer Doudna and her remarkable discovery.",
+            "pubDate": "November 22, 2021"
+        },
+        {
+            "guid": "07531c39-f5ee-4bc4-9903-337a7992d82e",
+            "link": "https://www.gatesnotes.com/Books/Project-Hail-Mary",
+            "title": "How far would you go to save the world?",
+            "description": "Even if you aren’t a big science fiction fan, <i>Project Hail Mary</i> is a lot of fun.",
+            "pubDate": "November 22, 2021"
+        }
+    ]
+}
