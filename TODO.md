@@ -28,18 +28,3 @@ In the spirit of microservices, this should probably be its own thing.
 
 First, does this violate the spirit of skim?  If not, then it would be nice
 to pop ahead to the next article instead of scrolling a potentially long one.
-
-# Deployment
-
-## SQLite3 on NFS is a bad plan
-
-Currently pinned to a specific cluster node because otherwise, no amount of
-concurrency will work.  Still need to work on the "database is locked" problem.
-
-Could possibly bring back iSCSI volumes to see if it corrects the locking issue,
-but iSCSI can't be mounted in multiple pods at a time.  If I do try iSCSI, I'll
-need to make crawling something that happens _within_ the same process as the
-web server.  They should be able to share the same event loop, but contention
-may be a bit of an issue.
-
-## Automated backups
