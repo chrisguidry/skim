@@ -188,11 +188,13 @@ def test_normalizing_markup_relative_links():
             ),
         }
     )
-    assert normalized['body'] == (
-        '<a href="https://example.com/1/2/3/">\n'
-        ' <img src="https://example.com/4/5/6"/>\n'
-        ' <img src="https://leaveit"/>\n'
-        '</a>'
+    assert normalized['body'] == '\n'.join(
+        [
+            '<a href="https://example.com/1/2/3/">',
+            ' <img src="https://example.com/4/5/6"/>',
+            ' <img src="https://leaveit"/>',
+            '</a>',
+        ]
     )
 
 
@@ -209,15 +211,17 @@ def test_normalizing_scrubbing_google_analytics_images():
             ),
         }
     )
-    assert normalized['body'] == (
-        '<p>\n'
-        ' <em>\n'
-        '  hello\n'
-        ' </em>\n'
-        ' <em>\n'
-        '  world\n'
-        ' </em>\n'
-        '</p>'
+    assert normalized['body'] == '\n'.join(
+        [
+            '<p>',
+            ' <em>',
+            '  hello',
+            ' </em>',
+            ' <em>',
+            '  world',
+            ' </em>',
+            '</p>',
+        ]
     )
 
 
@@ -236,4 +240,159 @@ def test_normalizing_markup_plain_text_wrapped_in_a_paragraph():
     )
     assert normalized['body'] == (
         '<p>\n Hello, world!\n</p>\n' '<p>\n This is awesome!\n</p>'
+    )
+
+
+def test_embedding_empty_enclosure():
+    normalized = normalize.entry(
+        {
+            'content': 'Hello, world!',
+            'enclosure': None,
+        }
+    )
+    assert normalized['body'] == '<p>\n Hello, world!\n</p>'
+
+    normalized = normalize.entry(
+        {
+            'content': 'Hello, world!',
+            'enclosure': {},
+        }
+    )
+    assert normalized['body'] == '<p>\n Hello, world!\n</p>'
+
+    normalized = normalize.entry(
+        {
+            'content': 'Hello, world!',
+            'enclosure': {'foo': 'bar'},
+        }
+    )
+    assert normalized['body'] == '<p>\n Hello, world!\n</p>'
+
+
+def test_embedding_unrecognized_media_type():
+    normalized = normalize.entry(
+        {
+            'content': 'Hello, world!',
+            'enclosure': {'url': 'https://example.com/wut', 'type': 'foo/bar'},
+        }
+    )
+    assert normalized['body'] == '<p>\n Hello, world!\n</p>'
+
+
+def test_embedding_single_image_enclosure():
+    normalized = normalize.entry(
+        {
+            'content': 'Hello, world!',
+            'enclosure': {
+                'href': 'http://example.com/image.png',
+                'type': 'image/png',
+            },
+        }
+    )
+    assert normalized['body'] == '\n'.join(
+        [
+            '<picture class="enclosure">',
+            ' <img src="http://example.com/image.png"/>',
+            '</picture>',
+            '<p>',
+            ' Hello, world!',
+            '</p>',
+        ]
+    )
+
+
+def test_embedding_single_image_enclosure_with_url():
+    normalized = normalize.entry(
+        {
+            'content': 'Hello, world!',
+            'enclosure': {
+                'url': 'http://example.com/image.png',
+                'type': 'image/png',
+            },
+        }
+    )
+    assert normalized['body'] == '\n'.join(
+        [
+            '<picture class="enclosure">',
+            ' <img src="http://example.com/image.png"/>',
+            '</picture>',
+            '<p>',
+            ' Hello, world!',
+            '</p>',
+        ]
+    )
+
+
+def test_embedding_multiple_image_enclosures():
+    normalized = normalize.entry(
+        {
+            'content': 'Hello, world!',
+            'enclosure': [
+                {
+                    'href': 'http://example.com/image-1.png',
+                    'type': 'image/png',
+                },
+                {
+                    'href': 'http://example.com/image-2.png',
+                    'type': 'image/png',
+                },
+            ],
+        }
+    )
+    assert normalized['body'] == '\n'.join(
+        [
+            '<picture class="enclosure">',
+            ' <img src="http://example.com/image-1.png"/>',
+            '</picture>',
+            '<picture class="enclosure">',
+            ' <img src="http://example.com/image-2.png"/>',
+            '</picture>',
+            '<p>',
+            ' Hello, world!',
+            '</p>',
+        ]
+    )
+
+
+def test_embedding_single_audio_enclosure():
+    normalized = normalize.entry(
+        {
+            'content': 'Hello, world!',
+            'enclosure': {
+                'href': 'http://example.com/yay.mp3',
+                'type': 'audio/mpeg',
+            },
+        }
+    )
+    assert normalized['body'] == '\n'.join(
+        [
+            '<audio class="enclosure" controls>',
+            ' <source src="http://example.com/yay.mp3" type="audio/mpeg"/>',
+            '</audio>',
+            '<p>',
+            ' Hello, world!',
+            '</p>',
+        ]
+    )
+
+
+def test_embedding_single_video_enclosure():
+    normalized = normalize.entry(
+        {
+            'content': 'Hello, world!',
+            'enclosure': {
+                'href': 'http://example.com/yay.mpeg',
+                'type': 'video/mpeg',
+            },
+        }
+    )
+    assert normalized['body'] == '\n'.join(
+        [
+            '<video class="enclosure" controls>',
+            ' <source src="http://example.com/yay.mpeg" type="video/mpeg"/>',
+            '</video>',
+            '<p>',
+            ' Hello, world!',
+            '</p>',
+        ]
     )

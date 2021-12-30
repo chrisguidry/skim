@@ -64,6 +64,7 @@ def entry(entry):
             or entry.get('summary')
             or entry.get('description')
             or youtube_embed(entry),
+            enclosures=entry.get('enclosure'),
             base_url=link,
         ),
     }
@@ -78,6 +79,8 @@ def feed_icon(icon):
 
     if isinstance(icon, dict):
         return icon.get('url')
+
+    return None
 
 
 def entry_date(datestring):
@@ -159,18 +162,24 @@ def title(content):
     return html.unescape(soup.prettify().strip())
 
 
-def markup(content, base_url=''):
-    if not content:
+def markup(content, base_url='', enclosures=None):
+    if not content and not enclosures:
         return content
 
-    content = content.strip()
+    content = (content or '').strip()
 
     # when the result seems like just plain text, wrap it in paragraphs
-    if '<' not in content and '>' not in content:
+    if content and '<' not in content and '>' not in content:
         content = content.replace('\n\n', '\n')
         content = '<p>' + '</p><p>'.join(content.split('\n')) + '</p>'
 
     soup = BeautifulSoup(content, features='html.parser')
+
+    enclosures = list_or_none(enclosures)
+    if enclosures:
+        tags = [embed_enclosure(soup, enclosure) for enclosure in enclosures]
+        for i, tag in enumerate(filter(None, tags)):
+            soup.insert(i, tag)
 
     # translate relative URLs to absolute URLs
     for attribute in ['href', 'src']:
@@ -186,3 +195,30 @@ def markup(content, base_url=''):
             element.decompose()
 
     return soup.prettify()
+
+
+def embed_enclosure(soup, enclosure):
+    url = enclosure.get('url') or enclosure.get('href')
+    media_type = enclosure.get('type')
+    if not url or not media_type:
+        return
+
+    if media_type.startswith('image/'):
+        tag = soup.new_tag('picture')
+        source = soup.new_tag('img', src=url)
+    elif media_type.startswith('audio/'):
+        tag = soup.new_tag('audio')
+        tag['controls'] = None
+        source = soup.new_tag('source', src=url, type=media_type)
+    elif media_type.startswith('video/'):
+        tag = soup.new_tag('video')
+        tag['controls'] = None
+        source = soup.new_tag('source', src=url, type=media_type)
+    else:
+        print('Unrecognized enclosure media type {media_type!r}')
+        return
+
+    tag['class'] = 'enclosure'
+    tag.append(source)
+
+    return tag

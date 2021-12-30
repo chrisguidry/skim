@@ -8,7 +8,7 @@ aioconsole==0.3.3
     # via -r requirements.in
 aiodns==3.0.0
     # via aiohttp
-aiofiles==0.7.0
+aiofiles==0.8.0
     # via -r requirements.in
 aiohttp[speedups]==3.8.1
     # via
@@ -24,17 +24,17 @@ aiosignal==1.2.0
     # via aiohttp
 aiosqlite==0.17.0
     # via -r requirements.in
-astroid==2.8.6
+astroid==2.9.0
     # via pylint
-async-timeout==4.0.1
+async-timeout==4.0.2
     # via aiohttp
-attrs==21.2.0
+attrs==21.4.0
     # via
     #   aiohttp
     #   pytest
 beautifulsoup4==4.10.0
     # via -r requirements.in
-black==21.11b1
+black==21.12b0
     # via
     #   -r requirements.in
     #   pytest-black
@@ -44,19 +44,19 @@ cchardet==2.1.7
     # via aiohttp
 cffi==1.15.0
     # via pycares
-charset-normalizer==2.0.7
+charset-normalizer==2.0.9
     # via aiohttp
 click==8.0.3
     # via
     #   black
     #   pip-tools
-coverage[toml]==6.1.2
+coverage[toml]==6.2
     # via pytest-cov
 frozenlist==1.2.0
     # via
     #   aiohttp
     #   aiosignal
-humanize==3.12.0
+humanize==3.13.1
     # via -r requirements.in
 idna==3.3
     # via yarl
@@ -69,9 +69,9 @@ isort==5.10.1
     #   pytest-isort
 jinja2==3.0.3
     # via aiohttp-jinja2
-lazy-object-proxy==1.6.0
+lazy-object-proxy==1.7.1
     # via astroid
-lxml==4.6.4
+lxml==4.7.1
     # via -r requirements.in
 markupsafe==2.0.1
     # via jinja2
@@ -91,7 +91,7 @@ pep517==0.12.0
     # via pip-tools
 pip-tools==6.4.0
     # via -r requirements.in
-platformdirs==2.4.0
+platformdirs==2.4.1
     # via
     #   black
     #   pylint
@@ -103,7 +103,7 @@ pycares==4.1.2
     # via aiodns
 pycparser==2.21
     # via cffi
-pylint==2.11.1
+pylint==2.12.2
     # via
     #   -r requirements.in
     #   pytest-pylint
@@ -131,8 +131,6 @@ pytest-pylint==0.18.0
     # via -r requirements.in
 python-dateutil==2.8.2
     # via -r requirements.in
-regex==2021.11.10
-    # via black
 six==1.16.0
     # via python-dateutil
 soupsieve==2.3.1
@@ -143,21 +141,20 @@ toml==0.10.2
     #   pytest
     #   pytest-black
     #   pytest-pylint
-tomli==1.2.2
+tomli==1.2.3
     # via
     #   black
     #   coverage
     #   pep517
-typing-extensions==4.0.0
+typing-extensions==4.0.1
     # via
     #   aiosqlite
     #   astroid
-    #   async-timeout
     #   black
     #   pylint
 watchgod==0.7
     # via -r requirements.in
-wheel==0.37.0
+wheel==0.37.1
     # via pip-tools
 wrapt==1.13.3
     # via astroid

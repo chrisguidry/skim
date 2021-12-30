@@ -116,6 +116,8 @@ async def parse_xml_feed(content_type, charset, stream):
 
             if 'href' in attributes:
                 child['__value__'] = attributes['href']
+            elif tag == 'enclosure':
+                child['__value__'] = attributes
             else:
                 text = element.text or ''
                 if tag in EMBEDDABLE_HTML_TAGS:

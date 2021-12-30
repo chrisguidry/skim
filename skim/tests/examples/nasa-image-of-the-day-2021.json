@@ -1,0 +1,72 @@
+{
+    "feed": {
+        "title": "NASA Image of the Day",
+        "description": "The latest NASA \"Image of the Day\" image.",
+        "link": "http://www.nasa.gov/",
+        "atom:link[self]": "http://www.nasa.gov/rss/dyn/lg_image_of_the_day.rss",
+        "language": "en-us",
+        "managingEditor": "yvette.smith-1@nasa.gov",
+        "webMaster": "brian.dunbar@nasa.gov",
+        "docs": "http://blogs.law.harvard.edu/tech/rss",
+        "skim:namespaces": {
+            "http://www.w3.org/2005/Atom": "atom",
+            "http://purl.org/dc/elements/1.1/": "dc",
+            "http://www.itunes.com/dtds/podcast-1.0.dtd": "itunes",
+            "http://search.yahoo.com/mrss/": "media"
+        }
+    },
+    "entries": [
+        {
+            "title": "Images of 2021: International Space Station Transits the Sun",
+            "link": "http://www.nasa.gov/image-feature/images-of-2021-international-space-station-transits-the-sun",
+            "description": "This composite image made from seven frames shows the International Space Station, with a crew of seven onboard, in silhouette as it transits the Sun.",
+            "enclosure": {
+                "url": "http://www.nasa.gov/sites/default/files/thumbnails/image/51271450910_2301dffc91_o.jpeg",
+                "length": "5365792",
+                "type": "image/jpeg"
+            },
+            "guid": "http://www.nasa.gov/image-feature/images-of-2021-international-space-station-transits-the-sun",
+            "pubDate": "Thu, 30 Dec 2021 10:46 EST",
+            "source": "NASA Image of the Day"
+        },
+        {
+            "title": "James Webb Telescope Rolls to the Pad Aboard an Ariane 5 Rocket",
+            "link": "http://www.nasa.gov/image-feature/james-webb-telescope-rolls-to-the-pad-aboard-an-ariane-5-rocket",
+            "description": "Arianespace's Ariane 5 rocket with NASA\u2019s James Webb Space Telescope onboard, is rolled out to the launch pad, Thursday, Dec. 23, 2021.",
+            "enclosure": {
+                "url": "http://www.nasa.gov/sites/default/files/thumbnails/image/nhq202112230007_0.jpg",
+                "length": "5375829",
+                "type": "image/jpeg"
+            },
+            "guid": "http://www.nasa.gov/image-feature/james-webb-telescope-rolls-to-the-pad-aboard-an-ariane-5-rocket",
+            "pubDate": "Thu, 23 Dec 2021 09:26 EST",
+            "source": "NASA Image of the Day"
+        },
+        {
+            "title": "Small (But Mighty) Weather Instruments",
+            "link": "http://www.nasa.gov/image-feature/small-but-mighty-weather-instruments",
+            "description": "In this image, the COWVR and TEMPEST instruments are shown in the trunk of the cargo craft.",
+            "enclosure": {
+                "url": "http://www.nasa.gov/sites/default/files/thumbnails/image/1-cowvr-loaded-1041.jpg",
+                "length": "189386",
+                "type": "image/jpeg"
+            },
+            "guid": "http://www.nasa.gov/image-feature/small-but-mighty-weather-instruments",
+            "pubDate": "Wed, 22 Dec 2021 07:18 EST",
+            "source": "NASA Image of the Day"
+        },
+        {
+            "title": "Behold a Winter Solstice",
+            "link": "http://www.nasa.gov/image-feature/behold-a-winter-solstice",
+            "description": "The Earth's solstices come twice a year. For the Northern Hemisphere,  this year's winter solstice happens on Dec. 21.",
+            "enclosure": {
+                "url": "http://www.nasa.gov/sites/default/files/thumbnails/image/seasons_msg_20101221_lrg.jpeg",
+                "length": "1341223",
+                "type": "image/jpeg"
+            },
+            "guid": "http://www.nasa.gov/image-feature/behold-a-winter-solstice",
+            "pubDate": "Tue, 21 Dec 2021 09:23 EST",
+            "source": "NASA Image of the Day"
+        }
+    ]
+}

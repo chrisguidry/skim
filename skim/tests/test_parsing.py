@@ -63,6 +63,7 @@ async def test_parsing_standard_examples_generic_xml_type(example):
     [
         ('gatesnotes-2021', 'text/xml'),
         ('our-world-in-data-2021', 'application/xml'),
+        ('nasa-image-of-the-day-2021', 'application/rss+xml'),
     ],
 )
 async def test_parsing_examples_from_the_wild(example, content_type):
