@@ -62,6 +62,7 @@ async def test_parsing_standard_examples_generic_xml_type(example):
     'example,content_type',
     [
         ('gatesnotes-2021', 'text/xml'),
+        ('our-world-in-data-2021', 'application/xml'),
     ],
 )
 async def test_parsing_examples_from_the_wild(example, content_type):

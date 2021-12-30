@@ -53,8 +53,7 @@ def entry(entry):
             or dates.utcnow().isoformat()
         ),
         'creators': list_or_none(
-            entry.get('dc:creator')
-            or entry.get('atom:author', {}).get('atom:name')
+            creators(entry.get('dc:creator') or entry.get('atom:author'))
         ),
         'categories': list_or_none(entry.get('category')),
         'body': markup(
@@ -100,6 +99,22 @@ def entry_date(datestring):
         parsed = now
 
     return parsed.astimezone(timezone.utc)
+
+
+def creators(values):
+    values = list_or_none(values)
+    if not values:
+        return values
+
+    return [item for item in map(creator, values) if item]
+
+
+def creator(value):
+    if not value:
+        return None
+    if isinstance(value, dict):
+        return value.get('atom:name')
+    return str(value)
 
 
 def urllike(string):

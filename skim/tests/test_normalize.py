@@ -122,6 +122,45 @@ def test_normalizing_date_only_today(utcnow):
     assert normalized['timestamp'] == FROZEN_NOW
 
 
+def test_normalizing_null_creators():
+    normalized = normalize.entry({})
+    assert normalized['creators'] is None
+
+    normalized = normalize.entry({'atom:author': [None]})
+    assert normalized['creators'] is None
+
+    normalized = normalize.entry({'atom:author': ['']})
+    assert normalized['creators'] is None
+
+    normalized = normalize.entry({'atom:author': {}})
+    assert normalized['creators'] is None
+
+    normalized = normalize.entry({'atom:author': []})
+    assert normalized['creators'] is None
+
+    normalized = normalize.entry({'atom:author': {}})
+    assert normalized['creators'] is None
+
+
+def test_normalizing_single_creators():
+    normalized = normalize.entry(
+        {'atom:author': {'atom:name': 'Jiminy Crickets'}}
+    )
+    assert normalized['creators'] == ['Jiminy Crickets']
+
+
+def test_normalizing_multiple_creators():
+    normalized = normalize.entry(
+        {
+            'atom:author': [
+                {'atom:name': 'Jiminy Crickets'},
+                {'atom:name': 'Criminy Jickets'},
+            ],
+        }
+    )
+    assert normalized['creators'] == ['Jiminy Crickets', 'Criminy Jickets']
+
+
 def test_normalizing_youtube_feeds():
     normalized = normalize.entry({'atom:id': 'yt:video:abcdefg'})
     assert (

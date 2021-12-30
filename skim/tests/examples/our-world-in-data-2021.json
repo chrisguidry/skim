@@ -1,0 +1,152 @@
+{
+    "feed": {
+        "atom:title": "Our World in Data",
+        "atom:subtitle": "Research and data to make progress against the world\u2019s largest problems",
+        "atom:id": "https://ourworldindata.org/",
+        "atom:link[alternate]": "https://ourworldindata.org",
+        "atom:link[self]": "https://ourworldindata.org/atom.xml",
+        "atom:updated": "2021-12-16T11:00:00.000Z",
+        "skim:namespaces": {
+            "http://www.w3.org/2005/Atom": "atom",
+            "http://purl.org/dc/elements/1.1/": "dc"
+        }
+    },
+    "entries": [
+        {
+            "atom:title": "We just published our new Global Food Data Explorer",
+            "atom:id": "https://ourworldindata.org/global-food-explorer-launch",
+            "atom:link[alternate]": "https://ourworldindata.org/global-food-explorer-launch",
+            "atom:published": "2021-12-16T11:00:00.000Z",
+            "atom:updated": "2021-12-16T11:40:14.000Z",
+            "atom:author": [
+                {
+                    "atom:name": "Hannah Ritchie"
+                },
+                {
+                    "atom:name": "Lucas Rod\u00e9s-Guirao"
+                },
+                {
+                    "atom:name": "Marcel Gerber"
+                }
+            ],
+            "atom:summary": "Explore the global food system from field to plate, for all countries in the world.<br><br><a href=\"https://ourworldindata.org/global-food-explorer-launch\" target=\"_blank\"><img src=\"https://ourworldindata.org/app/uploads/2021/12/global-food-explorer-thumbnail-768x403.png\"/></a>"
+        },
+        {
+            "atom:title": "Global economic inequality: what matters most for your living conditions is not who you are, but where you are",
+            "atom:id": "https://ourworldindata.org/global-economic-inequality-introduction",
+            "atom:link[alternate]": "https://ourworldindata.org/global-economic-inequality-introduction",
+            "atom:published": "2021-12-09T11:30:00.000Z",
+            "atom:updated": "2021-12-17T13:19:18.000Z",
+            "atom:author": {
+                "atom:name": "Max Roser"
+            },
+            "atom:summary": "How much does it matter whether or not you are born into a productive, industrialized economy?<br><br><a href=\"https://ourworldindata.org/global-economic-inequality-introduction\" target=\"_blank\"><img src=\"https://ourworldindata.org/app/uploads/2021/11/Screen-Shot-2021-11-27-at-12.08.06-768x315.png\"/></a>"
+        },
+        {
+            "atom:title": "How much energy do countries consume when we take offshoring into account?",
+            "atom:id": "https://ourworldindata.org/energy-offshoring",
+            "atom:link[alternate]": "https://ourworldindata.org/energy-offshoring",
+            "atom:published": "2021-12-07T10:30:00.000Z",
+            "atom:updated": "2021-12-07T12:09:11.000Z",
+            "atom:author": {
+                "atom:name": "Hannah Ritchie"
+            },
+            "atom:summary": "How do energy footprints compare across the world when we adjust for the goods that we import from overseas?<br><br><a href=\"https://ourworldindata.org/energy-offshoring\" target=\"_blank\"><img src=\"https://ourworldindata.org/app/uploads/2021/11/energy-offshoring-thumbnail-768x301.png\"/></a>"
+        },
+        {
+            "atom:title": "Want to stay up to date on our work? Subscribe to our two newsletters.",
+            "atom:id": "https://ourworldindata.org/subscribe-to-newsletters-2021",
+            "atom:link[alternate]": "https://ourworldindata.org/subscribe-to-newsletters-2021",
+            "atom:published": "2021-12-06T12:55:00.000Z",
+            "atom:updated": "2021-12-06T13:16:39.000Z",
+            "atom:author": {
+                "atom:name": "Charlie Giattino"
+            },
+            "atom:summary": "We send two regular newsletters so our readers can stay up to date on our work \u2014 an immediate update and a biweekly digest.<br><br><a href=\"https://ourworldindata.org/subscribe-to-newsletters-2021\" target=\"_blank\"><img src=\"https://ourworldindata.org/app/uploads/2021/12/newsletter_featured-768x402.png\"/></a>"
+        },
+        {
+            "atom:title": "200 years ago, everyone lacked democratic rights. Now, billions of people have them",
+            "atom:id": "https://ourworldindata.org/democratic-rights",
+            "atom:link[alternate]": "https://ourworldindata.org/democratic-rights",
+            "atom:published": "2021-12-02T12:37:00.000Z",
+            "atom:updated": "2021-12-02T13:46:57.000Z",
+            "atom:author": {
+                "atom:name": "Bastian Herre"
+            },
+            "atom:summary": "The majority of countries are democracies. But how many people enjoy democratic rights?<br><br><a href=\"https://ourworldindata.org/democratic-rights\" target=\"_blank\"><img src=\"https://ourworldindata.org/app/uploads/2021/12/democratic-rights-thumbnail-768x301.png\"/></a>"
+        },
+        {
+            "atom:title": "Data Review: How many people die from air pollution?",
+            "atom:id": "https://ourworldindata.org/data-review-air-pollution-deaths",
+            "atom:link[alternate]": "https://ourworldindata.org/data-review-air-pollution-deaths",
+            "atom:published": "2021-11-25T10:30:00.000Z",
+            "atom:updated": "2021-11-30T11:42:39.000Z",
+            "atom:author": {
+                "atom:name": "Max Roser"
+            },
+            "atom:summary": "This Data Review presents published estimates of the global death toll from air pollution and provides the context that makes them understandable. <br><br><a href=\"https://ourworldindata.org/data-review-air-pollution-deaths\" target=\"_blank\"><img src=\"https://ourworldindata.org/app/uploads/2021/11/Screen-Shot-2021-11-22-at-09.37.17-768x328.png\"/></a>"
+        },
+        {
+            "atom:title": "How do death rates from COVID-19 differ between people who are vaccinated and those who are not?",
+            "atom:id": "https://ourworldindata.org/covid-deaths-by-vaccination",
+            "atom:link[alternate]": "https://ourworldindata.org/covid-deaths-by-vaccination",
+            "atom:published": "2021-11-23T15:00:00.000Z",
+            "atom:updated": "2021-12-27T13:08:13.000Z",
+            "atom:author": [
+                {
+                    "atom:name": "Edouard Mathieu"
+                },
+                {
+                    "atom:name": "Max Roser"
+                }
+            ],
+            "atom:summary": "To understand how the pandemic is evolving, it\u2019s crucial to know how death rates from COVID-19 are affected by vaccination status.<br><br><a href=\"https://ourworldindata.org/covid-deaths-by-vaccination\" target=\"_blank\"><img src=\"https://ourworldindata.org/app/uploads/2021/11/Screen-Shot-2021-11-23-at-15.21.00-768x317.png\"/></a>"
+        },
+        {
+            "atom:title": "We\u2019ve just published our new data explorer on Natural Disasters",
+            "atom:id": "https://ourworldindata.org/natural-disasters-explorer-launch",
+            "atom:link[alternate]": "https://ourworldindata.org/natural-disasters-explorer-launch",
+            "atom:published": "2021-11-23T11:00:00.000Z",
+            "atom:updated": "2021-11-23T12:12:14.000Z",
+            "atom:author": [
+                {
+                    "atom:name": "Hannah Ritchie"
+                },
+                {
+                    "atom:name": "Lucas Rod\u00e9s-Guirao"
+                }
+            ],
+            "atom:summary": "Explore death rates, numbers of people affected, and economic damages from natural disasters across the world.<br><br><a href=\"https://ourworldindata.org/natural-disasters-explorer-launch\" target=\"_blank\"><img src=\"https://ourworldindata.org/app/uploads/2021/01/data_explorer-featured-768x404.png\"/></a>"
+        },
+        {
+            "atom:title": "Extreme poverty: how far have we come, how far do we still have to go?",
+            "atom:id": "https://ourworldindata.org/extreme-poverty-in-brief",
+            "atom:link[alternate]": "https://ourworldindata.org/extreme-poverty-in-brief",
+            "atom:published": "2021-11-22T10:30:00.000Z",
+            "atom:updated": "2021-11-30T16:52:21.000Z",
+            "atom:author": {
+                "atom:name": "Max Roser"
+            },
+            "atom:summary": "Despite making immense progress against extreme poverty, it is still the reality for every tenth person in the world. <br><br><a href=\"https://ourworldindata.org/extreme-poverty-in-brief\" target=\"_blank\"><img src=\"https://ourworldindata.org/app/uploads/2021/11/Featured-Image-for-the-post-768x422.png\"/></a>"
+        },
+        {
+            "atom:title": "We\u2019ve just updated all of our data on global CO\u2082 emissions",
+            "atom:id": "https://ourworldindata.org/co2-data-update-2021",
+            "atom:link[alternate]": "https://ourworldindata.org/co2-data-update-2021",
+            "atom:published": "2021-11-04T07:30:00.000Z",
+            "atom:updated": "2021-11-04T08:36:58.000Z",
+            "atom:author": [
+                {
+                    "atom:name": "Bobbie Macdonald"
+                },
+                {
+                    "atom:name": "Hannah Ritchie"
+                },
+                {
+                    "atom:name": "Edouard Mathieu"
+                }
+            ],
+            "atom:summary": "Our annual update based on the latest release from the Global Carbon Project. Explore it here.<br><br><a href=\"https://ourworldindata.org/co2-data-update-2021\" target=\"_blank\"><img src=\"https://ourworldindata.org/app/uploads/2020/08/CO2-Landing-page-768x402.png\"/></a>"
+        }
+    ]
+}
