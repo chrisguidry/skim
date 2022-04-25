@@ -16,7 +16,7 @@ VOLUME /feeds/
 
 RUN mkdir -p /skim/
 WORKDIR /skim/
-ENTRYPOINT ["/usr/local/bin/python", "-m"]
+ENTRYPOINT ["/usr/local/bin/opentelemetry-instrument", "/usr/local/bin/python", "-m"]
 CMD ["skim"]
 
 COPY . /skim/

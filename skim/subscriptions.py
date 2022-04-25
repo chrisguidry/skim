@@ -11,7 +11,7 @@ async def all():
         ORDER BY title
         """
         async with db.execute(query) as cursor:
-            async for row in cursor:
+            async for row in cursor:  # pragma: no branch
                 yield subscription_from_row(row)
 
 

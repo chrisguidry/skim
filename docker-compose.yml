@@ -18,7 +18,7 @@ services:
     - 5000:5000
     environment:
       PYTHONUNBUFFERED: 1
-    command: watchgod skim.server.run
+    command: watchfiles skim.server.run
     volumes:
     - feeds:/feeds/
     - ./:/skim/

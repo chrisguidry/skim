@@ -8,6 +8,14 @@ aiosqlite
 beautifulsoup4
 humanize
 lxml
+opentelemetry-api
+opentelemetry-distro
+opentelemetry-sdk
+opentelemetry-exporter-otlp-proto-grpc
+opentelemetry-instrumentation-aiohttp-client
+opentelemetry-instrumentation-dbapi
+opentelemetry-instrumentation-jinja2
+opentelemetry-instrumentation-logging
 python-dateutil
 
 # development
@@ -22,4 +30,5 @@ pytest-black
 pytest-cov
 pytest-isort
 pytest-pylint
-watchgod
+pytest-xdist
+watchfiles

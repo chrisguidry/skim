@@ -31,7 +31,7 @@ async def migrate():
             current_version = await cursor.fetchone()
             current_version = current_version[0]
 
-        async for version, migration in migrations():
+        async for version, migration in migrations():  # pragma: no branch
             if version <= current_version:
                 print(f'{version} already applied')
                 continue

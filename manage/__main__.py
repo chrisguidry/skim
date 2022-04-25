@@ -3,9 +3,10 @@ import os
 import sys
 
 from aiohttp import ClientSession, ClientTimeout
+from opentelemetry import trace
 
 
-def help():
+def help():  # pylint: disable=redefined-builtin
     """Prints available commands"""
     print('Usage: manage [command]')
     print()
@@ -19,6 +20,8 @@ def update_requirements():
     os.system(
         'pip-compile --upgrade requirements.in --output-file requirements.txt'
     )
+    original = os.stat('requirements.in')
+    os.chown('requirements.txt', uid=original.st_uid, gid=original.st_gid)
 
 
 def migrate():
@@ -97,4 +100,6 @@ try:
 except (KeyError, IndexError):
     command = help
 
-command()
+tracer = trace.get_tracer('skim.manage')
+with tracer.start_as_current_span(command.__name__):
+    command()

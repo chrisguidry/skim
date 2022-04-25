@@ -1,8 +1,11 @@
 import asyncio
 
 from aiohttp import ClientConnectionError, ClientSession, ClientTimeout
+from opentelemetry import trace
 
 from skim import entries, normalize, parse, subscriptions
+
+tracer = trace.get_tracer(__name__)
 
 MAX_CONCURRENT = 2
 
@@ -18,40 +21,46 @@ async def crawl():
 
 
 async def fetch_and_save(subscription):
-    feed_url = subscription['feed']
-    try:
-        feed_url, response, feed, feed_entries = await fetch(
-            feed_url, caching=subscription['caching']
+    with tracer.start_as_current_span('fetch_and_save') as span:
+        span.set_attributes({'feed.url': subscription['feed']})
+        feed_url = subscription['feed']
+        try:
+            feed_url, response, feed, feed_entries = await fetch(
+                feed_url, caching=subscription['caching']
+            )
+            status = response.status
+        except (asyncio.TimeoutError, ClientConnectionError):
+            feed = None
+            status = -1
+        except parse.ParseError:
+            feed = None
+            status = -1
+        except Exception:
+            print(f'Unhandled exception while crawling {feed_url}')
+            raise
+
+        span.set_attributes({'feed.status': status})
+
+        if not feed:
+            print(f"Status {status} for {feed_url}")
+            await subscriptions.log_crawl(feed_url, status=status)
+            return
+
+        feed = normalize.feed(feed)
+        await subscriptions.update(feed_url, **feed)
+
+        new_entries = await entries.add_all(
+            feed_url, map(normalize.entry, feed_entries)
         )
-        status = response.status
-    except (asyncio.TimeoutError, ClientConnectionError):
-        feed = None
-        status = -1
-    except parse.ParseError:
-        feed = None
-        status = -1
-    except Exception:
-        print(f'Unhandled exception while crawling {feed_url}')
-        raise
 
-    if not feed:
-        print(f"Status {status} for {feed_url}")
-        await subscriptions.log_crawl(feed_url, status=status)
-        return
+        span.set_attributes({'feed.new_entries': new_entries})
 
-    feed = normalize.feed(feed)
-    await subscriptions.update(feed_url, **feed)
-
-    new_entries = await entries.add_all(
-        feed_url, map(normalize.entry, feed_entries)
-    )
-
-    await subscriptions.log_crawl(
-        feed_url,
-        status=response.status,
-        content_type=response.content_type,
-        new_entries=new_entries,
-    )
+        await subscriptions.log_crawl(
+            feed_url,
+            status=response.status,
+            content_type=response.content_type,
+            new_entries=new_entries,
+        )
 
 
 async def fetch(feed_url, caching=None):
@@ -69,7 +78,8 @@ async def fetch(feed_url, caching=None):
 
             if response.status == 304:
                 return feed_url, response, None, None
-            elif response.status != 200:
+
+            if response.status != 200:
                 print(
                     'TODO: Error status codes',
                     feed_url,

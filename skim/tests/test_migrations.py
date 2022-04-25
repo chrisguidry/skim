@@ -1,4 +1,5 @@
 import os
+import tempfile
 
 import pytest
 
@@ -42,6 +43,28 @@ async def test_listing_migrations():
     version, migration = found[1]
     assert version == 3
     assert 'ALTER TABLE testing' in migration
+
+
+@pytest.fixture
+def empty_migrations(example_migrations):
+    original = database.MIGRATIONS_BASE
+    with tempfile.TemporaryDirectory() as tempdir:
+        database.MIGRATIONS_BASE = tempdir
+        try:
+            yield
+        finally:
+            database.MIGRATIONS_BASE = original
+
+
+async def test_no_migrations_at_all(empty_migrations, example_database):
+    await database.migrate()
+
+    async with database.connection() as db:
+        async with db.execute('PRAGMA user_version;') as cursor:
+            current_version = await cursor.fetchone()
+            current_version = current_version[0]
+
+        assert current_version == 0
 
 
 async def test_applying_migrations_increments_user_version(example_database):

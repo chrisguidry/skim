@@ -1,4 +1,5 @@
 .coverage
+docker-compose.override.yml
 __pycache__
 .pytest_cache
 .pyc
