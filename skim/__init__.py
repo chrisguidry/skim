@@ -10,6 +10,9 @@ from opentelemetry.sdk._metrics.export import PeriodicExportingMetricReader
 
 
 def configure_metrics():  # pragma: no cover
+    if not os.environ.get('OTEL_EXPORTER_OTLP_ENDPOINT'):
+        return
+
     metrics.set_meter_provider(
         MeterProvider(
             metric_readers=[
