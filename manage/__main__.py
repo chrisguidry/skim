@@ -5,6 +5,8 @@ import sys
 from aiohttp import ClientSession, ClientTimeout
 from opentelemetry import trace
 
+import skim
+
 
 def help():  # pylint: disable=redefined-builtin
     """Prints available commands"""
@@ -92,13 +94,17 @@ async def post_crawl_webhook():
 
 
 available_commands = {
-    name: function for name, function in locals().items() if callable(function)
+    name: function
+    for name, function in locals().items()
+    if callable(function) and not name.startswith('_')
 }
 
 try:
     command = available_commands[sys.argv[1]]
 except (KeyError, IndexError):
     command = help
+
+skim.configure_metrics()
 
 tracer = trace.get_tracer('skim.manage')
 with tracer.start_as_current_span(command.__name__):

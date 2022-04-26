@@ -2,10 +2,16 @@ import asyncio
 
 from aiohttp import ClientConnectionError, ClientSession, ClientTimeout
 from opentelemetry import trace
+from opentelemetry import _metrics as metrics
 
 from skim import entries, normalize, parse, subscriptions
 
 tracer = trace.get_tracer(__name__)
+meter = metrics.get_meter(__name__)
+
+new_entries_counter = meter.create_counter(
+    'new_entries', '{entries}', 'The number of new entries crawled'
+)
 
 MAX_CONCURRENT = 2
 
@@ -22,8 +28,8 @@ async def crawl():
 
 async def fetch_and_save(subscription):
     with tracer.start_as_current_span('fetch_and_save') as span:
-        span.set_attributes({'feed.url': subscription['feed']})
         feed_url = subscription['feed']
+        span.set_attributes({'feed.url': feed_url})
         try:
             feed_url, response, feed, feed_entries = await fetch(
                 feed_url, caching=subscription['caching']
@@ -54,6 +60,7 @@ async def fetch_and_save(subscription):
         )
 
         span.set_attributes({'feed.new_entries': new_entries})
+        new_entries_counter.add(new_entries, {'feed.url': feed_url})
 
         await subscriptions.log_crawl(
             feed_url,
