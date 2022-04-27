@@ -41,7 +41,9 @@ steps:
 - name: test
   <<: *docker
   commands:
-  - docker run --rm \
+  - |
+    docker run \
+      --rm \
       -e OTEL_EXPORTER_OTLP_ENDPOINT=http://collector.telemetry:4317 \
       -e OTEL_EXPORTER_OTLP_INSECURE=true \
       $IMAGE_NAME:$IMAGE_TAG \
