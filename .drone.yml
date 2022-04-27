@@ -47,8 +47,9 @@ steps:
       -e OTEL_RESOURCE_ATTRIBUTES=service.name=skim.tests \
       -e OTEL_EXPORTER_OTLP_ENDPOINT=http://collector.home.theguidrys.us:4317 \
       -e OTEL_EXPORTER_OTLP_INSECURE=true \
-      --entrypoint=/usr/local/bin/pytest --export-traces \
-      $IMAGE_NAME:$IMAGE_TAG
+      --entrypoint=/usr/local/bin/pytest \
+      $IMAGE_NAME:$IMAGE_TAG \
+       --export-traces
 
 - name: publish
   <<: *docker
