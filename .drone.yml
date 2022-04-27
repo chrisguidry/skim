@@ -48,7 +48,7 @@ steps:
       -e OTEL_EXPORTER_OTLP_ENDPOINT=http://collector.home.theguidrys.us:4317 \
       -e OTEL_EXPORTER_OTLP_INSECURE=true \
       $IMAGE_NAME:$IMAGE_TAG \
-      pytest --export-traces
+      --entrypoint=/usr/local/bin/pytest --export-traces
 
 - name: publish
   <<: *docker
