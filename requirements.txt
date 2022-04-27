@@ -110,10 +110,13 @@ opentelemetry-api==1.11.1
     #   opentelemetry-instrumentation-jinja2
     #   opentelemetry-instrumentation-logging
     #   opentelemetry-sdk
+    #   pytest-opentelemetry
 opentelemetry-distro==0.30b1
     # via -r requirements.in
 opentelemetry-exporter-otlp-proto-grpc==1.11.1
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   pytest-opentelemetry
 opentelemetry-instrumentation==0.30b1
     # via
     #   opentelemetry-distro
@@ -136,11 +139,13 @@ opentelemetry-sdk==1.11.1
     #   -r requirements.in
     #   opentelemetry-distro
     #   opentelemetry-exporter-otlp-proto-grpc
+    #   pytest-opentelemetry
 opentelemetry-semantic-conventions==0.30b1
     # via
     #   opentelemetry-instrumentation-aiohttp-client
     #   opentelemetry-instrumentation-dbapi
     #   opentelemetry-sdk
+    #   pytest-opentelemetry
 opentelemetry-util-http==0.30b1
     # via opentelemetry-instrumentation-aiohttp-client
 packaging==21.3
@@ -161,6 +166,8 @@ protobuf==3.20.1
     # via
     #   googleapis-common-protos
     #   opentelemetry-proto
+psutil==5.9.0
+    # via pytest-opentelemetry
 py==1.11.0
     # via
     #   pytest
@@ -184,6 +191,7 @@ pytest==7.1.2
     #   pytest-cov
     #   pytest-forked
     #   pytest-isort
+    #   pytest-opentelemetry
     #   pytest-pylint
     #   pytest-xdist
 pytest-aiohttp==1.0.4
@@ -199,6 +207,8 @@ pytest-cov==3.0.0
 pytest-forked==1.4.0
     # via pytest-xdist
 pytest-isort==3.0.0
+    # via -r requirements.in
+pytest-opentelemetry==0.0.2
     # via -r requirements.in
 pytest-pylint==0.18.0
     # via -r requirements.in

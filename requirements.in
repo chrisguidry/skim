@@ -29,6 +29,7 @@ pytest-asyncio
 pytest-black
 pytest-cov
 pytest-isort
+pytest-opentelemetry
 pytest-pylint
 pytest-xdist
 watchfiles
