@@ -44,6 +44,7 @@ steps:
   - |
     docker run \
       --rm \
+      -e OTEL_RESOURCE_ATTRIBUTES=service.name=skim.tests \
       -e OTEL_EXPORTER_OTLP_ENDPOINT=http://collector.home.theguidrys.us:4317 \
       -e OTEL_EXPORTER_OTLP_INSECURE=true \
       $IMAGE_NAME:$IMAGE_TAG \
