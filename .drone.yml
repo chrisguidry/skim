@@ -40,11 +40,12 @@ steps:
 
 - name: test
   <<: *docker
-  environment:
-    OTEL_EXPORTER_OTLP_ENDPOINT: http://collector.telemetry:4317
-    OTEL_EXPORTER_OTLP_INSECURE: "true"
   commands:
-  - docker run --rm $IMAGE_NAME:$IMAGE_TAG pytest --export-traces
+  - docker run --rm \
+      -e OTEL_EXPORTER_OTLP_ENDPOINT=http://collector.telemetry:4317 \
+      -e OTEL_EXPORTER_OTLP_INSECURE=true \
+      $IMAGE_NAME:$IMAGE_TAG \
+      pytest --export-traces
 
 - name: publish
   <<: *docker
