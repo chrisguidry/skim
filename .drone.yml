@@ -48,7 +48,7 @@ steps:
       -e POSTGRES_USER=skim \
       -e POSTGRES_PASSWORD=skim-password \
       --tmpfs /var/lib/postgresql/data \
-      --name postgres-$IMAGE_TAG
+      --name postgres-$IMAGE_TAG \
       postgres:14.2
   - |
     docker run \
