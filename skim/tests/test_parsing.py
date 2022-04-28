@@ -91,9 +91,7 @@ async def test_handles_empty_feed_document():
         weird_file.flush()
 
         async with aiofiles.open(weird_file.name, 'r') as stream:
-            feed, entries = await parse.parse(
-                'application/rss+xml', 'utf-8', stream
-            )
+            feed, entries = await parse.parse('application/rss+xml', 'utf-8', stream)
 
         assert not feed
         assert not entries
@@ -140,9 +138,7 @@ async def test_handles_single_item_feed():
         single_entry.flush()
 
         async with aiofiles.open(single_entry.name, 'rb') as stream:
-            feed, entries = await parse.parse(
-                'application/rss+xml', 'utf-8', stream
-            )
+            feed, entries = await parse.parse('application/rss+xml', 'utf-8', stream)
 
         assert feed == {
             'title': 'Example!',

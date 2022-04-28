@@ -17,10 +17,9 @@ async def parse(content_type, charset, stream):
     if content_type in XML_FEEDS:
         return await parse_xml_feed(content_type, charset, stream)
 
-    else:
-        raise NotImplementedError(
-            f'Parsing feeds of type "{content_type}" is not implemented'
-        )
+    raise NotImplementedError(
+        f'Parsing feeds of type "{content_type}" is not implemented'
+    )
 
 
 async def xml_from_stream(stream, events):
@@ -54,6 +53,9 @@ NAMESPACE_ALIASES = {
 EMBEDDABLE_HTML_TAGS = {'i', 'em'}
 
 
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-locals
+# pylint: disable=too-many-statements
 async def parse_xml_feed(content_type, charset, stream):
     """Parse an XML-based feed, like an RSS or Atom feed, returning a feed and
     its entries as a pair"""

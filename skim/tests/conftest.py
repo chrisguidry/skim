@@ -1,4 +1,4 @@
-import os
+from unittest import mock
 
 import pytest
 
@@ -6,21 +6,19 @@ from skim import database
 
 
 @pytest.fixture
-async def skim_db():
-    TEST_PATH = '/tmp/test.db'
+async def unmigrated_db():
+    async with database.connection() as connection:
+        with mock.patch.object(database, 'connection') as connection_manager:
+            connection_manager.return_value.__aenter__.return_value = connection
+            transaction = connection.transaction()
+            await transaction.start()
+            try:
+                yield connection
+            finally:
+                await transaction.rollback()
 
-    original = database.DATABASE_PATH
 
-    database.DATABASE_PATH = TEST_PATH
-
-    try:
-        os.remove(TEST_PATH)
-    except FileNotFoundError:
-        pass
-
+@pytest.fixture
+async def skim_db(unmigrated_db):
     await database.migrate()
-
-    try:
-        yield TEST_PATH
-    finally:
-        database.DATABASE_PATH = original
+    return unmigrated_db

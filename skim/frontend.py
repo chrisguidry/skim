@@ -3,7 +3,7 @@ from urllib.parse import urlencode
 
 import humanize
 from aiohttp import web
-from aiohttp_jinja2 import render_template, template
+from aiohttp_jinja2 import template
 
 from skim import dates, entries, opml, subscriptions
 
@@ -55,14 +55,16 @@ async def home(request):
     return {
         'filters': filters,
         'entries': entries.older_than(older_than, filters, limit=20),
-        'subscriptions': {s['feed']: s async for s in subscriptions.all()},
+        'subscriptions': {
+            s['feed']: s async for s in subscriptions.all_subscriptions()
+        },
     }
 
 
 @routes.get('/subscriptions')
 @template('subscriptions.html')
 async def subscriptions_list(request):
-    return {'subscriptions': subscriptions.all()}
+    return {'subscriptions': subscriptions.all_subscriptions()}
 
 
 @routes.post('/subscriptions')
@@ -82,6 +84,6 @@ async def subscriptions_opml(request):
     response = web.Response(
         status=200,
         headers={'Content-Type': 'text/x-opml'},
-        text=await opml.from_subscriptions(subscriptions.all()),
+        text=await opml.from_subscriptions(subscriptions.all_subscriptions()),
     )
     return response

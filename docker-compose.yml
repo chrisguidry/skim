@@ -1,34 +1,70 @@
 version: "3.8"
 services:
+  database:
+    image: postgres:14.2
+    environment:
+      - POSTGRES_DB=skim
+      - POSTGRES_USER=skim
+      - POSTGRES_PASSWORD=skim-password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+  test-database:
+    image: postgres:14.2
+    environment:
+      POSTGRES_DB: skim
+      POSTGRES_USER: skim
+      POSTGRES_PASSWORD: skim-password
+    tmpfs:
+      - /var/lib/postgresql/data
   manage:
+    depends_on:
+      - database
     build:
       context: .
       dockerfile: Dockerfile
     environment:
       PYTHONUNBUFFERED: 1
+      DB_HOST: database
+      DB_USER: skim
+      DB_PASSWORD: skim-password
+      DB_NAME: skim
     entrypoint: python -m manage
     volumes:
-    - feeds:/feeds/
-    - ./:/skim/
+      - feeds:/feeds/
+      - ./:/skim/
   server:
+    depends_on:
+      - database
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-    - 5000:5000
+      - 5000:5000
     environment:
       PYTHONUNBUFFERED: 1
+      DB_HOST: database
+      DB_USER: skim
+      DB_PASSWORD: skim-password
+      DB_NAME: skim
     command: watchfiles skim.server.run
     volumes:
-    - feeds:/feeds/
-    - ./:/skim/
+      - feeds:/feeds/
+      - ./:/skim/
   tests:
+    depends_on:
+      - test-database
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      DB_HOST: test-database
+      DB_USER: skim
+      DB_PASSWORD: skim-password
+      DB_NAME: skim
     volumes:
-    - ./:/skim/
+      - ./:/skim/
     entrypoint:
-    - pytest
+      - pytest
 volumes:
+  postgres-data:
   feeds:

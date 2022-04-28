@@ -20,22 +20,23 @@ async def two_subscriptions(one_subscription):
 
 async def test_crawl(two_subscriptions):
     with mock.patch('skim.crawl.fetch') as fetch:
-        fetch.side_effect = [
-            (
-                'https://example.com/1',
-                mock.Mock(status=200, content_type='application/rss+xml'),
-                {'title': 'One'},
-                [{'id': 'entry-one', 'title': 'Entry One'}],
-            ),
-            (
-                'https://example.com/2',
-                mock.Mock(status=200, content_type='application/rss+xml'),
-                {'title': 'Two'},
-                [{'id': 'entry-two', 'title': 'Entry Two'}],
-            ),
-        ]
+        with mock.patch.object(crawl, 'MAX_CONCURRENT', 1):
+            fetch.side_effect = [
+                (
+                    'https://example.com/1',
+                    mock.Mock(status=200, content_type='application/rss+xml'),
+                    {'title': 'One'},
+                    [{'id': 'entry-one', 'title': 'Entry One'}],
+                ),
+                (
+                    'https://example.com/2',
+                    mock.Mock(status=200, content_type='application/rss+xml'),
+                    {'title': 'Two'},
+                    [{'id': 'entry-two', 'title': 'Entry Two'}],
+                ),
+            ]
 
-        await crawl.crawl()
+            await crawl.crawl()
 
         fetch.assert_has_calls(
             [
@@ -44,7 +45,7 @@ async def test_crawl(two_subscriptions):
             ]
         )
 
-        by_feed = {s['feed']: s async for s in subscriptions.all()}
+        by_feed = {s['feed']: s async for s in subscriptions.all_subscriptions()}
 
         assert by_feed == {
             'https://example.com/1': {
@@ -141,9 +142,7 @@ async def test_fetch():
             ''',
         )
 
-        feed_url, response, feed, entries = await crawl.fetch(
-            'https://example.com/1'
-        )
+        feed_url, response, feed, entries = await crawl.fetch('https://example.com/1')
 
         assert feed_url == 'https://example.com/1'
         assert response.status == 200
@@ -215,9 +214,7 @@ async def test_fetch_error_status():
             body='any old thing',
         )
 
-        feed_url, response, feed, entries = await crawl.fetch(
-            'https://example.com/1'
-        )
+        feed_url, response, feed, entries = await crawl.fetch('https://example.com/1')
 
         assert feed_url == 'https://example.com/1'
         assert response.status == 500

@@ -5,7 +5,7 @@ async def test_subscriptions_management(skim_db):
     before = await subscriptions.get('https://example.com')
     assert not before
 
-    before = [s['feed'] async for s in subscriptions.all()]
+    before = [s['feed'] async for s in subscriptions.all_subscriptions()]
     assert 'https://example.com' not in before
 
     await subscriptions.add('https://example.com')
@@ -13,7 +13,7 @@ async def test_subscriptions_management(skim_db):
     after = await subscriptions.get('https://example.com')
     assert after['feed'] == 'https://example.com'
 
-    after = [s['feed'] async for s in subscriptions.all()]
+    after = [s['feed'] async for s in subscriptions.all_subscriptions()]
     assert 'https://example.com' in after
 
     await subscriptions.remove('https://example.com')
@@ -21,7 +21,7 @@ async def test_subscriptions_management(skim_db):
     after = await subscriptions.get('https://example.com')
     assert not after
 
-    after = [s['feed'] async for s in subscriptions.all()]
+    after = [s['feed'] async for s in subscriptions.all_subscriptions()]
     assert 'https://example.com' not in after
 
 

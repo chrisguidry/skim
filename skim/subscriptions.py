@@ -3,46 +3,41 @@ import json
 from skim import database, dates
 
 
-async def all():
+async def all_subscriptions():
     async with database.connection() as db:
         query = """
         SELECT  *
         FROM    subscriptions
         ORDER BY title
         """
-        async with db.execute(query) as cursor:
-            async for row in cursor:  # pragma: no branch
-                yield subscription_from_row(row)
+        for row in await db.fetch(query):
+            yield subscription_from_row(row)
 
 
 async def add(feed):
     async with database.connection() as db:
-        query = """
-        INSERT OR IGNORE INTO subscriptions (feed) VALUES (?)
+        insert = """
+        INSERT INTO subscriptions (feed) VALUES ($1) ON CONFLICT DO NOTHING
         """
-        parameters = [feed]
-        await db.execute(query, parameters)
-        await db.commit()
+        await db.execute(insert, feed)
 
 
 async def get(feed):
     async with database.connection() as db:
-        query = 'SELECT * FROM subscriptions WHERE feed = ?'
-        parameters = [feed]
-        async with db.execute(query, parameters) as cursor:
-            row = await cursor.fetchone()
-            return subscription_from_row(row) if row else None
+        query = 'SELECT * FROM subscriptions WHERE feed = $1'
+        row = await db.fetchrow(query, feed)
+        return subscription_from_row(row) if row else None
 
 
 async def update(feed, title=None, site=None, icon=None, caching=None):
     async with database.connection() as db:
         query = """
         UPDATE subscriptions
-        SET    title = ?,
-               site = ?,
-               icon = ?,
-               caching = ?
-        WHERE  feed = ?
+        SET    title = $1,
+               site = $2,
+               icon = $3,
+               caching = $4
+        WHERE  feed = $5
         """
         parameters = [
             title,
@@ -51,25 +46,13 @@ async def update(feed, title=None, site=None, icon=None, caching=None):
             json.dumps(caching) if caching else None,
             feed,
         ]
-        await db.execute(query, parameters)
-        await db.commit()
+        await db.execute(query, *parameters)
 
 
 async def remove(feed):
-    async with database.connection() as db:
-        query = """
-        DELETE FROM subscriptions WHERE feed = ?
-        """
-        parameters = [feed]
-        await db.execute(query, parameters)
-
-        query = """
-        DELETE FROM entries WHERE feed = ?
-        """
-        parameters = [feed]
-        await db.execute(query, parameters)
-
-        await db.commit()
+    async with database.connection() as db, db.transaction():
+        await db.execute('DELETE FROM subscriptions WHERE feed = $1;', feed)
+        await db.execute('DELETE FROM entries WHERE feed = $1;', feed)
 
 
 def subscription_from_row(row):
@@ -89,14 +72,13 @@ async def log_crawl(feed, status=None, content_type=None, new_entries=None):
             content_type,
             new_entries
         )
-        VALUES (?, ?, ?, ? ,?)
+        VALUES ($1, $2, $3, $4, $5)
         """
         parameters = [
             feed,
-            dates.utcnow().isoformat(),
+            dates.utcnow(),
             status,
             content_type,
             new_entries,
         ]
-        await db.execute(query, parameters)
-        await db.commit()
+        await db.execute(query, *parameters)

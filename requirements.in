@@ -4,7 +4,7 @@ aiofiles
 aiohttp-jinja2
 aiohttp[speedups]
 aioresponses
-aiosqlite
+asyncpg
 beautifulsoup4
 humanize
 lxml
@@ -13,7 +13,7 @@ opentelemetry-distro
 opentelemetry-sdk
 opentelemetry-exporter-otlp-proto-grpc
 opentelemetry-instrumentation-aiohttp-client
-opentelemetry-instrumentation-dbapi
+opentelemetry-instrumentation-asyncpg
 opentelemetry-instrumentation-jinja2
 opentelemetry-instrumentation-logging
 python-dateutil
@@ -21,6 +21,7 @@ python-dateutil
 # development
 black
 isort
+mypy
 pip-tools
 pylint
 pytest
@@ -29,7 +30,11 @@ pytest-asyncio
 pytest-black
 pytest-cov
 pytest-isort
+pytest-mypy
 pytest-opentelemetry
 pytest-pylint
 pytest-xdist
+types-aiofiles
+types-beautifulsoup4
+types-python-dateutil
 watchfiles

@@ -1,9 +1,8 @@
-import os
 import tempfile
 
 import pytest
 
-from skim import database
+from skim import database, dates
 
 
 @pytest.fixture(autouse=True)
@@ -14,21 +13,6 @@ def example_migrations():
         yield
     finally:
         database.MIGRATIONS_BASE = original
-
-
-@pytest.fixture(autouse=True)
-def example_database():
-    original = database.DATABASE_PATH
-    database.DATABASE_PATH = '/tmp/example.db'
-    try:
-        os.remove(database.DATABASE_PATH)
-    except FileNotFoundError:
-        pass
-
-    try:
-        yield database.DATABASE_PATH
-    finally:
-        database.DATABASE_PATH = original
 
 
 async def test_listing_migrations():
@@ -56,29 +40,23 @@ def empty_migrations(example_migrations):
             database.MIGRATIONS_BASE = original
 
 
-async def test_no_migrations_at_all(empty_migrations, example_database):
+async def test_no_migrations_at_all(empty_migrations, unmigrated_db):
     await database.migrate()
 
     async with database.connection() as db:
-        async with db.execute('PRAGMA user_version;') as cursor:
-            current_version = await cursor.fetchone()
-            current_version = current_version[0]
-
+        current_version = await database.current_version(db)
         assert current_version == 0
 
 
-async def test_applying_migrations_increments_user_version(example_database):
+async def test_applying_migrations_increments_user_version(unmigrated_db):
     await database.migrate()
 
     async with database.connection() as db:
-        async with db.execute('PRAGMA user_version;') as cursor:
-            current_version = await cursor.fetchone()
-            current_version = current_version[0]
-
+        current_version = await database.current_version(db)
         assert current_version == 3
 
 
-async def test_applying_migrations_executes_scripts(example_database):
+async def test_applying_migrations_executes_scripts(unmigrated_db):
     await database.migrate()
 
     async with database.connection() as db:
@@ -86,21 +64,26 @@ async def test_applying_migrations_executes_scripts(example_database):
         await db.execute('SELECT * FROM testing;')
 
 
-async def test_skips_applied_migrations(example_database):
+async def test_skips_applied_migrations(unmigrated_db):
     async with database.connection() as db:
-        await db.execute('PRAGMA user_version = 3;')
+        current_version = await database.current_version(db)
+        assert current_version == 0
+        await db.execute(
+            'INSERT INTO migrations (version, applied) VALUES ($1, $2)',
+            3,
+            dates.utcnow(),
+        )
 
     await database.migrate()
 
     async with database.connection() as db:
         table_query = '''
         SELECT  COUNT(*)
-        FROM    sqlite_master
-        WHERE   type = 'table' AND
-                name = 'testing';
+        FROM    information_schema.tables
+        WHERE   table_type = 'table' AND
+                table_name = 'testing';
         '''
-        async with db.execute(table_query) as cursor:
-            # since we "faked" migration 3,
-            # we should not have a "testing" table
-            count = await cursor.fetchone()
-            assert count[0] == 0
+        count = await db.fetchval(table_query)
+        # since we "faked" migration 3,
+        # we should not have a "testing" table
+        assert count == 0

@@ -143,9 +143,7 @@ def test_normalizing_null_creators():
 
 
 def test_normalizing_single_creators():
-    normalized = normalize.entry(
-        {'atom:author': {'atom:name': 'Jiminy Crickets'}}
-    )
+    normalized = normalize.entry({'atom:author': {'atom:name': 'Jiminy Crickets'}})
     assert normalized['creators'] == ['Jiminy Crickets']
 
 

@@ -2,51 +2,72 @@ import os
 from contextlib import asynccontextmanager
 
 import aiofiles
-import aiosqlite
+import asyncpg
+from opentelemetry import trace
+from opentelemetry.instrumentation.asyncpg import AsyncPGInstrumentor
 
-DATABASE_PATH = '/feeds/skim.db'
+from skim import dates
+
+AsyncPGInstrumentor().instrument()
+
 MIGRATIONS_BASE = '/skim/skim/migrations/'
 
-
-_depth = 0
+tracer = trace.get_tracer(__name__)
 
 
 @asynccontextmanager
 async def connection():
-    global _depth
-    async with aiosqlite.connect(DATABASE_PATH) as db:
-        db.row_factory = aiosqlite.Row
-        try:
-            _depth += 1
-            # print('opened at depth', _depth)
-            yield db
-        finally:
-            # print('closed at depth', _depth)
-            _depth -= 1
+    db = await asyncpg.connect(**connection_parameters())
+    try:
+        yield db
+    finally:
+        await db.close()
+
+
+def connection_parameters():
+    return {
+        'host': os.environ['DB_HOST'],
+        'port': int(os.environ.get('DB_PORT', '5432')),
+        'user': os.environ['DB_USER'],
+        'password': os.environ['DB_PASSWORD'],
+        'database': os.environ['DB_NAME'],
+    }
 
 
 async def migrate():
-    async with connection() as db:
-        async with db.execute('PRAGMA user_version;') as cursor:
-            current_version = await cursor.fetchone()
-            current_version = current_version[0]
+    with tracer.start_as_current_span('migrate'):
+        async with connection() as db, db.transaction():
+            starting_version = await current_version(db)
 
-        async for version, migration in migrations():  # pragma: no branch
-            if version <= current_version:
-                print(f'{version} already applied')
-                continue
+            async for version, migration in migrations():  # pragma: no branch
+                if version <= starting_version:
+                    print(f'{version} already applied')
+                    continue
 
-            print(f'Applying {version}')
-            await db.executescript(
-                '\n'.join(
-                    [
-                        'BEGIN;',
-                        f'PRAGMA user_version = {version};',
-                        migration,
-                        'COMMIT;',
-                    ]
+                print(f'Applying {version}')
+                await db.execute(migration)
+                await db.execute(
+                    'INSERT INTO migrations (version, applied) VALUES ($1, $2)',
+                    version,
+                    dates.utcnow(),
                 )
-            )
+
+
+async def current_version(db) -> int:
+    current_version = 0
+    try:
+        async with db.transaction():
+            current_version = await db.fetchval('SELECT MAX(version) FROM migrations;')
+    except asyncpg.exceptions.UndefinedTableError:
+        await db.execute(
+            """
+        CREATE TABLE migrations(
+            version INT PRIMARY KEY NOT NULL,
+            applied timestamptz NOT NULL
+        );
+        """
+        )
+    return current_version or 0
 
 
 async def migrations():

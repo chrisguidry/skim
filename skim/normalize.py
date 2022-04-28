@@ -12,9 +12,7 @@ from skim import dates
 def feed(feed):
     return {
         'title': title(
-            feed.get('title')
-            or feed.get('atom:title')
-            or feed.get('description')
+            feed.get('title') or feed.get('atom:title') or feed.get('description')
         ),
         'site': (
             feed.get('link')
@@ -201,7 +199,7 @@ def embed_enclosure(soup, enclosure):
     url = enclosure.get('url') or enclosure.get('href')
     media_type = enclosure.get('type')
     if not url or not media_type:
-        return
+        return None
 
     if media_type.startswith('image/'):
         tag = soup.new_tag('picture')
@@ -216,7 +214,7 @@ def embed_enclosure(soup, enclosure):
         source = soup.new_tag('source', src=url, type=media_type)
     else:
         print('Unrecognized enclosure media type {media_type!r}')
-        return
+        return None
 
     tag['class'] = 'enclosure'
     tag.append(source)

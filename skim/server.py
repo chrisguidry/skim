@@ -46,9 +46,7 @@ async def trace_requests(request, handler):
                 SpanAttributes.HTTP_SCHEME: request.scheme,
                 SpanAttributes.HTTP_URL: request.url,
                 SpanAttributes.HTTP_HOST: request.headers['Host'],
-                SpanAttributes.HTTP_USER_AGENT: request.headers.get(
-                    'User-Agent'
-                ),
+                SpanAttributes.HTTP_USER_AGENT: request.headers.get('User-Agent'),
                 SpanAttributes.HTTP_ROUTE: canonical_name,
             }
         )

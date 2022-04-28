@@ -1,10 +1,8 @@
 import os
 
-from opentelemetry import trace
 from opentelemetry import _metrics as metrics
-from opentelemetry.exporter.otlp.proto.grpc._metric_exporter import (
-    OTLPMetricExporter,
-)
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.grpc._metric_exporter import OTLPMetricExporter
 from opentelemetry.sdk._metrics import MeterProvider
 from opentelemetry.sdk._metrics.export import PeriodicExportingMetricReader
 

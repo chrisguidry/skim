@@ -102,9 +102,7 @@ async def test_add_subscription(skim_db, client):
 
 
 async def test_add_subscription_empty(skim_db, client):
-    response = await client.post(
-        '/subscriptions', data={'feed': '', 'action': 'add'}
-    )
+    response = await client.post('/subscriptions', data={'feed': '', 'action': 'add'})
     assert response.status == 200
     assert response.headers['Content-Type'] == 'text/html; charset=utf-8'
 

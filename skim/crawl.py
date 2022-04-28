@@ -1,13 +1,13 @@
 import asyncio
 
 from aiohttp import ClientConnectionError, ClientSession, ClientTimeout
-from opentelemetry import trace
 from opentelemetry import _metrics as metrics
+from opentelemetry import trace
 
 from skim import entries, normalize, parse, subscriptions
 
 tracer = trace.get_tracer(__name__)
-meter = metrics.get_meter(__name__)
+meter = metrics.get_meter(__name__)  # type: ignore
 
 new_entries_counter = meter.create_counter(
     'new_entries', '{entries}', 'The number of new entries crawled'
@@ -19,7 +19,7 @@ MAX_CONCURRENT = 2
 async def crawl():
     fetches = [
         fetch_and_save(subscription)
-        async for subscription in subscriptions.all()
+        async for subscription in subscriptions.all_subscriptions()
     ]
     while fetches:
         batch, fetches = fetches[:MAX_CONCURRENT], fetches[MAX_CONCURRENT:]

@@ -6,6 +6,9 @@ from aiohttp import ClientSession, ClientTimeout
 from opentelemetry import trace
 
 import skim
+import skim.crawl
+import skim.database
+import skim.subscriptions
 
 
 def help():  # pylint: disable=redefined-builtin
@@ -17,20 +20,9 @@ def help():  # pylint: disable=redefined-builtin
         print('  ', name, '-', function.__doc__)
 
 
-def update_requirements():
-    """Updates all python requirements, saving them to requirements.txt"""
-    os.system(
-        'pip-compile --upgrade requirements.in --output-file requirements.txt'
-    )
-    original = os.stat('requirements.in')
-    os.chown('requirements.txt', uid=original.st_uid, gid=original.st_gid)
-
-
 def migrate():
     """Applies migrations to the database"""
-    from skim.database import migrate
-
-    asyncio.run(migrate())
+    asyncio.run(skim.database.migrate())
 
 
 def shell():
@@ -40,15 +32,16 @@ def shell():
 
 def dbshell():
     """Opens a SQLite3 shell to the database"""
-    os.system('sqlite3 /feeds/skim.db')
+    parameters = skim.database.connection_parameters()
+    os.environ['PGPASSWORD'] = parameters['password']
+    os.system('psql -h {host} -p {port} -U {user} {database}'.format(**parameters))
 
 
 def feeds():
     """Lists the current feeds"""
-    from skim import subscriptions
 
     async def print_feeds():
-        async for subscription in subscriptions.all():
+        async for subscription in skim.subscriptions.all_subscriptions():
             print(f"{subscription['title']}: {subscription['feed']}")
 
     asyncio.run(print_feeds())
@@ -56,29 +49,21 @@ def feeds():
 
 def add_feed():
     """Subscribes to a new feed"""
-    from skim import subscriptions
-
-    asyncio.run(subscriptions.add(sys.argv[2]))
+    asyncio.run(skim.subscriptions.add(sys.argv[2]))
 
 
 def remove_feed():
     """Unsubscribes from a feed"""
-    from skim import subscriptions
-
-    asyncio.run(subscriptions.remove(sys.argv[2]))
+    asyncio.run(skim.subscriptions.remove(sys.argv[2]))
 
 
 def fetch():
-    from skim import crawl
-
-    asyncio.run(crawl.fetch(sys.argv[2]))
+    asyncio.run(skim.crawl.fetch(sys.argv[2]))
 
 
 def crawl():
     """Runs one full crawl"""
-    from skim import crawl
-
-    asyncio.run(crawl.crawl())
+    asyncio.run(skim.crawl.crawl())
     asyncio.run(post_crawl_webhook())
 
 
