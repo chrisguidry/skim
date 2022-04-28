@@ -33,6 +33,7 @@ addopts = """
     --isort
     --pylint
     --mypy
+    -n 4
     --cov=/skim/
     --cov-branch
     --cov-report=term-missing

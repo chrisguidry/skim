@@ -1,4 +1,5 @@
 import asyncio
+import os
 
 from aiohttp import ClientConnectionError, ClientSession, ClientTimeout
 from opentelemetry import _metrics as metrics
@@ -13,7 +14,7 @@ new_entries_counter = meter.create_counter(
     'new_entries', '{entries}', 'The number of new entries crawled'
 )
 
-MAX_CONCURRENT = 2
+MAX_CONCURRENT = int(os.getenv('SKIM_CRAWL_CONCURRENCY') or '2') or 2
 
 
 async def crawl():
