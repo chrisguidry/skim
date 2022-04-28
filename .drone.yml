@@ -53,7 +53,8 @@ steps:
   - |
     docker run \
       --rm \
-      -e DB_HOST=postgres-$IMAGE_TAG \
+      --link postgres-$IMAGE_TAG:database \
+      -e DB_HOST=database \
       -e DB_USER=skim \
       -e DB_PASSWORD=skim-password \
       -e DB_NAME=skim \
