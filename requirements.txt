@@ -208,7 +208,7 @@ pytest-forked==1.4.0
     # via pytest-xdist
 pytest-isort==3.0.0
     # via -r requirements.in
-pytest-opentelemetry==0.1.0
+pytest-opentelemetry==0.2.0
     # via -r requirements.in
 pytest-pylint==0.18.0
     # via -r requirements.in
