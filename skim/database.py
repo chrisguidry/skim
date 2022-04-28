@@ -4,11 +4,8 @@ from contextlib import asynccontextmanager
 import aiofiles
 import asyncpg
 from opentelemetry import trace
-from opentelemetry.instrumentation.asyncpg import AsyncPGInstrumentor
 
 from skim import dates
-
-AsyncPGInstrumentor().instrument()
 
 MIGRATIONS_BASE = '/skim/skim/migrations/'
 
