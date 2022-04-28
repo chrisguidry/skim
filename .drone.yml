@@ -79,6 +79,11 @@ steps:
 
 - name: deploy
   image: registry.home.theguidrys.us/44stonypoint/k8s-deploy
+  volumes:
+  - name: docker-socket
+    path: /var/run/
+  - name: docker-config
+    path: /root/.docker/
   pull: always
   commands:
   - /44stonypoint/k8s/deploy skim $REGISTRY/$IMAGE_NAME:latest=$REGISTRY/$IMAGE_NAME:$IMAGE_TAG
