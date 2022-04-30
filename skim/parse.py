@@ -73,27 +73,31 @@ async def parse_xml_feed(content_type, charset, stream):
 
     element_stream = xml_from_stream(stream, ['start-ns', 'start', 'end'])
 
-    async for event, element in element_stream:  # pragma no branch, bug?
+    async for event, element in element_stream:
         if event == 'start-ns':
             alias, namespace = element
-            if namespace not in namespace_aliases:
-                namespace_aliases[namespace] = alias
+            if namespace in namespace_aliases:
+                continue
+
+            namespace_aliases[namespace] = alias
 
         elif event == 'start':
             stack.append({})
 
             tag = aliased(element.tag)
 
+            if xml_format:
+                continue
+
             # if we couldn't determine the feed format from the Content-Type,
             # guess it from the root element, or stop now
-            if not xml_format:
-                for xml_format in XML_FORMATS.values():
-                    if tag == xml_format['feed_path'][0]:
-                        break
-                else:
-                    raise NotImplementedError(
-                        f'Unrecognized XML feed format "{content_type}"'
-                    )
+            for xml_format in XML_FORMATS.values():
+                if tag == xml_format['feed_path'][0]:
+                    break
+            else:
+                raise NotImplementedError(
+                    f'Unrecognized XML feed format "{content_type}"'
+                )
 
         else:  # event == 'end':
             child = stack.pop()

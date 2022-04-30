@@ -7,7 +7,7 @@ async def from_subscriptions(subscriptions):
     SubElement(opml, 'head')
     body = SubElement(opml, 'body')
 
-    async for subscription in subscriptions:  # pragma no branch, bug?
+    async for subscription in subscriptions:
         attributes = {
             'title': (
                 subscription.get('title')

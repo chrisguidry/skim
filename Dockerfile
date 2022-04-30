@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM python:3.10
 LABEL maintainer="chris@theguidrys.us"
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
