@@ -117,10 +117,28 @@ async def _query_results(query, parameters=None):
 async def add_all(feed, entries):
     async with database.connection() as db:
         new_entries = 0
+        entries = list(entries)
+        seen, _ = await partition_by_seen(feed, entries, db)
         for entry in entries:
+            if entry['id'] in seen:
+                continue
             new = await add(feed, **entry, db=db)
             new_entries += 1 if new else 0
         return new_entries
+
+
+async def partition_by_seen(feed, entries, db):
+    ids = [entry['id'] for entry in entries]
+
+    id_parameters = ', '.join(f'${i+2}' for i in range(len(ids)))
+    query = (
+        f'SELECT entries.id FROM entries WHERE feed = $1 AND id in ({id_parameters});'
+    )
+
+    seen = set(row['id'] for row in await db.fetch(query, feed, *ids))
+    unseen = set(ids) - seen
+
+    return seen, unseen
 
 
 async def add(  # pylint: disable=too-many-arguments

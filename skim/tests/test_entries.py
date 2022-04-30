@@ -87,6 +87,42 @@ async def test_entries_adding(skim_db):
     }
 
 
+async def test_adding_multiple_is_idempotent(skim_db):
+    before = [e['id'] async for e in entries.all_entries()]
+    assert 'test-id-1' not in before
+    assert 'test-id-2' not in before
+
+    new_entries = [
+        dict(
+            id='test-id-1',
+            timestamp=datetime(2021, 2, 3, 4, 5, 6, tzinfo=timezone.utc),
+            title='Test Entry',
+            link='https://example.com/1',
+            body='Hiiiii',
+        ),
+        dict(
+            id='test-id-2',
+            timestamp=datetime(2021, 2, 3, 4, 5, 6, tzinfo=timezone.utc),
+            title='Test Entry',
+            link='https://example.com/1',
+            body='Hiiiii',
+        ),
+    ]
+
+    await entries.add_all('https://example.com/feed', new_entries)
+
+    after = [e['id'] async for e in entries.all_entries()]
+    assert 'test-id-1' in after
+    assert 'test-id-2' in after
+
+    await entries.add_all('https://example.com/feed', new_entries)
+    final = [e['id'] async for e in entries.all_entries()]
+    assert 'test-id-1' in final
+    assert 'test-id-2' in final
+
+    assert len(after) == len(final)
+
+
 @pytest.fixture
 async def filterable_entries(skim_db):
     new = datetime(2021, 2, 3, 4, 5, 6, tzinfo=timezone.utc)
