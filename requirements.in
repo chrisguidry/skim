@@ -24,14 +24,14 @@ isort
 mypy
 pip-tools
 pylint
-pytest
+pytest<7.0.0  # until the pytest/black thing is sorted out
 pytest-aiohttp
 pytest-asyncio
 pytest-black
 pytest-cov
 pytest-isort
 pytest-mypy
-pytest-opentelemetry
+pytest-opentelemetry>=0.3.0
 pytest-pylint
 pytest-xdist
 types-aiofiles

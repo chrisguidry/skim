@@ -47,10 +47,14 @@ brotli==1.0.9
     # via aiohttp
 cchardet==2.1.7
     # via aiohttp
+certifi==2021.10.8
+    # via requests
 cffi==1.15.0
     # via pycares
 charset-normalizer==2.0.12
-    # via aiohttp
+    # via
+    #   aiohttp
+    #   requests
 click==8.1.3
     # via
     #   black
@@ -61,6 +65,8 @@ deprecated==1.2.13
     # via opentelemetry-api
 dill==0.3.4
     # via pylint
+docker==5.0.3
+    # via opentelemetry-resourcedetector-docker
 execnet==1.9.0
     # via pytest-xdist
 filelock==3.6.0
@@ -78,6 +84,7 @@ humanize==4.0.0
 idna==3.3
     # via
     #   anyio
+    #   requests
     #   yarl
 iniconfig==1.1.1
     # via pytest
@@ -143,16 +150,24 @@ opentelemetry-instrumentation-logging==0.30b1
     # via -r requirements.in
 opentelemetry-proto==1.11.1
     # via opentelemetry-exporter-otlp-proto-grpc
+opentelemetry-resourcedetector-docker==0.1.0
+    # via pytest-opentelemetry
+opentelemetry-resourcedetector-process==0.1.0
+    # via pytest-opentelemetry
 opentelemetry-sdk==1.11.1
     # via
     #   -r requirements.in
     #   opentelemetry-distro
     #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-resourcedetector-docker
+    #   opentelemetry-resourcedetector-process
     #   pytest-opentelemetry
 opentelemetry-semantic-conventions==0.30b1
     # via
     #   opentelemetry-instrumentation-aiohttp-client
     #   opentelemetry-instrumentation-asyncpg
+    #   opentelemetry-resourcedetector-docker
+    #   opentelemetry-resourcedetector-process
     #   opentelemetry-sdk
     #   pytest-opentelemetry
 opentelemetry-util-http==0.30b1
@@ -176,7 +191,7 @@ protobuf==3.20.1
     #   googleapis-common-protos
     #   opentelemetry-proto
 psutil==5.9.0
-    # via pytest-opentelemetry
+    # via opentelemetry-resourcedetector-process
 py==1.11.0
     # via
     #   pytest
@@ -191,7 +206,7 @@ pylint==2.13.7
     #   pytest-pylint
 pyparsing==3.0.8
     # via packaging
-pytest==7.1.2
+pytest==6.2.5
     # via
     #   -r requirements.in
     #   pytest-aiohttp
@@ -220,7 +235,7 @@ pytest-isort==3.0.0
     # via -r requirements.in
 pytest-mypy==0.9.1
     # via -r requirements.in
-pytest-opentelemetry==0.2.1
+pytest-opentelemetry==0.3.0
     # via -r requirements.in
 pytest-pylint==0.18.0
     # via -r requirements.in
@@ -228,6 +243,8 @@ pytest-xdist==2.5.0
     # via -r requirements.in
 python-dateutil==2.8.2
     # via -r requirements.in
+requests==2.27.1
+    # via docker
 six==1.16.0
     # via
     #   grpcio
@@ -238,6 +255,7 @@ soupsieve==2.3.2.post1
     # via beautifulsoup4
 toml==0.10.2
     # via
+    #   pytest
     #   pytest-black
     #   pytest-pylint
 tomli==2.0.1
@@ -247,7 +265,6 @@ tomli==2.0.1
     #   mypy
     #   pep517
     #   pylint
-    #   pytest
 types-aiofiles==0.8.8
     # via -r requirements.in
 types-beautifulsoup4==4.10.20
@@ -258,8 +275,12 @@ typing-extensions==4.2.0
     # via
     #   mypy
     #   opentelemetry-sdk
+urllib3==1.26.9
+    # via requests
 watchfiles==0.13
     # via -r requirements.in
+websocket-client==1.3.2
+    # via docker
 wheel==0.37.1
     # via pip-tools
 wrapt==1.14.0

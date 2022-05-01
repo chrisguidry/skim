@@ -58,6 +58,7 @@ steps:
       -e DB_USER=skim \
       -e DB_PASSWORD=skim-password \
       -e DB_NAME=skim \
+      -e OTEL_RESOURCE_ATTRIBUTES=service.name=skim.tests \
       -e OTEL_EXPORTER_OTLP_ENDPOINT=http://collector.home.theguidrys.us:4317 \
       -e OTEL_EXPORTER_OTLP_INSECURE=true \
       --entrypoint=/usr/local/bin/pytest \
