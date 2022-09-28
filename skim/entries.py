@@ -141,9 +141,9 @@ async def partition_by_seen(feed, entries, db):
     return seen, unseen
 
 
-async def add(  # pylint: disable=too-many-arguments
+async def add(
     feed,
-    id,  # pylint: disable=redefined-builtin
+    id,
     timestamp=None,
     title=None,
     link=None,

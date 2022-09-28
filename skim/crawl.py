@@ -2,8 +2,7 @@ import asyncio
 import os
 
 from aiohttp import ClientConnectionError, ClientSession, ClientTimeout
-from opentelemetry import _metrics as metrics
-from opentelemetry import trace
+from opentelemetry import metrics, trace
 
 from skim import entries, normalize, parse, subscriptions
 

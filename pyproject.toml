@@ -16,23 +16,9 @@ ignore_missing_imports = true
 module = ['humanize']
 ignore_missing_imports = true
 
-[tool.pylint.messages_control]
-disable = [
-    'fixme',
-    'invalid-name',
-    'missing-module-docstring',
-    'missing-function-docstring',
-    'redefined-outer-name',
-    'unused-argument'
-]
-
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = """
-    --black
-    --isort
-    --pylint
-    --mypy
     -n 4
     --cov=/skim/
     --cov-branch

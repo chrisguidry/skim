@@ -6,7 +6,12 @@
 
 	pip install -r .bookkeeping/development.txt.next
 	pip-sync .bookkeeping/development.txt.next
-	docker-compose build --pull
+
+ifdef PYENV_VIRTUAL_ENV
+	pyenv rehash
+endif
+
+	docker compose build --pull
 
 	mv .bookkeeping/development.txt.next .bookkeeping/development.txt
 
@@ -15,6 +20,10 @@
 	touch .bookkeeping/pip-tools.next
 
 	pip install -U pip pip-tools
+
+ifdef PYENV_VIRTUAL_ENV
+	pyenv rehash
+endif
 
 	mv .bookkeeping/pip-tools.next .bookkeeping/pip-tools
 

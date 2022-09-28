@@ -11,7 +11,7 @@ import skim.database
 import skim.subscriptions
 
 
-def help():  # pylint: disable=redefined-builtin
+def help():
     """Prints available commands"""
     print('Usage: manage [command]')
     print()

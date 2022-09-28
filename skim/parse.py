@@ -53,9 +53,6 @@ NAMESPACE_ALIASES = {
 EMBEDDABLE_HTML_TAGS = {'i', 'em'}
 
 
-# pylint: disable=too-many-branches
-# pylint: disable=too-many-locals
-# pylint: disable=too-many-statements
 async def parse_xml_feed(content_type, charset, stream):
     """Parse an XML-based feed, like an RSS or Atom feed, returning a feed and
     its entries as a pair"""
