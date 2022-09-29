@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from unittest import mock
 
 import pytest
 from bs4 import BeautifulSoup
@@ -26,6 +27,7 @@ async def some_entries(a_subscription, skim_db):
             title=f'Entry {i}',
             link=f'https://example.com/{i}',
             timestamp=datetime(2021, 1, 2, 3 + i, tzinfo=timezone.utc),
+            categories=['Cool'],
         )
 
 
@@ -122,3 +124,34 @@ async def test_delete_subscription(client, a_subscription):
     soup = BeautifulSoup(await response.text(), 'html.parser')
     feed_links = [a['href'] for a in soup.select('table td a[href]')]
     assert feed_links == []
+
+
+@pytest.fixture
+def mock_top_categories():
+    with mock.patch('skim.frontend.categories.top_categories_by_month') as top:
+        top.return_value = {
+            (datetime(2022, 9, 1), datetime(2022, 10, 1)): ['a', 'b', 'c'],
+            (datetime(2022, 8, 1), datetime(2022, 9, 1)): ['b', 'c', 'd'],
+            (datetime(2022, 7, 1), datetime(2022, 8, 1)): ['d', 'c', 'b'],
+        }
+        yield top
+
+
+async def test_list_hot_topics(client, mock_top_categories):
+    response = await client.get('/hot')
+    assert response.status == 200
+    assert response.headers['Content-Type'] == 'text/html; charset=utf-8'
+
+    soup = BeautifulSoup(await response.text(), 'html.parser')
+    category_links = [a['href'] for a in soup.select('ol li a[href]')]
+    assert category_links == [
+        '/?category=a&older-than=2022-10-01T00%3A00%3A00',
+        '/?category=b&older-than=2022-10-01T00%3A00%3A00',
+        '/?category=c&older-than=2022-10-01T00%3A00%3A00',
+        '/?category=b&older-than=2022-09-01T00%3A00%3A00',
+        '/?category=c&older-than=2022-09-01T00%3A00%3A00',
+        '/?category=d&older-than=2022-09-01T00%3A00%3A00',
+        '/?category=d&older-than=2022-08-01T00%3A00%3A00',
+        '/?category=c&older-than=2022-08-01T00%3A00%3A00',
+        '/?category=b&older-than=2022-08-01T00%3A00%3A00',
+    ]

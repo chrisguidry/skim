@@ -6,6 +6,8 @@ services:
       - POSTGRES_DB=skim
       - POSTGRES_USER=skim
       - POSTGRES_PASSWORD=skim-password
+    ports:
+      - 15432:5432
     volumes:
       - postgres-data:/var/lib/postgresql/data
   test-database:

@@ -5,7 +5,7 @@ import humanize
 from aiohttp import web
 from aiohttp_jinja2 import template
 
-from skim import dates, entries, opml, subscriptions
+from skim import categories, dates, entries, opml, subscriptions
 
 routes = web.RouteTableDef()
 
@@ -59,6 +59,12 @@ async def home(request):
             s['feed']: s async for s in subscriptions.all_subscriptions()
         },
     }
+
+
+@routes.get("/hot")
+@template("hot.html")
+async def hot(request):
+    return {'months': await categories.top_categories_by_month()}
 
 
 @routes.get('/subscriptions')

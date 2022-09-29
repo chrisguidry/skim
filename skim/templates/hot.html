@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+{% for start, end in months %}
+<h1>{{start.year}}-{{start.month}}</h1>
+<ol>
+    {% set categories = months[(start, end)] %}
+    {% for category in categories %}
+    <li><a href="/?category={{category|urlencode}}&older-than={{end.isoformat()|urlencode}}">{{category}}</a></li>
+    {% endfor %}
+</ol>
+{% endfor %}
+{% endblock %}
