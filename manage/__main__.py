@@ -89,8 +89,6 @@ try:
 except (KeyError, IndexError):
     command = help
 
-skim.configure_metrics()
-
 tracer = trace.get_tracer('skim.manage')
 with tracer.start_as_current_span(command.__name__):
     command()

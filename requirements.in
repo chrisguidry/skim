@@ -10,6 +10,7 @@ humanize
 lxml
 opentelemetry-api
 opentelemetry-container-distro
+opentelemetry-distro
 opentelemetry-sdk
 opentelemetry-instrumentation-aiohttp-client
 opentelemetry-instrumentation-asyncpg
