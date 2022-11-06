@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import os
 
 from aiohttp import ClientConnectionError, ClientSession, ClientTimeout
@@ -6,6 +7,7 @@ from opentelemetry import metrics, trace
 
 from skim import entries, normalize, parse, subscriptions
 
+logger = logging.getLogger(__name__)
 tracer = trace.get_tracer(__name__)
 meter = metrics.get_meter(__name__)  # type: ignore
 
@@ -13,17 +15,23 @@ new_entries_counter = meter.create_counter(
     'new_entries', '{entries}', 'The number of new entries crawled'
 )
 
-MAX_CONCURRENT = int(os.getenv('SKIM_CRAWL_CONCURRENCY') or '2') or 2
+MAX_CONCURRENT = int(os.getenv('SKIM_CRAWL_CONCURRENCY') or '8') or 8
 
 
 async def crawl():
-    fetches = [
-        fetch_and_save(subscription)
-        async for subscription in subscriptions.all_subscriptions()
+    to_fetch = [
+        subscription async for subscription in subscriptions.all_subscriptions()
     ]
-    while fetches:
-        batch, fetches = fetches[:MAX_CONCURRENT], fetches[MAX_CONCURRENT:]
-        await asyncio.gather(*batch)
+    while to_fetch:
+        batch, to_fetch = to_fetch[:MAX_CONCURRENT], to_fetch[MAX_CONCURRENT:]
+        results = await asyncio.gather(
+            *[fetch_and_save(subscription) for subscription in batch],
+            return_exceptions=True,
+        )
+        for i, result in enumerate(results):
+            if isinstance(result, Exception):
+                subscription = batch[i]
+                logger.warning('Exception crawling %s: %r', subscription, result)
 
 
 async def fetch_and_save(subscription):
