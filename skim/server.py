@@ -10,6 +10,8 @@ from . import frontend
 
 tracer = trace.get_tracer(__name__)
 
+server_routes = web.RouteTableDef()
+
 
 def create_application():
     app = web.Application(middlewares=[trace_requests])
@@ -29,12 +31,22 @@ def create_application():
     )
 
     app.add_routes(frontend.routes)
+    app.add_routes(server_routes)
     return app
 
 
+@server_routes.get('/health')
+async def health(request: web.Request):
+    return web.Response(status=204)
+
+
 @web.middleware
-async def trace_requests(request, handler):
+async def trace_requests(request: web.Request, handler):
     route = request.match_info.route
+
+    if route.resource and route.resource.canonical == '/health':
+        return await handler(request)
+
     canonical_name = route.resource.canonical if route.resource else 'TODO'
     with tracer.start_as_current_span(
         f'{route.method} {canonical_name}',
@@ -44,9 +56,9 @@ async def trace_requests(request, handler):
             {
                 SpanAttributes.HTTP_METHOD: request.method,
                 SpanAttributes.HTTP_SCHEME: request.scheme,
-                SpanAttributes.HTTP_URL: request.url,
+                SpanAttributes.HTTP_URL: str(request.url),
                 SpanAttributes.HTTP_HOST: request.headers['Host'],
-                SpanAttributes.HTTP_USER_AGENT: request.headers.get('User-Agent'),
+                SpanAttributes.HTTP_USER_AGENT: request.headers.get('User-Agent', ''),
                 SpanAttributes.HTTP_ROUTE: canonical_name,
             }
         )
