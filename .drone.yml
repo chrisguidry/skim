@@ -103,7 +103,8 @@ steps:
   - docker rmi $IMAGE_NAME:$IMAGE_TAG
 
 - name: notify
-  image: registry.home.theguidrys.us/44stonypoint/drone-pushover:20211105-015941
+  image: registry.home.theguidrys.us/44stonypoint/drone-pushover
+  pull: always
   when:
     status:
     - failure
