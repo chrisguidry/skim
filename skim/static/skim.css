@@ -41,6 +41,7 @@ body {
 a {
     color: var(--link-color);
 }
+
 a:visited {
     color: var(--visited-link-color);
 }
@@ -58,6 +59,7 @@ nav {
     height: 3em;
     line-height: 3em;
 }
+
 nav a {
     flex: 1;
     display: block;
@@ -66,6 +68,7 @@ nav a {
     font-style: italic;
     color: var(--text-color);
 }
+
 nav a:visited {
     color: var(--text-color);
 }
@@ -76,6 +79,7 @@ article {
     padding: 1em 0 1em 0;
     display: flex;
 }
+
 article:first-child {
     margin-top: 0;
     padding-top: 0;
@@ -89,22 +93,27 @@ article>header {
     align-self: flex-start;
     z-index: 1;
 }
+
 article>header h1 {
     font-size: 24px;
 }
+
 article>header a {
     color: var(--text-color);
     text-decoration: none;
 }
+
 article>header .site-link,
 article>header time {
     display: block;
 }
+
 article>header .creators,
 article>header .categories {
     margin: 1em 0 0 0;
     padding: 0;
 }
+
 article>header .creators li,
 article>header .categories li {
     list-style-type: none;
@@ -118,11 +127,13 @@ article>footer {
     body {
         font-size: 20px;
     }
+
     nav {
         height: 2.5em;
         line-height: 2.5em;
         filter: drop-shadow(0px -4px 4px var(--elevation-shadow));
     }
+
     article {
         display: block;
         margin: 0;
@@ -130,6 +141,7 @@ article>footer {
         padding-top: 0;
         padding-bottom: 0;
     }
+
     article>header {
         padding: 0.5em;
         background-color: var(--elevated-background-color);
@@ -137,13 +149,16 @@ article>footer {
         text-align: center;
         filter: drop-shadow(0px 4px 4px var(--elevation-shadow));
     }
+
     article>header h1 {
         font-size: 14px;
     }
+
     article>header .site-link,
     article>header time {
         display: inline-block;
     }
+
     article>header .creators,
     article>header .categories {
         display: none;
@@ -156,6 +171,7 @@ article>footer {
         height: 2em;
         line-height: 2em;
     }
+
     article>footer a {
         position: absolute;
         right: 0px;
@@ -170,6 +186,7 @@ article>footer {
         filter: drop-shadow(0px -4px 4px var(--elevation-shadow));
         text-align: right;
     }
+
     article>footer a:visited {
         color: var(--text-color);
     }
@@ -192,13 +209,16 @@ article>.article-body {
 .article-body * {
     max-width: 100% !important;
 }
+
 .article-body img {
     height: auto !important;
 }
 
 .article-body .video {
     position: relative;
-    padding-bottom: 56.25%;  /* 16:9 */;
+    padding-bottom: 56.25%;
+    /* 16:9 */
+    ;
     padding-top: 30px;
     height: 0;
     overflow: hidden;
@@ -221,6 +241,14 @@ article>.article-body {
     margin-right: 1.5em;
 }
 
+.article-body figcaption {
+    font-style: italic;
+}
+
+.article-body figcaption em {
+    font-style: normal;
+}
+
 /*
 for paragraphs that have some kind of embedded style, force them to at least
 be left justified
@@ -240,4 +268,57 @@ be left justified
 
 table th {
     text-align: left;
+}
+
+.article-body h1 {
+    font-size: 1.5em;
+    line-height: 1.2em;
+}
+
+/* hiding social media buttons/links/icons */
+.article-body .social-icons {
+    display: none;
+}
+
+/* publisher-specific fixes */
+
+/* NASA */
+.article-body .wp-block-nasa-blocks-article-intro p.label,
+.article-body .wp-block-nasa-blocks-related-articles,
+.article-body .wp-block-nasa-blocks-topic-cards,
+.article-body .wp-block-nasa-blocks-related-link,
+.article-body .wp-block-nasa-blocks-credits-and-details {
+    display: none;
+}
+
+.article-body .wp-block-nasa-blocks-blockquote {
+    margin-left: 1.5em;
+    margin-right: 1.5em;
+    margin-bottom: 2em;
+}
+
+.article-body .wp-block-nasa-blocks-blockquote .blockquote-icon {
+    display: none;
+}
+
+.article-body .wp-block-nasa-blocks-blockquote .blockquote-content h2 {
+    font-weight: normal;
+    font-size: 1em;
+    font-style: italic;
+}
+
+.article-body .wp-block-nasa-blocks-blockquote .blockquote-content .blockquote-credit-name,
+.article-body .wp-block-nasa-blocks-blockquote .blockquote-content .blockquote-credit-title {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+}
+
+.article-body .hds-carousel-nav {
+    display: none;
+}
+
+
+/* https://www.astro.gla.ac.uk/ */
+.article-body img.wp-post-image {
+    display: none !important;
 }
