@@ -1,10 +1,11 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from unittest import mock
 
 import pytest
 from bs4 import BeautifulSoup
+from markupsafe import Markup
 
-from skim import entries, server, subscriptions
+from skim import dates, entries, frontend, server, subscriptions
 
 
 @pytest.fixture
@@ -155,3 +156,44 @@ async def test_list_hot_topics(client, mock_top_categories):
         '/?category=c&older-than=2022-08-01T00%3A00%3A00',
         '/?category=b&older-than=2022-08-01T00%3A00%3A00',
     ]
+
+
+async def test_sparklines():
+    base_time = dates.utcnow()
+    sparkline = frontend.crawl_sparkline(
+        {
+            "earliest_crawl": base_time,
+            "p95_new_entries": 3,
+            "recent_crawls": [
+                {
+                    "crawled": base_time + timedelta(seconds=1),
+                    "new_entries": 1,
+                    "status": 200,
+                },
+                {
+                    "crawled": base_time + timedelta(seconds=2),
+                    "new_entries": 0,
+                    "status": 304,
+                },
+                {
+                    "crawled": base_time + timedelta(seconds=3),
+                    "new_entries": 0,
+                    "status": -1,
+                },
+                {
+                    "crawled": base_time + timedelta(seconds=4),
+                    "new_entries": 0,
+                    "status": 404,
+                },
+                {
+                    "crawled": None,
+                    "new_entries": None,
+                    "status": None,
+                },
+            ],
+        }
+    )
+    assert isinstance(sparkline, Markup)
+    assert sparkline.startswith("<svg")
+
+    # TODO: more tests here

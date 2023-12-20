@@ -28,6 +28,7 @@ def create_application():
         query_string=frontend.query_string,
         time_ago=frontend.time_ago,
         static_file=partial(frontend.static_file, app),
+        crawl_sparkline=frontend.crawl_sparkline,
     )
 
     app.add_routes(frontend.routes)

@@ -1,47 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
+<form method="POST">
   <table class="subscriptions">
-    <tr>
-      <th>Icon</th>
-      <th>Title</th>
-      <th>Feed</th>
-      <th>Delete</th>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td>
-        <form method="POST">
+    <thead>
+      <tr>
+        <th class="icon"></th>
+        <th class="feed">
           <input type="text" name="feed" placeholder="add a new feed" />
+        </th>
+        <th class="action">
           <input type="submit" name="action" value="add" />
-        </form>
-      </td>
-      <td></td>
-    </tr>
+        </th>
+      </tr>
+    </thead>
     {%- for subscription in subscriptions %}
     <tr>
-      <td>
+      <td class="icon">
         {%- if subscription.icon %}
-        <img src="{{subscription.icon}}" class="icon"/>
+        <img src="{{subscription.icon}}" class="icon" />
         {%- endif %}
       </td>
-      <td>
-        <a href="/?feed={{subscription.feed}}">
-        {% if subscription.title %}
-        {{subscription.title}}
-        {% elif subscription.site %}
-        {{subscription.site}}
-        {% else %}
-        {{subscription.feed}}
-        {% endif %}
+      <td class="feed">
+        <a href="/?feed={{subscription.feed}}" class="title">
+          {% if subscription.title %}
+          {{subscription.title}}
+          {% elif subscription.site %}
+          {{subscription.site}}
+          {% else %}
+          {{subscription.feed}}
+          {% endif %}
         </a>
-      </td>
-      <td>
-        <a href="{{subscription.feed}}" target="_blank">
-        {{subscription.feed}}
+        <br />
+        <a href="{{subscription.feed}}" target="_blank" class="feed">
+          {{subscription.feed}}
         </a>
+        <br />
+        {{ subscription|crawl_sparkline }}
       </td>
-      <td>
+      <td class="action">
         <form method="POST">
           <input type="hidden" name="feed" value="{{subscription.feed}}" />
           <input type="submit" name="action" value="delete" />
@@ -50,4 +46,5 @@
     </tr>
     {%- endfor %}
   </table>
+</form>
 {% endblock %}

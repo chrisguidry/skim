@@ -5,7 +5,7 @@ import pytest
 from aioresponses import aioresponses
 from yarl import URL
 
-from skim import crawl, parse, subscriptions
+from skim import crawl, dates, parse, subscriptions
 
 
 @pytest.fixture
@@ -19,7 +19,11 @@ async def two_subscriptions(one_subscription):
 
 
 async def test_crawl(two_subscriptions):
-    with mock.patch('skim.crawl.fetch') as fetch:
+    crawl_time = dates.utcnow()
+    with mock.patch('skim.crawl.fetch') as fetch, mock.patch(
+        'skim.subscriptions.dates.utcnow'
+    ) as utcnow:
+        utcnow.return_value = crawl_time
         with mock.patch.object(crawl, 'MAX_CONCURRENT', 1):
             fetch.side_effect = [
                 (
@@ -54,6 +58,12 @@ async def test_crawl(two_subscriptions):
                 'site': None,
                 'icon': None,
                 'caching': None,
+                'recent_crawls': [
+                    {'crawled': crawl_time, 'new_entries': 1, 'status': 200}
+                ],
+                'earliest_crawl': crawl_time,
+                'p95_new_entries': 1,
+                'total_new_entries': 1,
             },
             'https://example.com/2': {
                 'feed': 'https://example.com/2',
@@ -61,6 +71,12 @@ async def test_crawl(two_subscriptions):
                 'site': None,
                 'icon': None,
                 'caching': None,
+                'recent_crawls': [
+                    {'crawled': crawl_time, 'new_entries': 1, 'status': 200}
+                ],
+                'earliest_crawl': crawl_time,
+                'p95_new_entries': 1,
+                'total_new_entries': 1,
             },
         }
 
@@ -69,7 +85,6 @@ async def test_crawl_fetch_errors(one_subscription):
     with mock.patch('skim.crawl.fetch') as fetch, mock.patch(
         'skim.crawl.subscriptions.log_crawl'
     ) as log_crawl:
-
         fetch.return_value = (
             'https://example.com/1',
             mock.Mock(status=543, content_type='application/rss+xml'),
@@ -88,7 +103,6 @@ async def test_crawl_timeout(one_subscription):
     with mock.patch('skim.crawl.fetch') as fetch, mock.patch(
         'skim.crawl.subscriptions.log_crawl'
     ) as log_crawl:
-
         fetch.side_effect = asyncio.TimeoutError()
 
         await crawl.crawl()
@@ -102,7 +116,6 @@ async def test_crawl_parseerror(one_subscription):
     with mock.patch('skim.crawl.fetch') as fetch, mock.patch(
         'skim.crawl.subscriptions.log_crawl'
     ) as log_crawl:
-
         fetch.side_effect = parse.ParseError()
 
         await crawl.crawl()
@@ -114,7 +127,6 @@ async def test_crawl_parseerror(one_subscription):
 
 async def test_crawl_unhandled(caplog, one_subscription):
     with mock.patch('skim.crawl.fetch') as fetch:
-
         fetch.side_effect = ValueError('This went poorly')
 
         await crawl.crawl()

@@ -196,6 +196,42 @@ article>footer {
     }
 }
 
+table.subscriptions td {
+    padding-bottom: 1.25em
+}
+
+table.subscriptions thead th {
+    padding-bottom: 1.5em;
+}
+
+table.subscriptions td.icon {
+    vertical-align: top;
+    padding-top: 8px;
+    padding-right: 8px;
+}
+
+table.subscriptions th.feed {
+    width: 100%;
+    padding-right: 1em;
+}
+
+table.subscriptions th.feed input {
+    width: 100%;
+}
+
+table.subscriptions td.feed a.feed {
+    font-size: 14px;
+}
+
+table.subscriptions th.action,
+table.subscriptions td.action {
+    width: 3em;
+    text-align: center;
+}
+
+
+/* article body styles */
+
 article>.article-body {
     flex: 3;
     order: 2;

@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 import humanize
 from aiohttp import web
 from aiohttp_jinja2 import template
+from markupsafe import Markup
 
 from skim import categories, dates, entries, opml, subscriptions
 
@@ -34,6 +35,64 @@ def query_string(query):
 
 def static_file(app, filename):
     return app.router['static'].url_for(filename=filename)
+
+
+def crawl_sparkline(subscription):
+    recent_crawls = subscription['recent_crawls']
+
+    earliest_crawl = subscription['earliest_crawl']
+    if not earliest_crawl:
+        return ""
+
+    now = dates.utcnow()
+    timerange = now - earliest_crawl
+
+    width = 336
+    height = max(8, subscription['p95_new_entries'])
+
+    bottom = height
+    second_width = width / timerange.total_seconds()
+
+    lines = []
+
+    for crawl in recent_crawls:
+        if not crawl['crawled']:
+            continue
+        x = second_width * (crawl['crawled'] - earliest_crawl).total_seconds()
+        y = crawl['new_entries'] or 0
+
+        match crawl['status']:
+            case _ if 200 <= crawl['status'] < 300:
+                color = 'green'
+                y = y or -1
+                opacity = 0.3 if y == -1 else 1.0
+            case 304:
+                color = 'green'
+                y = -1
+                opacity = 0.05
+            case _:
+                color = 'red'
+                y = -1
+                opacity = 0.8
+
+        lines.append(
+            f'<line x1="{x}" y1="{bottom}" x2="{x}" y2="{bottom - y}" '
+            f'stroke="{color}" stroke-opacity="{opacity}" />'
+        )
+
+    return Markup(
+        f"""
+        <svg
+            class="sparkline"
+            viewBox="0 0 {width} {height + 2}"
+            preserveAspectRatio="none"
+            vector-effect="non-scaling-stroke"
+            role="img"
+            xmlns="http://www.w3.org/2000/svg">
+            {" ".join(lines)}
+        </svg>
+    """.strip()
+    )
 
 
 @routes.get('/')

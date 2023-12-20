@@ -3,12 +3,58 @@ import json
 from skim import database, dates
 
 
-async def all_subscriptions():
+async def all_subscriptions(lookback='14 day'):
     async with database.connection() as db:
-        query = """
-        SELECT  *
+        query = f"""
+        SELECT  subscriptions.feed,
+                subscriptions.title,
+                subscriptions.site,
+                subscriptions.caching,
+                subscriptions.icon,
+                ARRAY_AGG(
+                    ROW(
+                        crawls.crawled,
+                        crawls.status,
+                        crawls.new_entries
+                    )
+                ) AS recent_crawls,
+                SUM(crawls.new_entries) AS total_new_entries,
+                (
+                    SELECT MIN(crawled)
+                    FROM   crawl_log
+                    WHERE  (
+                        crawled >=
+                        date_trunc('day', current_timestamp - interval '{lookback}')
+                    )
+                ) AS earliest_crawl,
+                (
+                    SELECT percentile_disc(0.999) within group (order by new_entries)
+                    FROM   crawl_log
+                    WHERE  (
+                        crawled >=
+                        date_trunc('day', current_timestamp - interval '{lookback}')
+                    )
+                ) AS p95_new_entries
         FROM    subscriptions
-        ORDER BY title
+                LEFT JOIN (
+                    SELECT  feed,
+                            crawled,
+                            status,
+                            new_entries
+                    FROM    crawl_log
+                    WHERE   (
+                        crawled >=
+                        date_trunc('day', current_timestamp - interval '{lookback}')
+                    )
+                    ORDER BY feed, crawled
+                ) crawls
+                ON crawls.feed = subscriptions.feed
+        GROUP BY subscriptions.feed,
+                subscriptions.title,
+                subscriptions.site,
+                subscriptions.caching,
+                subscriptions.icon
+        ORDER BY subscriptions.title
         """
         for row in await db.fetch(query):
             yield subscription_from_row(row)
@@ -59,6 +105,11 @@ def subscription_from_row(row):
     subscription = dict(row)
     if subscription['caching']:
         subscription['caching'] = json.loads(subscription['caching'])
+    if 'recent_crawls' in subscription:
+        crawls_columns = ['crawled', 'status', 'new_entries']
+        subscription['recent_crawls'] = [
+            dict(zip(crawls_columns, c)) for c in subscription['recent_crawls']
+        ]
     return subscription
 
 
