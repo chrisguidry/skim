@@ -89,6 +89,8 @@ def test_normalizing_titles():
     assert normalize.title('hello &gt; world') == 'hello > world'
     assert normalize.title('hello > world') == 'hello > world'
     assert normalize.title('<em>hello</em>') == '<em>\n hello\n</em>'
+    # a goofy thing observed on a real feed
+    assert normalize.title('and#039;foo and#042; barand#039;') == "'foo * bar'"
 
 
 def test_normalizing_lists():
@@ -266,6 +268,13 @@ def test_embedding_empty_enclosure():
     )
     assert normalized['body'] == '<p>\n Hello, world!\n</p>'
 
+    normalized = normalize.entry(
+        {
+            'content': 'Hello, world!',
+            'enclosure': {'url': 'foo', 'type': None},
+        }
+    )
+    assert normalized['body'] == '<p>\n Hello, world!\n</p>'
 
 def test_embedding_unrecognized_media_type():
     normalized = normalize.entry(
@@ -347,6 +356,34 @@ def test_embedding_multiple_image_enclosures():
             '</picture>',
             '<p>',
             ' Hello, world!',
+            '</p>',
+        ]
+    )
+
+
+def test_skipping_enclosures_already_in_content():
+    normalized = normalize.entry(
+        {
+            'content': 'Hello, world! http://example.com/image-1.png is pretty, right?',
+            'enclosure': [
+                {
+                    'href': 'http://example.com/image-1.png',
+                    'type': 'image/png',
+                },
+                {
+                    'href': 'http://example.com/image-2.png',
+                    'type': 'image/png',
+                },
+            ],
+        }
+    )
+    assert normalized['body'] == '\n'.join(
+        [
+            '<picture class="enclosure">',
+            ' <img src="http://example.com/image-2.png"/>',
+            '</picture>',
+            '<p>',
+            ' Hello, world! http://example.com/image-1.png is pretty, right?',
             '</p>',
         ]
     )

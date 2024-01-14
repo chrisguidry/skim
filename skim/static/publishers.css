@@ -1,0 +1,59 @@
+/* publisher-specific fixes */
+
+/* hiding social media buttons/links/icons on many sites */
+.article-body .social-icons {
+    display: none;
+}
+
+/* NASA */
+
+.article-body .wp-block-nasa-blocks-article-intro p.label,
+.article-body .wp-block-nasa-blocks-related-articles,
+.article-body .wp-block-nasa-blocks-topic-cards,
+.article-body .wp-block-nasa-blocks-related-link,
+.article-body .wp-block-nasa-blocks-credits-and-details {
+    display: none;
+}
+
+.article-body .wp-block-nasa-blocks-blockquote {
+    margin-left: 1.5em;
+    margin-right: 1.5em;
+    margin-bottom: 2em;
+}
+
+.article-body .wp-block-nasa-blocks-blockquote .blockquote-icon {
+    display: none;
+}
+
+.article-body .wp-block-nasa-blocks-blockquote .blockquote-content h2 {
+    font-weight: normal;
+    font-size: 1em;
+    font-style: italic;
+}
+
+.article-body .wp-block-nasa-blocks-blockquote .blockquote-content .blockquote-credit-name,
+.article-body .wp-block-nasa-blocks-blockquote .blockquote-content .blockquote-credit-title {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+}
+
+.article-body .hds-carousel-nav {
+    display: none;
+}
+
+
+/* https://www.astro.gla.ac.uk/ */
+
+.article-body img.wp-post-image {
+    display: none !important;
+}
+
+
+/*
+   sites using the Ghost blogging platform may have an embedded bookmark to the current
+   article, which renders bonkers big
+*/
+
+.article-body figure.kg-bookmark-card {
+    display: none;
+}

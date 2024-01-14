@@ -1,4 +1,5 @@
 import html
+import re
 from datetime import timezone
 from urllib.parse import urljoin, urlparse
 
@@ -156,6 +157,11 @@ def title(content):
     if not content:
         return content
 
+    # pre-filter, convert mistakenly decoded HTML entities back into entities
+    # Observed in a real feed, all instances of '&' replaced by 'and', so
+    # '&#039;A Quote&#039;' became 'and#039;A Quoteand#039;'
+    content = re.sub(r'and(#\d+;)', r'&\1', content)
+
     soup = BeautifulSoup(content, features='html.parser')
     return html.unescape(soup.prettify().strip())
 
@@ -175,6 +181,8 @@ def markup(content, base_url='', enclosures=None):
 
     enclosures = list_or_none(enclosures)
     if enclosures:
+        # filter to only enclosures that aren't already present in the content
+        enclosures = [e for e in enclosures if (enclosure_url(e) or '') not in content]
         tags = [embed_enclosure(soup, enclosure) for enclosure in enclosures]
         for i, tag in enumerate(filter(None, tags)):
             soup.insert(i, tag)
@@ -195,8 +203,12 @@ def markup(content, base_url='', enclosures=None):
     return soup.prettify()
 
 
+def enclosure_url(enclosure):
+    return enclosure.get('url') or enclosure.get('href')
+
+
 def embed_enclosure(soup, enclosure):
-    url = enclosure.get('url') or enclosure.get('href')
+    url = enclosure_url(enclosure)
     media_type = enclosure.get('type')
     if not url or not media_type:
         return None

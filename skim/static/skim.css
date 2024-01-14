@@ -119,6 +119,10 @@ article>header .categories li {
     list-style-type: none;
 }
 
+article>header .categories {
+    font-size: 19px;
+}
+
 article>footer {
     display: none;
 }
@@ -154,12 +158,24 @@ article>footer {
         font-size: 14px;
     }
 
-    article>header .site-link,
-    article>header time {
-        display: inline-block;
+    article>header time,
+    article>header .creators,
+    article>header .creators li {
+        display: inline;
     }
 
-    article>header .creators,
+    article>header time::after {
+        content: ' · '
+    }
+
+    article>header .creators li::after {
+        content: ', ';
+    }
+
+    article>header .creators {
+        margin: 0;
+    }
+
     article>header .categories {
         display: none;
     }
@@ -244,10 +260,38 @@ article>.article-body {
 
 .article-body * {
     max-width: 100% !important;
+    white-space: normal !important;
+}
+
+.article-body>*:first-child {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.article-body>p:first-child {
+    margin-top: 0.6666em;
+}
+
+.article-body h1,
+.article-body h2,
+.article-body h3,
+.article-body h4,
+.article-body h5,
+.article-body h6 {
+    text-align: left !important;
+}
+
+.article-body figure {
+    margin-left: 0px
 }
 
 .article-body img {
     height: auto !important;
+}
+
+.article-body audio,
+.article-body iframe.podcast {
+    width: 100%;
 }
 
 .article-body .video {
@@ -311,50 +355,15 @@ table th {
     line-height: 1.2em;
 }
 
-/* hiding social media buttons/links/icons */
-.article-body .social-icons {
-    display: none;
-}
+@media only screen and (max-width: 800px) {
 
-/* publisher-specific fixes */
+    article>.article-body {
+        margin-top: 0.5em;
+    }
 
-/* NASA */
-.article-body .wp-block-nasa-blocks-article-intro p.label,
-.article-body .wp-block-nasa-blocks-related-articles,
-.article-body .wp-block-nasa-blocks-topic-cards,
-.article-body .wp-block-nasa-blocks-related-link,
-.article-body .wp-block-nasa-blocks-credits-and-details {
-    display: none;
-}
+    /* hide embedded PDFs on mobile */
+    .article-body object[type="application/pdf"] {
+        display: none;
+    }
 
-.article-body .wp-block-nasa-blocks-blockquote {
-    margin-left: 1.5em;
-    margin-right: 1.5em;
-    margin-bottom: 2em;
-}
-
-.article-body .wp-block-nasa-blocks-blockquote .blockquote-icon {
-    display: none;
-}
-
-.article-body .wp-block-nasa-blocks-blockquote .blockquote-content h2 {
-    font-weight: normal;
-    font-size: 1em;
-    font-style: italic;
-}
-
-.article-body .wp-block-nasa-blocks-blockquote .blockquote-content .blockquote-credit-name,
-.article-body .wp-block-nasa-blocks-blockquote .blockquote-content .blockquote-credit-title {
-    margin-top: 0.25em;
-    margin-bottom: 0.25em;
-}
-
-.article-body .hds-carousel-nav {
-    display: none;
-}
-
-
-/* https://www.astro.gla.ac.uk/ */
-.article-body img.wp-post-image {
-    display: none !important;
 }
